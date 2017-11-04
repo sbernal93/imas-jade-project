@@ -1,22 +1,3 @@
-Skip to content
-This repository
-Search
-Pull requests
-Issues
-Marketplace
-Explore
- @sbernal93
- Sign out
- Watch 2,286
-  Star 56,977
-  Fork 25,113 github/gitignore
- Code  Pull requests 160  Projects 0  Insights
-Branch: master Find file Copy pathgitignore/Global/Eclipse.gitignore
-0674ff5  on Mar 28
-@raeglan raeglan .project and .classpath should be inside VC
-22 contributors @sherzodv @tyutyutyu @shiftkey @aroben @Utumno @sveyret @segfly @drasolka @rlee287 @raeglan @mimibar @fhemberger @leandrodeleite @jcarsique @harshadsabne @gAmUssA @DenisGorbachev @pangratz @defunkt @arinto @apetresc @alexkaratarakis
-RawBlameHistory    
-51 lines (37 sloc)  684 Bytes
 
 .metadata
 bin/
