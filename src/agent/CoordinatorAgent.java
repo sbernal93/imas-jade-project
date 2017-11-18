@@ -19,6 +19,7 @@ package agent;
 
 import onthology.GameSettings;
 import behaviour.coordinator.RequesterBehaviour;
+import behaviour.coordinator.RequestResponseBehaviour;
 import onthology.MessageContent;
 import jade.core.*;
 import jade.domain.*;
@@ -34,6 +35,10 @@ import jade.lang.acl.*;
 public class CoordinatorAgent extends ImasAgent {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
      * Game settings in use.
      */
     private GameSettings game;
@@ -41,6 +46,11 @@ public class CoordinatorAgent extends ImasAgent {
      * System agent id.
      */
     private AID systemAgent;
+    
+    /**
+     * DiggerCoordinatorAgent id
+     */
+    private AID diggerCoordinatorAgent;
 
     /**
      * Builds the coordinator agent.
@@ -81,6 +91,12 @@ public class CoordinatorAgent extends ImasAgent {
         ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.SYSTEM.toString());
         this.systemAgent = UtilsAgents.searchAgent(this, searchCriterion);
+        
+        searchCriterion = new ServiceDescription();
+        searchCriterion.setType(AgentType.DIGGER_COORDINATOR.toString());
+        this.diggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
+        // searchAgent is a blocking method, so we will obtain always a correct AID
+
         // searchAgent is a blocking method, so we will obtain always a correct AID
 
         /* ********************************************************************/
@@ -98,9 +114,18 @@ public class CoordinatorAgent extends ImasAgent {
 
         //we add a behaviour that sends the message and waits for an answer
         this.addBehaviour(new RequesterBehaviour(this, initialRequest));
+        
+       
+        // add behaviours
+        // we wait for the initialization of the game
+        MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
+
+        this.addBehaviour(new RequestResponseBehaviour(this, mt));
+
 
         // setup finished. When we receive the last inform, the agent itself will add
         // a behaviour to send/receive actions
+        System.out.println("Finished setup");
     }
 
     /**

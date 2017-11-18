@@ -26,6 +26,11 @@ import jade.core.Agent;
 public class ImasAgent extends Agent {
     
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
      * Type of this agent.
      */
     protected AgentType type;

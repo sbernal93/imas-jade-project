@@ -20,6 +20,7 @@ package behaviour.coordinator;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import jade.proto.AchieveREInitiator;
+import agent.AgentType;
 import agent.CoordinatorAgent;
 import onthology.GameSettings;
 
@@ -34,7 +35,12 @@ import onthology.GameSettings;
  */
 public class RequesterBehaviour extends AchieveREInitiator {
 
-    public RequesterBehaviour(CoordinatorAgent agent, ACLMessage requestMsg) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public RequesterBehaviour(CoordinatorAgent agent, ACLMessage requestMsg) {
         super(agent, requestMsg);
         agent.log("Started behaviour to deal with AGREEs");
     }

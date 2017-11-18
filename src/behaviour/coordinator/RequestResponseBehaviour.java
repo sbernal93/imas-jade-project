@@ -1,32 +1,15 @@
-/**
- *  IMAS base code for the practical work.
- *  Copyright (C) 2014 DEIM - URV
- *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-package behaviour.system;
+package behaviour.coordinator;
 
-import agent.SystemAgent;
+import agent.CoordinatorAgent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREResponder;
 import onthology.MessageContent;
 
 /**
- * A request-responder behaviour for System agent, answering to queries
- * from the Coordinator agent. The Coordinator Agent sends a REQUEST of the whole
- * game information and the System Agent sends an AGREE and then an INFORM
+ * A request-responder behaviour for the Coordinator agent, answering to queries
+ * from the other Coordinator agents. The DiggerCoordinator Agent sends a REQUEST of the whole
+ * game information and the Coordinator Agent sends an AGREE and then an INFORM
  * with the city information.
  */
 public class RequestResponseBehaviour extends AchieveREResponder {
@@ -42,13 +25,13 @@ public class RequestResponseBehaviour extends AchieveREResponder {
      * @param agent The agent owning this behaviour
      * @param mt Template to receive future responses in this conversation
      */
-    public RequestResponseBehaviour(SystemAgent agent, MessageTemplate mt) {
+    public RequestResponseBehaviour(CoordinatorAgent agent, MessageTemplate mt) {
         super(agent, mt);
         agent.log("Waiting REQUESTs from authorized agents");
     }
 
     /**
-     * When System Agent receives a REQUEST message, it agrees. Only if
+     * When the Coordinator Agent receives a REQUEST message, it agrees. Only if
      * message type is AGREE, method prepareResultNotification() will be invoked.
      *
      * @param msg message received.
@@ -56,13 +39,18 @@ public class RequestResponseBehaviour extends AchieveREResponder {
      */
     @Override
     protected ACLMessage prepareResponse(ACLMessage msg) {
-        SystemAgent agent = (SystemAgent)this.getAgent();
+    	CoordinatorAgent agent = (CoordinatorAgent)this.getAgent();
         ACLMessage reply = msg.createReply();
         try {
             Object content = (Object) msg.getContent();
             if (content.equals(MessageContent.GET_MAP)) {
                 agent.log("Request received");
-                reply.setPerformative(ACLMessage.AGREE);
+                if(agent.getGame() == null) {
+                	agent.log("Game is null, need to get it from SystemAgent first");
+                    reply.setPerformative(ACLMessage.FAILURE);
+                } else {
+                    reply.setPerformative(ACLMessage.AGREE);
+                }
             }
         } catch (Exception e) {
             reply.setPerformative(ACLMessage.FAILURE);
@@ -91,12 +79,11 @@ public class RequestResponseBehaviour extends AchieveREResponder {
 
         // it is important to make the createReply in order to keep the same context of
         // the conversation
-        SystemAgent agent = (SystemAgent)this.getAgent();
+    	CoordinatorAgent agent = (CoordinatorAgent) this.getAgent();
         ACLMessage reply = msg.createReply();
         reply.setPerformative(ACLMessage.INFORM);
 
         try {
-            agent.addElementsForThisSimulationStep();
             reply.setContentObject(agent.getGame());
         } catch (Exception e) {
             reply.setPerformative(ACLMessage.FAILURE);
