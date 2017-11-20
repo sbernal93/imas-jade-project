@@ -22,6 +22,7 @@ import jade.lang.acl.ACLMessage;
 import jade.proto.AchieveREInitiator;
 import agent.AgentType;
 import agent.CoordinatorAgent;
+import behaviour.BaseRequesterBehaviour;
 import onthology.GameSettings;
 
 /**
@@ -33,7 +34,7 @@ import onthology.GameSettings;
  * NOTE: The game is processed by another behaviour that we add after the 
  * INFORM has been processed.
  */
-public class RequesterBehaviour extends AchieveREInitiator {
+public class RequesterBehaviour extends BaseRequesterBehaviour<CoordinatorAgent> {
 
     /**
 	 * 
@@ -45,17 +46,7 @@ public class RequesterBehaviour extends AchieveREInitiator {
         agent.log("Started behaviour to deal with AGREEs");
     }
 
-    /**
-     * Handle AGREE messages
-     *
-     * @param msg Message to handle
-     */
-    @Override
-    protected void handleAgree(ACLMessage msg) {
-        CoordinatorAgent agent = (CoordinatorAgent) this.getAgent();
-        agent.log("AGREE received from " + ((AID) msg.getSender()).getLocalName());
-    }
-
+ 
     /**
      * Handle INFORM messages
      *
@@ -74,38 +65,5 @@ public class RequesterBehaviour extends AchieveREInitiator {
         }
     }
 
-    /**
-     * Handle NOT-UNDERSTOOD messages
-     *
-     * @param msg Message
-     */
-    @Override
-    protected void handleNotUnderstood(ACLMessage msg) {
-        CoordinatorAgent agent = (CoordinatorAgent) this.getAgent();
-        agent.log("This message NOT UNDERSTOOD.");
-    }
-
-    /**
-     * Handle FAILURE messages
-     *
-     * @param msg Message
-     */
-    @Override
-    protected void handleFailure(ACLMessage msg) {
-        CoordinatorAgent agent = (CoordinatorAgent) this.getAgent();
-        agent.log("The action has failed.");
-
-    } //End of handleFailure
-
-    /**
-     * Handle REFUSE messages
-     *
-     * @param msg Message
-     */
-    @Override
-    protected void handleRefuse(ACLMessage msg) {
-        CoordinatorAgent agent = (CoordinatorAgent) this.getAgent();
-        agent.log("Action refused.");
-    }
 
 }
