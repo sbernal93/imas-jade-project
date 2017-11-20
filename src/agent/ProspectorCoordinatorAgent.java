@@ -1,5 +1,8 @@
 package agent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import behaviour.TimeoutBehaviour;
 import behaviour.prospector.coordinator.RequesterBehaviour;
 import jade.core.AID;
@@ -39,7 +42,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 	 * The Agent has a list of all the prospector agents that 
 	 * are currently in the map
 	 */
-	//private List<DiggerAgent> diggerAgents;
+	private List<ProspectorAgent> prospectorAgents;
 
 	public ProspectorCoordinatorAgent() {
 		super(AgentType.PROSPECTOR_COORDINATOR);
@@ -139,6 +142,20 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
         return this.game;
     }
     
+    public void addProspectorAgent(ProspectorAgent prospectorAgent) {
+    	if(this.prospectorAgents == null) {
+    		this.prospectorAgents = new ArrayList<>();
+    	}
+    	this.prospectorAgents.add(prospectorAgent);
+    }
+
+    public List<ProspectorAgent> getProspectorAgents() {
+    	return this.prospectorAgents;
+    }
+    
+    public void setProspectorAgents(List<ProspectorAgent> prospectorAgents) {
+    	this.prospectorAgents = prospectorAgents;
+    }
 	
 
 }
