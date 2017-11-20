@@ -8,11 +8,6 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 
 public class ProspectorAgent extends ImasCellAgent {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
 	public ProspectorAgent() {
 		super(AgentType.PROSPECTOR);
 	}
