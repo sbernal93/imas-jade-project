@@ -1,26 +1,26 @@
 package agent;
 
-import behaviour.digger.RequesterBehaviour;
 import jade.core.AID;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.domain.FIPANames.InteractionProtocol;
-import jade.lang.acl.ACLMessage;
-import map.Cell;
-import onthology.MessageContent;
 
-public class DiggerAgent extends ImasCellAgent{
+public class ProspectorAgent extends ImasCellAgent {
 
-	public DiggerAgent() {
-		super(AgentType.DIGGER);
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public ProspectorAgent() {
+		super(AgentType.PROSPECTOR);
 	}
 	
 	  /**
-     * Digger Coordinator agent id.
+     * Prospector Coordinator agent id.
      */
-    private AID diggerCoordinatorAgent;
+    private AID prospectorCoordinatorAgent;
 	
     @Override
     protected void setup() {
@@ -43,10 +43,10 @@ public class DiggerAgent extends ImasCellAgent{
             doDelete();
         }
 
-        // Searches for the DiggerCoordinator Agent
+        // Searches for the ProspectorCoordinator Agent
         ServiceDescription searchCriterion = new ServiceDescription();
-        searchCriterion.setType(AgentType.DIGGER_COORDINATOR.toString());
-        this.diggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
+        searchCriterion.setType(AgentType.PROSPECTOR_COORDINATOR.toString());
+        this.prospectorCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
         System.out.println("Digger agent setup finished");
 
 

@@ -19,8 +19,6 @@ package behaviour.coordinator;
 
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
-import jade.proto.AchieveREInitiator;
-import agent.AgentType;
 import agent.CoordinatorAgent;
 import behaviour.BaseRequesterBehaviour;
 import onthology.GameSettings;
