@@ -104,7 +104,7 @@ public class DiggerCoordinatorAgent extends ImasAgent{
          * by running the setup.
          */
         SequentialBehaviour seq = new SequentialBehaviour();
-        seq.addSubBehaviour(new TimeoutBehaviour(this, 1000));
+        seq.addSubBehaviour(new TimeoutBehaviour(this, 2000));
         seq.addSubBehaviour(new RequesterBehaviour(this, initialRequest) {
 			private static final long serialVersionUID = 1L;
 			 @Override

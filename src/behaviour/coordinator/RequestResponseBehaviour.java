@@ -81,16 +81,18 @@ public class RequestResponseBehaviour extends AchieveREResponder {
         // the conversation
     	CoordinatorAgent agent = (CoordinatorAgent) this.getAgent();
         ACLMessage reply = msg.createReply();
-        reply.setPerformative(ACLMessage.INFORM);
-
-        try {
-            reply.setContentObject(agent.getGame());
-        } catch (Exception e) {
-            reply.setPerformative(ACLMessage.FAILURE);
-            agent.errorLog(e.toString());
-            e.printStackTrace();
+        if (reply.getPerformative() != ACLMessage.FAILURE) {
+	        reply.setPerformative(ACLMessage.INFORM);
+	
+	        try {
+	            reply.setContentObject(agent.getGame());
+	        } catch (Exception e) {
+	            reply.setPerformative(ACLMessage.FAILURE);
+	            agent.errorLog(e.toString());
+	            e.printStackTrace();
+	        }
+	        agent.log("Game settings sent");
         }
-        agent.log("Game settings sent");
         return reply;
 
     }
