@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import behaviour.TimeoutBehaviour;
+import behaviour.digger.coordinator.CreateDiggerAgentBehaviour;
 import behaviour.digger.coordinator.RequesterBehaviour;
 import jade.core.AID;
 import jade.core.behaviours.SequentialBehaviour;
@@ -115,6 +116,7 @@ public class DiggerCoordinatorAgent extends ImasAgent{
 			 }
         	
         });
+        seq.addSubBehaviour(new CreateDiggerAgentBehaviour(this, AgentType.DIGGER));
         this.addBehaviour(seq);
         
         // setup finished. When we receive the last inform, the agent itself will add

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import behaviour.TimeoutBehaviour;
+import behaviour.prospector.coordinator.CreateProspectorAgentBehaviour;
 import behaviour.prospector.coordinator.RequesterBehaviour;
 import jade.core.AID;
 import jade.core.behaviours.SequentialBehaviour;
@@ -118,6 +119,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 			 }
         	
         });
+        seq.addSubBehaviour(new CreateProspectorAgentBehaviour(this, AgentType.PROSPECTOR));
         this.addBehaviour(seq);
         
     }

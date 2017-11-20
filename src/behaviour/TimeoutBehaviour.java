@@ -4,11 +4,16 @@ import jade.core.Agent;
 import jade.core.behaviours.SimpleBehaviour;
 
 /**
- * 
+ *  A Timeout behaviour used to establish timeouts between behaviours
  * 
  *
  */
 public class TimeoutBehaviour extends SimpleBehaviour{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	private long timeout;
 	private long timeToWakeUp;
