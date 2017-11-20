@@ -18,33 +18,34 @@ import onthology.MessageContent;
 
 /**
  * 
- * Digger Coordinator Agent.
+ * Prospector Coordinator Agent.
  * Gets the initial Game Settings from the CoordinatorAgent, 
- * initializes the Digger Agents and sends directions to the 
- * DiggerAgents according to: New mines found or when a DiggerAgent
- * finishes digging. 
+ * initializes the Prospector Agents and sends directions to the 
+ * them according to: New mines found and new mines created
  * Updates the CoordinatorAgent with the 
- * information that each Digger did each turn
+ * information that each Propspector did each turn
  *
  */
-public class DiggerCoordinatorAgent extends ImasAgent{
+public class ProspectorCoordinatorAgent extends ImasAgent{
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
 	
 	private GameSettings game;
 	
 	private AID coordinatorAgent;
 	
 	/**
-	 * The Agent has a list of all the digger agents that 
+	 * The Agent has a list of all the prospector agents that 
 	 * are currently in the map
 	 */
-	private List<DiggerAgent> diggerAgents;
+	//private List<DiggerAgent> diggerAgents;
 
-	public DiggerCoordinatorAgent() {
-		super(AgentType.DIGGER_COORDINATOR);
+	public ProspectorCoordinatorAgent() {
+		super(AgentType.PROSPECTOR_COORDINATOR);
 	}
 
 	   /**
@@ -155,4 +156,6 @@ public class DiggerCoordinatorAgent extends ImasAgent{
     public void setDiggerAgents(List<DiggerAgent> diggerAgents) {
     	this.diggerAgents = diggerAgents;
     }
+	
+
 }
