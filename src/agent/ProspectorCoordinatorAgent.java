@@ -1,10 +1,7 @@
 package agent;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import behaviour.TimeoutBehaviour;
-import behaviour.digger.coordinator.RequesterBehaviour;
+import behaviour.prospector.coordinator.RequesterBehaviour;
 import jade.core.AID;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.DFService;
@@ -103,6 +100,8 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
          * he doesnt have the game setting available, for this case
          * we wait using the custom timeout behaviour, and we try again
          * by running the setup.
+         * 
+         * The timeout is used so we can avoid overloading the coordinator agent with requests
          */
         SequentialBehaviour seq = new SequentialBehaviour();
         seq.addSubBehaviour(new TimeoutBehaviour(this, 1000));
@@ -118,8 +117,6 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
         });
         this.addBehaviour(seq);
         
-        // setup finished. When we receive the last inform, the agent itself will add
-        // a behaviour to send/receive actions
     }
     
     
@@ -142,20 +139,6 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
         return this.game;
     }
     
-    public void addDiggerAgent(DiggerAgent diggerAgent) {
-    	if(this.diggerAgents == null) {
-    		this.diggerAgents = new ArrayList<>();
-    	}
-    	this.diggerAgents.add(diggerAgent);
-    }
-
-    public List<DiggerAgent> getDiggerAgents() {
-    	return this.diggerAgents;
-    }
-    
-    public void setDiggerAgents(List<DiggerAgent> diggerAgents) {
-    	this.diggerAgents = diggerAgents;
-    }
 	
 
 }
