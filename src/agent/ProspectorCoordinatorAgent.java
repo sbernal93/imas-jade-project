@@ -113,7 +113,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 			private static final long serialVersionUID = 1L;
 			 @Override
 			 protected void handleFailure(ACLMessage msg) {
-			    DiggerCoordinatorAgent agent = (DiggerCoordinatorAgent) this.getAgent();
+			    ProspectorCoordinatorAgent agent = (ProspectorCoordinatorAgent) this.getAgent();
 			    agent.log("The action has failed.");
 			    setupBehaviours();
 			 }

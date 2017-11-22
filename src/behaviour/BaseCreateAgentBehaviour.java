@@ -34,7 +34,7 @@ public abstract class BaseCreateAgentBehaviour<T> extends SimpleBehaviour {
 		} else {
 			try {
 				 int count = 0;
-				 List<Cell> agentCells = getGame().getAgentList().get(AgentType.PROSPECTOR);
+				 List<Cell> agentCells = getGame().getAgentList().get(type);
 				 for(Cell cell : agentCells) {
 					 Object[] args = {cell};
 					 AgentController controller = this.agent.getContainerController()
