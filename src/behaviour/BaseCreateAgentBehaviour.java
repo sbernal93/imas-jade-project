@@ -25,29 +25,54 @@ public abstract class BaseCreateAgentBehaviour<T> extends SimpleBehaviour {
 		this.agent = agent;
 		this.type = type;
 	}
+	
+	private void createMultipleAgents() {
+		try {
+			 int count = 0;
+			 List<Cell> agentCells = getGame().getAgentList().get(type);
+			 for(Cell cell : agentCells) {
+				 Object[] args = {cell};
+				 AgentController controller = this.agent.getContainerController()
+						 .createNewAgent(type.name() + count, "agent." + getAgentToCreateClass().getSimpleName(), args);
+				 controller.start();
+	       		 addAgent(controller.getO2AInterface(getAgentToCreateClass()));
+	       		 count++;	
+			 }
+			 this.agent.log("Sub agents created");
+		} catch (Exception e) {
+			this.agent.errorLog("Incorrect content: " + e.toString());
+		} finally {
+			finished = true;
+		}
+	}
+	
+	private void createIndividualAgent() {
+		try {
+			AgentController controller = this.agent.getContainerController()
+					.createNewAgent(type.name(), "agent." + getAgentToCreateClass().getSimpleName(), null);
+			controller.start();
+			addAgent(controller.getO2AInterface(getAgentToCreateClass()));
+			this.agent.log("Agent succesfully created");
+		} catch (Exception e) {
+			this.agent.errorLog("Incorrect content: " + e.toString());
+		} finally {
+			finished = true;
+		}
+	}
 
 	@Override
 	public void action() {
+		//Do all agents need a game settings? this validation could be done
+		//for smoe type of agents
 		if(this.getGame() == null) {
 			this.agent.log("No game set yet, cant create agents");
 			finished = true;
 		} else {
-			try {
-				 int count = 0;
-				 List<Cell> agentCells = getGame().getAgentList().get(type);
-				 for(Cell cell : agentCells) {
-					 Object[] args = {cell};
-					 AgentController controller = this.agent.getContainerController()
-							 .createNewAgent(type.name() + count, "agent." + getAgentToCreateClass().getSimpleName(), args);
-					 controller.start();
-		       		 addAgent(controller.getO2AInterface(getAgentToCreateClass()));
-		       		 count++;	
-				 }
-				 this.agent.log("Sub agents created");
-			} catch (Exception e) {
-				this.agent.errorLog("Incorrect content: " + e.toString());
-			} finally {
-				finished = true;
+			agent.log("Attempting to create agent: " + type.name());
+			if(type.equals(AgentType.DIGGER) || type.equals(AgentType.PROSPECTOR)) {
+				createMultipleAgents();
+			} else {
+				createIndividualAgent();
 			}
 		}
 	}
