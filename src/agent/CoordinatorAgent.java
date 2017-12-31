@@ -51,6 +51,11 @@ public class CoordinatorAgent extends ImasAgent {
      * DiggerCoordinatorAgent id
      */
     private AID diggerCoordinatorAgent;
+    
+    /**
+     * ProspectorCoordinatorAgent id
+     */
+    private AID prospectorCoordinatorAgent;
 
     /**
      * Builds the coordinator agent.
@@ -92,15 +97,15 @@ public class CoordinatorAgent extends ImasAgent {
         searchCriterion.setType(AgentType.SYSTEM.toString());
         this.systemAgent = UtilsAgents.searchAgent(this, searchCriterion);
         
-        searchCriterion = new ServiceDescription();
+       /* searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.DIGGER_COORDINATOR.toString());
-        this.diggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
+        this.diggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);*/
         // searchAgent is a blocking method, so we will obtain always a correct AID
 
         // searchAgent is a blocking method, so we will obtain always a correct AID
 
         /* ********************************************************************/
-        ACLMessage initialRequest = new ACLMessage(ACLMessage.REQUEST);
+       /* ACLMessage initialRequest = new ACLMessage(ACLMessage.REQUEST);
         initialRequest.clearAllReceiver();
         initialRequest.addReceiver(this.systemAgent);
         initialRequest.setProtocol(InteractionProtocol.FIPA_REQUEST);
@@ -111,16 +116,16 @@ public class CoordinatorAgent extends ImasAgent {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+*/
         //we add a behaviour that sends the message and waits for an answer
-        this.addBehaviour(new RequesterBehaviour(this, initialRequest));
+        //this.addBehaviour(new RequesterBehaviour(this, initialRequest));
         
        
         // add behaviours
         // we wait for the initialization of the game
-        MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
+        //MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
 
-        this.addBehaviour(new RequestResponseBehaviour(this, mt));
+        //this.addBehaviour(new RequestResponseBehaviour(this, mt));
 
 
         // setup finished. When we receive the last inform, the agent itself will add
@@ -146,4 +151,12 @@ public class CoordinatorAgent extends ImasAgent {
         return this.game;
     }
 
+    public void setDiggerCoordinatorAgent(DiggerCoordinatorAgent diggerCoordinatorAgent) {
+    	this.diggerCoordinatorAgent = diggerCoordinatorAgent.getAID();
+    }
+    
+    public void setProspectorCoordinatorAgent(ProspectorCoordinatorAgent prospectorCoordinatorAgent) {
+    	this.prospectorCoordinatorAgent = prospectorCoordinatorAgent.getAID();
+    }
 }
+

@@ -20,8 +20,10 @@ package agent;
 import onthology.InitialGameSettings;
 import onthology.GameSettings;
 import gui.GraphicInterface;
+import behaviour.system.CreateCoordinatorAgentBehaviour;
 import behaviour.system.RequestResponseBehaviour;
 import jade.core.*;
+import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPANames.InteractionProtocol;
@@ -145,15 +147,16 @@ public class SystemAgent extends ImasAgent {
         }
 
         // search CoordinatorAgent
-        ServiceDescription searchCriterion = new ServiceDescription();
-        searchCriterion.setType(AgentType.COORDINATOR.toString());
-        this.coordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
+        //ServiceDescription searchCriterion = new ServiceDescription();
+        //searchCriterion.setType(AgentType.COORDINATOR.toString());
+        //this.coordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
         // searchAgent is a blocking method, so we will obtain always a correct AID
 
         // add behaviours
         // we wait for the initialization of the game
         MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
 
+        this.addBehaviour(new CreateCoordinatorAgentBehaviour(this, AgentType.COORDINATOR));
         this.addBehaviour(new RequestResponseBehaviour(this, mt));
 
         // Setup finished. When the last inform is received, the agent itself will add
@@ -163,5 +166,11 @@ public class SystemAgent extends ImasAgent {
     public void updateGUI() {
         this.gui.updateGame();
     }
+    
+    public void setCoordinatorAgent(CoordinatorAgent agent) {
+    	this.coordinatorAgent = agent.getAID();
+    }
+    
+    
 
 }
