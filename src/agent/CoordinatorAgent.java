@@ -19,6 +19,7 @@ package agent;
 
 import onthology.GameSettings;
 import behaviour.coordinator.RequesterBehaviour;
+import behaviour.BaseSearchAgentBehaviour;
 import behaviour.coordinator.CreateDiggerCoordinatorBehaviour;
 import behaviour.coordinator.CreateProspectorCoordinatorBehaviour;
 import behaviour.coordinator.RequestResponseBehaviour;
@@ -124,19 +125,30 @@ public class CoordinatorAgent extends ImasAgent {
         this.addBehaviour(new CreateDiggerCoordinatorBehaviour(this, AgentType.DIGGER_COORDINATOR));
         this.addBehaviour(new CreateProspectorCoordinatorBehaviour(this, AgentType.PROSPECTOR_COORDINATOR));
         
+        this.addBehaviour(new BaseSearchAgentBehaviour(this, AgentType.DIGGER_COORDINATOR) {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void setAgent(Agent agent) {
+				((CoordinatorAgent) this.getAgent()).setDiggerCoordinatorAgent(agent);
+			}
+		});
+        this.addBehaviour(new BaseSearchAgentBehaviour(this, AgentType.PROSPECTOR_COORDINATOR) {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void setAgent(Agent agent) {
+				((CoordinatorAgent) this.getAgent()).setProspectorCoordinatorAgent(agent);
+			}
+		});
+        
 
         // search SystemAgent
         ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.SYSTEM.toString());
         this.systemAgent = UtilsAgents.searchAgent(this, searchCriterion);
-        /*
-        searchCriterion = new ServiceDescription();
-        searchCriterion.setType(AgentType.DIGGER_COORDINATOR.toString());
-        this.diggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
-        
-        searchCriterion = new ServiceDescription();
-        searchCriterion.setType(AgentType.PROSPECTOR_COORDINATOR.toString());
-        this.diggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);*/
         
         System.out.println("Finished setup");
     }
@@ -159,12 +171,12 @@ public class CoordinatorAgent extends ImasAgent {
         return this.game;
     }
 
-/*    public void setDiggerCoordinatorAgent(DiggerCoordinatorAgent diggerCoordinatorAgent) {
+    public void setDiggerCoordinatorAgent(Agent diggerCoordinatorAgent) {
     	this.diggerCoordinatorAgent = diggerCoordinatorAgent.getAID();
     }
     
-    public void setProspectorCoordinatorAgent(ProspectorCoordinatorAgent prospectorCoordinatorAgent) {
+    public void setProspectorCoordinatorAgent(Agent prospectorCoordinatorAgent) {
     	this.prospectorCoordinatorAgent = prospectorCoordinatorAgent.getAID();
-    }*/
+    }
 }
 

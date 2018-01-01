@@ -29,6 +29,7 @@ public abstract class BaseSearchAgentBehaviour extends SimpleBehaviour {
 		ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(type.toString());
         UtilsAgents.searchAgent(this.agent, searchCriterion);
+        this.agent.log("Agent found");
         finished = true;
 	}
 	
