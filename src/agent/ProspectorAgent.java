@@ -5,13 +5,16 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import map.Cell;
+import onthology.GameSettings;
 
 public class ProspectorAgent extends ImasCellAgent {
 
 	public ProspectorAgent() {
 		super(AgentType.PROSPECTOR);
 	}
-	
+
+	private GameSettings game;
 	  /**
      * Prospector Coordinator agent id.
      */
@@ -19,6 +22,9 @@ public class ProspectorAgent extends ImasCellAgent {
 	
     @Override
     protected void setup() {
+    	this.setCell((Cell) this.getArguments()[1]);
+    	this.setGame((GameSettings) this.getArguments()[0]);
+    	
         this.setEnabledO2ACommunication(true, 1);
 
         // Registers the agent to the DF
@@ -42,7 +48,7 @@ public class ProspectorAgent extends ImasCellAgent {
         ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.PROSPECTOR_COORDINATOR.toString());
         this.prospectorCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
-        System.out.println("Digger agent setup finished");
+        System.out.println("Prospector agent setup finished");
 
 
     }
@@ -51,5 +57,14 @@ public class ProspectorAgent extends ImasCellAgent {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	public GameSettings getGame() {
+		return game;
+	}
+
+	public void setGame(GameSettings game) {
+		this.game = game;
+	}
+	
 
 }

@@ -9,6 +9,7 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.ACLMessage;
 import map.Cell;
+import onthology.GameSettings;
 import onthology.MessageContent;
 
 public class DiggerAgent extends ImasCellAgent{
@@ -17,6 +18,7 @@ public class DiggerAgent extends ImasCellAgent{
 		super(AgentType.DIGGER);
 	}
 	
+	private GameSettings game;
 	  /**
      * Digger Coordinator agent id.
      */
@@ -24,6 +26,9 @@ public class DiggerAgent extends ImasCellAgent{
 	
     @Override
     protected void setup() {
+    	this.setCell((Cell) this.getArguments()[1]);
+    	this.setGame((GameSettings) this.getArguments()[0]);
+    	
         this.setEnabledO2ACommunication(true, 1);
 
         // Registers the agent to the DF
@@ -56,5 +61,15 @@ public class DiggerAgent extends ImasCellAgent{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+
+	public GameSettings getGame() {
+		return game;
+	}
+
+	public void setGame(GameSettings game) {
+		this.game = game;
+	}
+	
+	
 
 }
