@@ -25,8 +25,7 @@ public class CreateCoordinatorAgentBehaviour extends BaseCreateAgentBehaviour<Co
 
 	@Override
 	public void addAgent(CoordinatorAgent agent) {
-		agent.setGame(getGame());
-		((SystemAgent) this.getAgent()).setCoordinatorAgent(agent);
+		//((SystemAgent) this.getAgent()).setCoordinatorAgent(agent);
 		
 	}
 

@@ -31,7 +31,7 @@ public abstract class BaseCreateAgentBehaviour<T> extends SimpleBehaviour {
 			 int count = 0;
 			 List<Cell> agentCells = getGame().getAgentList().get(type);
 			 for(Cell cell : agentCells) {
-				 Object[] args = {cell};
+				 Object[] args = {getGame(), cell};
 				 AgentController controller = this.agent.getContainerController()
 						 .createNewAgent(type.name() + count, "agent." + getAgentToCreateClass().getSimpleName(), args);
 				 controller.start();
@@ -48,10 +48,12 @@ public abstract class BaseCreateAgentBehaviour<T> extends SimpleBehaviour {
 	
 	private void createIndividualAgent() {
 		try {
+			Object[] args = {getGame()};
 			AgentController controller = this.agent.getContainerController()
-					.createNewAgent(type.name(), "agent." + getAgentToCreateClass().getSimpleName(), null);
+					.createNewAgent(type.name(), "agent." + getAgentToCreateClass().getSimpleName(), args);
+			this.agent.log("Starting agent");
 			controller.start();
-			addAgent(controller.getO2AInterface(getAgentToCreateClass()));
+			//addAgent(controller.getO2AInterface(getAgentToCreateClass()));
 			this.agent.log("Agent succesfully created");
 		} catch (Exception e) {
 			this.agent.errorLog("Incorrect content: " + e.toString());
@@ -63,7 +65,7 @@ public abstract class BaseCreateAgentBehaviour<T> extends SimpleBehaviour {
 	@Override
 	public void action() {
 		//Do all agents need a game settings? this validation could be done
-		//for smoe type of agents
+		//for some type of agents
 		if(this.getGame() == null) {
 			this.agent.log("No game set yet, cant create agents");
 			finished = true;

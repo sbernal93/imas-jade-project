@@ -145,19 +145,22 @@ public class SystemAgent extends ImasAgent {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        // search CoordinatorAgent
-        //ServiceDescription searchCriterion = new ServiceDescription();
-        //searchCriterion.setType(AgentType.COORDINATOR.toString());
-        //this.coordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
         // searchAgent is a blocking method, so we will obtain always a correct AID
 
         // add behaviours
         // we wait for the initialization of the game
-        MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
+       // MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
 
         this.addBehaviour(new CreateCoordinatorAgentBehaviour(this, AgentType.COORDINATOR));
-        this.addBehaviour(new RequestResponseBehaviour(this, mt));
+        //this.addBehaviour(new RequestResponseBehaviour(this, mt));
+        
+
+
+        // search CoordinatorAgent
+      /*  this.log("Searching for COORDINATOR");
+        ServiceDescription searchCriterion = new ServiceDescription();
+        searchCriterion.setType(AgentType.COORDINATOR.toString());
+        this.coordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);*/
 
         // Setup finished. When the last inform is received, the agent itself will add
         // a behaviour to send/receive actions
@@ -166,10 +169,7 @@ public class SystemAgent extends ImasAgent {
     public void updateGUI() {
         this.gui.updateGame();
     }
-    
-    public void setCoordinatorAgent(CoordinatorAgent agent) {
-    	this.coordinatorAgent = agent.getAID();
-    }
+   
     
     
 

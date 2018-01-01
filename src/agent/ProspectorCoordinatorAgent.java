@@ -56,6 +56,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
     @Override
     protected void setup() {
 
+    	this.setGame((GameSettings) this.getArguments()[0]);
         /* ** Very Important Line (VIL) ***************************************/
         this.setEnabledO2ACommunication(true, 1);
         /* ********************************************************************/
@@ -82,49 +83,9 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
         searchCriterion.setType(AgentType.COORDINATOR.toString());
         this.coordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
         // searchAgent is a blocking method, so we will obtain always a correct AID
-        setupBehaviours();
-        
-    }
-    
-    private void setupBehaviours(){
-        ACLMessage initialRequest = new ACLMessage(ACLMessage.REQUEST);
-        initialRequest.clearAllReceiver();
-        initialRequest.addReceiver(this.coordinatorAgent);
-        initialRequest.setProtocol(InteractionProtocol.FIPA_REQUEST);
-        log("Request message to agent");
-        try {
-            initialRequest.setContent(MessageContent.GET_MAP);
-            log("Request message content:" + initialRequest.getContent());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.addBehaviour(new CreateProspectorAgentBehaviour(this, AgentType.PROSPECTOR));
 
-        /**
-         * There is a chance that when we connect with the Coordinator agent 
-         * he doesnt have the game setting available, for this case
-         * we wait using the custom timeout behaviour, and we try again
-         * by running the setup.
-         * 
-         * The timeout is used so we can avoid overloading the coordinator agent with requests
-         */
-        SequentialBehaviour seq = new SequentialBehaviour();
-        seq.addSubBehaviour(new TimeoutBehaviour(this, 2000));
-        seq.addSubBehaviour(new RequesterBehaviour(this, initialRequest) {
-			private static final long serialVersionUID = 1L;
-			 @Override
-			 protected void handleFailure(ACLMessage msg) {
-			    ProspectorCoordinatorAgent agent = (ProspectorCoordinatorAgent) this.getAgent();
-			    agent.log("The action has failed.");
-			    setupBehaviours();
-			 }
-        	
-        });
-        seq.addSubBehaviour(new CreateProspectorAgentBehaviour(this, AgentType.PROSPECTOR));
-        this.addBehaviour(seq);
-        
     }
-    
-    
     
     /**
      * Update the game settings.

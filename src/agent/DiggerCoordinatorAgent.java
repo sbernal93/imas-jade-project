@@ -54,6 +54,8 @@ public class DiggerCoordinatorAgent extends ImasAgent{
      */
     @Override
     protected void setup() {
+    	this.setGame((GameSettings) this.getArguments()[0]);
+    	
 
         /* ** Very Important Line (VIL) ***************************************/
         this.setEnabledO2ACommunication(true, 1);
@@ -81,49 +83,8 @@ public class DiggerCoordinatorAgent extends ImasAgent{
         searchCriterion.setType(AgentType.COORDINATOR.toString());
         this.coordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
         // searchAgent is a blocking method, so we will obtain always a correct AID
-        setupBehaviours();
-        
+        this.addBehaviour(new CreateDiggerAgentBehaviour(this, AgentType.DIGGER));
     }
-    
-    private void setupBehaviours(){
-        ACLMessage initialRequest = new ACLMessage(ACLMessage.REQUEST);
-        initialRequest.clearAllReceiver();
-        initialRequest.addReceiver(this.coordinatorAgent);
-        initialRequest.setProtocol(InteractionProtocol.FIPA_REQUEST);
-        log("Request message to agent");
-        try {
-            initialRequest.setContent(MessageContent.GET_MAP);
-            log("Request message content:" + initialRequest.getContent());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        /**
-         * There is a chance that when we connect with the Coordinator agent 
-         * he doesnt have the game setting available, for this case
-         * we wait using the custom timeout behaviour, and we try again
-         * by running the setup.
-         */
-        SequentialBehaviour seq = new SequentialBehaviour();
-        seq.addSubBehaviour(new TimeoutBehaviour(this, 2000));
-        seq.addSubBehaviour(new RequesterBehaviour(this, initialRequest) {
-			private static final long serialVersionUID = 1L;
-			 @Override
-			 protected void handleFailure(ACLMessage msg) {
-			    DiggerCoordinatorAgent agent = (DiggerCoordinatorAgent) this.getAgent();
-			    agent.log("The action has failed.");
-			    setupBehaviours();
-			 }
-        	
-        });
-        seq.addSubBehaviour(new CreateDiggerAgentBehaviour(this, AgentType.DIGGER));
-        this.addBehaviour(seq);
-        
-        // setup finished. When we receive the last inform, the agent itself will add
-        // a behaviour to send/receive actions
-    }
-    
-    
     
     /**
      * Update the game settings.
