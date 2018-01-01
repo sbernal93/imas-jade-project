@@ -20,6 +20,8 @@ package agent;
 import onthology.InitialGameSettings;
 import onthology.GameSettings;
 import gui.GraphicInterface;
+import behaviour.BaseCreateAgentBehaviour;
+import behaviour.BaseSearchAgentBehaviour;
 import behaviour.system.CreateCoordinatorAgentBehaviour;
 import behaviour.system.RequestResponseBehaviour;
 import jade.core.*;
@@ -152,25 +154,25 @@ public class SystemAgent extends ImasAgent {
        // MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
 
         this.addBehaviour(new CreateCoordinatorAgentBehaviour(this, AgentType.COORDINATOR));
-        //this.addBehaviour(new RequestResponseBehaviour(this, mt));
-        
+        //searches for the coordinator agent
+        this.addBehaviour(new BaseSearchAgentBehaviour(this, AgentType.COORDINATOR) {
 
+			private static final long serialVersionUID = 1L;
 
-        // search CoordinatorAgent
-      /*  this.log("Searching for COORDINATOR");
-        ServiceDescription searchCriterion = new ServiceDescription();
-        searchCriterion.setType(AgentType.COORDINATOR.toString());
-        this.coordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);*/
-
-        // Setup finished. When the last inform is received, the agent itself will add
-        // a behaviour to send/receive actions
+			@Override
+			public void setAgent(Agent agent) {
+				((SystemAgent) this.getAgent()).setCoordinatorAgent(agent);
+			}
+		});
     }
 
     public void updateGUI() {
         this.gui.updateGame();
     }
    
-    
+    public void setCoordinatorAgent(Agent agent) {
+    	this.coordinatorAgent = agent.getAID();
+    }
     
 
 }
