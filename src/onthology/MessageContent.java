@@ -28,4 +28,9 @@ public class MessageContent {
      */
     public static final String GET_MAP = "Get map";
     
+    /**
+     * MEssage sent from the system agent to the coordinator agent to start a new step
+     */
+    public static String NEW_STEP = "New step";
+    
 }

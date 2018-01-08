@@ -151,6 +151,11 @@ public class CoordinatorAgent extends ImasAgent {
         this.systemAgent = UtilsAgents.searchAgent(this, searchCriterion);
         
         System.out.println("Finished setup");
+        
+        //TODO: this 
+        MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
+
+        this.addBehaviour(new RequestResponseBehaviour(this, mt));
     }
 
     /**

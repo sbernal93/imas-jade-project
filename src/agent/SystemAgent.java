@@ -24,6 +24,7 @@ import behaviour.BaseCreateAgentBehaviour;
 import behaviour.BaseSearchAgentBehaviour;
 import behaviour.system.CreateCoordinatorAgentBehaviour;
 import behaviour.system.RequestResponseBehaviour;
+import behaviour.system.SimulationBehaviour;
 import jade.core.*;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.*;
@@ -153,6 +154,7 @@ public class SystemAgent extends ImasAgent {
         // we wait for the initialization of the game
        // MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
 
+        
         this.addBehaviour(new CreateCoordinatorAgentBehaviour(this, AgentType.COORDINATOR));
         //searches for the coordinator agent
         this.addBehaviour(new BaseSearchAgentBehaviour(this, AgentType.COORDINATOR) {
@@ -164,6 +166,7 @@ public class SystemAgent extends ImasAgent {
 				((SystemAgent) this.getAgent()).setCoordinatorAgent(agent);
 			}
 		});
+        this.addBehaviour(new SimulationBehaviour(this));
     }
 
     public void updateGUI() {
@@ -172,6 +175,10 @@ public class SystemAgent extends ImasAgent {
    
     public void setCoordinatorAgent(Agent agent) {
     	this.coordinatorAgent = agent.getAID();
+    }
+    
+    public AID getCoordinatorAgent() {
+    	return this.coordinatorAgent;
     }
     
 

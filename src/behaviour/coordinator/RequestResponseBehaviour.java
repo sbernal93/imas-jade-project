@@ -6,11 +6,7 @@ import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREResponder;
 import onthology.MessageContent;
 
-/**
- * A request-responder behaviour for the Coordinator agent, answering to queries
- * from the other Coordinator agents. The DiggerCoordinator Agent sends a REQUEST of the whole
- * game information and the Coordinator Agent sends an AGREE and then an INFORM
- * with the city information.
+/**.
  */
 public class RequestResponseBehaviour extends AchieveREResponder {
 
@@ -45,12 +41,19 @@ public class RequestResponseBehaviour extends AchieveREResponder {
             Object content = (Object) msg.getContent();
             if (content.equals(MessageContent.GET_MAP)) {
                 agent.log("Request received");
-                if(agent.getGame() == null) {
+                //deprecated
+                /*if(agent.getGame() == null) {
                 	agent.log("Game is null, need to get it from SystemAgent first");
                     reply.setPerformative(ACLMessage.FAILURE);
                 } else {
                     reply.setPerformative(ACLMessage.AGREE);
-                }
+                }*/
+                reply.setPerformative(ACLMessage.AGREE);
+            }
+            if(content.equals(MessageContent.NEW_STEP)) {
+            	//TODO: respond with simulation step
+            	agent.log("NEW_STEP request message received");
+            	reply.setPerformative(ACLMessage.AGREE);
             }
         } catch (Exception e) {
             reply.setPerformative(ACLMessage.FAILURE);
@@ -62,8 +65,7 @@ public class RequestResponseBehaviour extends AchieveREResponder {
     }
 
     /**
-     * After sending an AGREE message on prepareResponse(), this behaviour
-     * sends an INFORM message with the whole game settings.
+     * After sending an AGREE message on prepareResponse(), this method is executed
      *
      * NOTE: This method is called after the response has been sent and only when one
      * of the following two cases arise: the response was an agree message OR no
@@ -84,14 +86,14 @@ public class RequestResponseBehaviour extends AchieveREResponder {
         if (reply.getPerformative() != ACLMessage.FAILURE) {
 	        reply.setPerformative(ACLMessage.INFORM);
 	
-	        try {
+	       /* try {
 	            reply.setContentObject(agent.getGame());
 	        } catch (Exception e) {
 	            reply.setPerformative(ACLMessage.FAILURE);
 	            agent.errorLog(e.toString());
 	            e.printStackTrace();
-	        }
-	        agent.log("Game settings sent");
+	        }*/
+	        agent.log("INFORM message sent");
         }
         return reply;
 
