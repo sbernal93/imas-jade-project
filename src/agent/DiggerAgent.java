@@ -12,7 +12,7 @@ import map.Cell;
 import onthology.GameSettings;
 import onthology.MessageContent;
 
-public class DiggerAgent extends ImasCellAgent{
+public class DiggerAgent extends ImasMobileAgent{
 
 	public DiggerAgent() {
 		super(AgentType.DIGGER);

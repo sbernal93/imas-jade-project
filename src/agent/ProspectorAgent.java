@@ -8,7 +8,7 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import map.Cell;
 import onthology.GameSettings;
 
-public class ProspectorAgent extends ImasCellAgent {
+public class ProspectorAgent extends ImasMobileAgent {
 
 	public ProspectorAgent() {
 		super(AgentType.PROSPECTOR);

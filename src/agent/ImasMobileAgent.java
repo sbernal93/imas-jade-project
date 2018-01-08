@@ -2,7 +2,11 @@ package agent;
 
 import map.Cell;
 
-public class ImasCellAgent extends ImasAgent{
+public abstract class ImasMobileAgent extends ImasAgent{
+
+	public ImasMobileAgent(AgentType type) {
+		super(type);
+	}
 
 	/**
 	 * 
@@ -10,15 +14,6 @@ public class ImasCellAgent extends ImasAgent{
 	private static final long serialVersionUID = 1L;
 	
 	private Cell cell;
-	
-	public ImasCellAgent(AgentType type) {
-		this(type, null);
-	}
-	
-	public ImasCellAgent(AgentType type, Cell cell) {
-		super(type);
-		this.cell = cell;
-	}
 
 	public void setCell(Cell cell) {
 		this.cell = cell;
@@ -28,5 +23,6 @@ public class ImasCellAgent extends ImasAgent{
 		return this.cell;
 	}
 
+	
 
 }
