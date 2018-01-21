@@ -17,20 +17,15 @@
  */
 package agent;
 
-import onthology.InitialGameSettings;
-import onthology.GameSettings;
-import gui.GraphicInterface;
-import behaviour.BaseCreateAgentBehaviour;
-import behaviour.BaseSearchAgentBehaviour;
-import behaviour.system.CreateCoordinatorAgentBehaviour;
-import behaviour.system.RequestResponseBehaviour;
 import behaviour.system.SimulationBehaviour;
-import jade.core.*;
-import jade.core.behaviours.SequentialBehaviour;
-import jade.domain.*;
-import jade.domain.FIPAAgentManagement.*;
-import jade.domain.FIPANames.InteractionProtocol;
-import jade.lang.acl.*;
+import gui.GraphicInterface;
+import jade.core.AID;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import onthology.GameSettings;
+import onthology.InitialGameSettings;
 
 
 /**

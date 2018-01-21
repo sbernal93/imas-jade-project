@@ -1,16 +1,12 @@
 package agent;
 
-import behaviour.digger.RequesterBehaviour;
 import jade.core.AID;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.domain.FIPANames.InteractionProtocol;
-import jade.lang.acl.ACLMessage;
 import map.Cell;
 import onthology.GameSettings;
-import onthology.MessageContent;
 
 public class DiggerAgent extends ImasMobileAgent{
 

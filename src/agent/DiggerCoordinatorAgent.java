@@ -3,19 +3,13 @@ package agent;
 import java.util.ArrayList;
 import java.util.List;
 
-import behaviour.TimeoutBehaviour;
 import behaviour.digger.coordinator.CreateDiggerAgentBehaviour;
-import behaviour.digger.coordinator.RequesterBehaviour;
 import jade.core.AID;
-import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.domain.FIPANames.InteractionProtocol;
-import jade.lang.acl.ACLMessage;
 import onthology.GameSettings;
-import onthology.MessageContent;
 
 /**
  * 

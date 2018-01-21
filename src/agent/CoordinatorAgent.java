@@ -17,18 +17,19 @@
  */
 package agent;
 
-import onthology.GameSettings;
-import behaviour.coordinator.RequesterBehaviour;
 import behaviour.BaseSearchAgentBehaviour;
 import behaviour.coordinator.CreateDiggerCoordinatorBehaviour;
 import behaviour.coordinator.CreateProspectorCoordinatorBehaviour;
 import behaviour.coordinator.RequestResponseBehaviour;
-import onthology.MessageContent;
-import jade.core.*;
-import jade.domain.*;
-import jade.domain.FIPAAgentManagement.*;
+import jade.core.AID;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
 import jade.domain.FIPANames.InteractionProtocol;
-import jade.lang.acl.*;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import onthology.GameSettings;
 
 /**
  * The main Coordinator agent. 
@@ -53,7 +54,7 @@ public class CoordinatorAgent extends ImasAgent {
     /**
      * DiggerCoordinatorAgent id
      */
-    private AID diggerCoordinatorAgent;
+	private AID diggerCoordinatorAgent;
     
     /**
      * ProspectorCoordinatorAgent id

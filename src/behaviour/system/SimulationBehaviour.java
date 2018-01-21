@@ -1,17 +1,7 @@
 package behaviour.system;
 
-import agent.AgentType;
 import agent.SystemAgent;
-import behaviour.BaseRequesterBehaviour;
-import behaviour.BaseSearchAgentBehaviour;
-import jade.core.Agent;
 import jade.core.behaviours.FSMBehaviour;
-import jade.core.behaviours.ReceiverBehaviour;
-import jade.core.behaviours.SequentialBehaviour;
-import jade.domain.FIPANames.InteractionProtocol;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
-import onthology.MessageContent;
 
 /**
  * The Simulation behaviour is a FSM behaviour with the following states:
