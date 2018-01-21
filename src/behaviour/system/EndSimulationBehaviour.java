@@ -19,6 +19,6 @@ public class EndSimulationBehaviour extends OneShotBehaviour{
 	@Override
 	public void action() {
 		//TODO: finish simulation
-		
+		this.agent.log("Finished simulation");
 	}
 }

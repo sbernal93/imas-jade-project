@@ -3,6 +3,7 @@ package behaviour;
 import agent.AgentType;
 import agent.ImasAgent;
 import agent.UtilsAgents;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.SimpleBehaviour;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
@@ -28,7 +29,7 @@ public abstract class BaseSearchAgentBehaviour extends SimpleBehaviour {
 		this.agent.log("Searching for agent: " + this.type.toString());
 		ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(type.toString());
-        UtilsAgents.searchAgent(this.agent, searchCriterion);
+        setAgent(UtilsAgents.searchAgent(this.agent, searchCriterion));
         this.agent.log("Agent found");
         finished = true;
 	}
@@ -43,6 +44,6 @@ public abstract class BaseSearchAgentBehaviour extends SimpleBehaviour {
 		return this.agent;
 	}
 	
-	public abstract void setAgent(Agent agent);
+	public abstract void setAgent(AID agent);
 	
 }

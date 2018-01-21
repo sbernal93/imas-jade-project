@@ -130,7 +130,7 @@ public class CoordinatorAgent extends ImasAgent {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void setAgent(Agent agent) {
+			public void setAgent(AID agent) {
 				((CoordinatorAgent) this.getAgent()).setDiggerCoordinatorAgent(agent);
 			}
 		});
@@ -139,7 +139,7 @@ public class CoordinatorAgent extends ImasAgent {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void setAgent(Agent agent) {
+			public void setAgent(AID agent) {
 				((CoordinatorAgent) this.getAgent()).setProspectorCoordinatorAgent(agent);
 			}
 		});
@@ -176,12 +176,12 @@ public class CoordinatorAgent extends ImasAgent {
         return this.game;
     }
 
-    public void setDiggerCoordinatorAgent(Agent diggerCoordinatorAgent) {
-    	this.diggerCoordinatorAgent = diggerCoordinatorAgent.getAID();
+    public void setDiggerCoordinatorAgent(AID diggerCoordinatorAgent) {
+    	this.diggerCoordinatorAgent = diggerCoordinatorAgent;
     }
     
-    public void setProspectorCoordinatorAgent(Agent prospectorCoordinatorAgent) {
-    	this.prospectorCoordinatorAgent = prospectorCoordinatorAgent.getAID();
+    public void setProspectorCoordinatorAgent(AID prospectorCoordinatorAgent) {
+    	this.prospectorCoordinatorAgent = prospectorCoordinatorAgent;
     }
 }
 

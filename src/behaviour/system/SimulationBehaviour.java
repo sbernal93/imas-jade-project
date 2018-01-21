@@ -72,6 +72,7 @@ public class SimulationBehaviour extends FSMBehaviour{
 			}
 		});*/
 		
+		//Setup behaviour not being used, commmented out
 		registerFirstState(new SetupBehaviour(this.agent), SETUP_STATE);
 		registerState(simStep, SIM_STEP_STATE);
 		registerState(new ApplySimulationStepBehaviour(this.agent), APPLY_STEP_STATE);

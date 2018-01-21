@@ -54,6 +54,11 @@ public class SystemAgent extends ImasAgent {
      * round.
      */
     private AID coordinatorAgent;
+    
+    /**
+     * Current amount of steps in the game
+     */
+    private int currentStep;
 
     /**
      * Builds the System agent.
@@ -148,24 +153,7 @@ public class SystemAgent extends ImasAgent {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // searchAgent is a blocking method, so we will obtain always a correct AID
 
-        // add behaviours
-        // we wait for the initialization of the game
-       // MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
-
-        
-        this.addBehaviour(new CreateCoordinatorAgentBehaviour(this, AgentType.COORDINATOR));
-        //searches for the coordinator agent
-        this.addBehaviour(new BaseSearchAgentBehaviour(this, AgentType.COORDINATOR) {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void setAgent(Agent agent) {
-				((SystemAgent) this.getAgent()).setCoordinatorAgent(agent);
-			}
-		});
         this.addBehaviour(new SimulationBehaviour(this));
     }
 
@@ -173,13 +161,19 @@ public class SystemAgent extends ImasAgent {
         this.gui.updateGame();
     }
    
-    public void setCoordinatorAgent(Agent agent) {
-    	this.coordinatorAgent = agent.getAID();
+    public void setCoordinatorAgent(AID agent) {
+    	this.coordinatorAgent =  agent;
     }
     
     public AID getCoordinatorAgent() {
     	return this.coordinatorAgent;
     }
+
+	public int getCurrentStep() {
+		return currentStep;
+	}
+	
+	
     
 
 }

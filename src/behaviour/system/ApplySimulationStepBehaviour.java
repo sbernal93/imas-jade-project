@@ -22,13 +22,22 @@ public class ApplySimulationStepBehaviour extends OneShotBehaviour{
 
 	@Override
 	public void action() {
-		//TODO: execute step, should check and apply actions, and notify coordinator when finished
+		this.agent.log("ApplySimulationStepBehaviour started");
 		
 	}
 	
 	@Override
 	public int onEnd() {
-		// TODO should check if game is ended
+		this.agent.log("ApplySimulationStepBehaviour finished" );
+		//commented out while steps not yet implemented
+		/*
+		if(this.agent.getGame().getSimulationSteps() >= this.agent.getCurrentStep()) {
+			this.agent.log("Simulation finished");
+			return FINISHED_SIMULATION;
+		}
+		this.agent.log("Simulation continues");
+		return CONTINUE_SIMULATION;*/
+		
 		return FINISHED_SIMULATION;
 	}
 
