@@ -74,6 +74,40 @@ public class CoordinatorAgent extends ImasAgent {
     @Override
     protected void setup() {
     	this.setGame((GameSettings) this.getArguments()[0]);
+    	this.addBehaviour(new CreateDiggerCoordinatorBehaviour(this, AgentType.DIGGER_COORDINATOR));
+        this.addBehaviour(new CreateProspectorCoordinatorBehaviour(this, AgentType.PROSPECTOR_COORDINATOR));
+        
+        this.addBehaviour(new BaseSearchAgentBehaviour(this, AgentType.DIGGER_COORDINATOR) {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void setAgent(AID agent) {
+				((CoordinatorAgent) this.getAgent()).setDiggerCoordinatorAgent(agent);
+			}
+		});
+        this.addBehaviour(new BaseSearchAgentBehaviour(this, AgentType.PROSPECTOR_COORDINATOR) {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void setAgent(AID agent) {
+				((CoordinatorAgent) this.getAgent()).setProspectorCoordinatorAgent(agent);
+			}
+		});
+        
+
+        // search SystemAgent
+        ServiceDescription searchCriterion = new ServiceDescription();
+        searchCriterion.setType(AgentType.SYSTEM.toString());
+        this.systemAgent = UtilsAgents.searchAgent(this, searchCriterion);
+        
+        log("Finished setup");
+        
+        //TODO: this 
+        MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
+
+        this.addBehaviour(new RequestResponseBehaviour(this, mt));
 
         /* ** Very Important Line (VIL) ***************************************/
         this.setEnabledO2ACommunication(true, 1);
@@ -122,40 +156,7 @@ public class CoordinatorAgent extends ImasAgent {
 */
         // setup finished. When we receive the last inform, the agent itself will add
         // a behaviour to send/receive actions. we create the other coordinator agents
-        this.addBehaviour(new CreateDiggerCoordinatorBehaviour(this, AgentType.DIGGER_COORDINATOR));
-        this.addBehaviour(new CreateProspectorCoordinatorBehaviour(this, AgentType.PROSPECTOR_COORDINATOR));
         
-        this.addBehaviour(new BaseSearchAgentBehaviour(this, AgentType.DIGGER_COORDINATOR) {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void setAgent(AID agent) {
-				((CoordinatorAgent) this.getAgent()).setDiggerCoordinatorAgent(agent);
-			}
-		});
-        this.addBehaviour(new BaseSearchAgentBehaviour(this, AgentType.PROSPECTOR_COORDINATOR) {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void setAgent(AID agent) {
-				((CoordinatorAgent) this.getAgent()).setProspectorCoordinatorAgent(agent);
-			}
-		});
-        
-
-        // search SystemAgent
-        ServiceDescription searchCriterion = new ServiceDescription();
-        searchCriterion.setType(AgentType.SYSTEM.toString());
-        this.systemAgent = UtilsAgents.searchAgent(this, searchCriterion);
-        
-        System.out.println("Finished setup");
-        
-        //TODO: this 
-        MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
-
-        this.addBehaviour(new RequestResponseBehaviour(this, mt));
     }
 
     /**

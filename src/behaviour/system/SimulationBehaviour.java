@@ -52,27 +52,15 @@ public class SimulationBehaviour extends FSMBehaviour{
 	}
 	
 	private void setupFSM(){
-		BaseRequesterBehaviour<SystemAgent> simStep = new BaseRequesterBehaviour<SystemAgent>(this.agent, buildMessageForCoordinatorAgent()) {
+		BaseRequesterBehaviour<SystemAgent> simStep = new BaseRequesterBehaviour<SystemAgent>(
+				this.agent, buildMessageForCoordinatorAgent()) {
 			private static final long serialVersionUID = 1L;
 			//TODO: implement handle of message type. INFORM messages should be handled 
 			//receiving the new actions that where attempted during the simulation steps
 			//this actions should be stored in the systemAgent in order to be validated
 			//in the other FSM state
 		};
-		
-		/*SequentialBehaviour seqBehaviour = new SequentialBehaviour();
-		seqBehaviour.addSubBehaviour(new CreateCoordinatorAgentBehaviour(this.agent, AgentType.COORDINATOR));
-		seqBehaviour.addSubBehaviour(new BaseSearchAgentBehaviour(this.agent, AgentType.COORDINATOR) {
 
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void setAgent(Agent agent) {
-				((SystemAgent) this.getAgent()).setCoordinatorAgent(agent);
-			}
-		});*/
-		
-		//Setup behaviour not being used, commmented out
 		registerFirstState(new SetupBehaviour(this.agent), SETUP_STATE);
 		registerState(simStep, SIM_STEP_STATE);
 		registerState(new ApplySimulationStepBehaviour(this.agent), APPLY_STEP_STATE);
@@ -98,13 +86,5 @@ public class SimulationBehaviour extends FSMBehaviour{
             e.printStackTrace();
         }
         return message;
-        //we add a behaviour that sends the message and waits for an answer
-        /*this.addBehaviour(new RequesterBehaviour(this, initialRequest));
-        
-       
-        // add behaviours
-       	MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
-
-        this.addBehaviour(new RequestResponseBehaviour(this, mt));*/
 	}
 }
