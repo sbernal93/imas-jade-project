@@ -39,8 +39,9 @@ public class RequestResponseBehaviour extends AchieveREResponder {
         ACLMessage reply = msg.createReply();
         try {
             Object content = (Object) msg.getContent();
+            agent.log("Request received");
             if (content.equals(MessageContent.GET_MAP)) {
-                agent.log("Request received");
+                agent.log("GET MAP received");
                 //deprecated
                 /*if(agent.getGame() == null) {
                 	agent.log("Game is null, need to get it from SystemAgent first");
