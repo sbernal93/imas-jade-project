@@ -3,13 +3,21 @@ package agent;
 import java.util.ArrayList;
 import java.util.List;
 
+import behaviour.BaseRequesterBehaviour;
 import behaviour.prospector.coordinator.CreateProspectorAgentBehaviour;
+import behaviour.prospector.coordinator.RequestResponseBehaviour;
 import jade.core.AID;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.domain.FIPANames.InteractionProtocol;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 import onthology.GameSettings;
+import onthology.MessageContent;
+import onthology.Movement;
 
 /**
  * 
@@ -33,11 +41,13 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 	
 	private AID coordinatorAgent;
 	
+
+	private List<Movement> movements;
 	/**
 	 * The Agent has a list of all the prospector agents that 
 	 * are currently in the map
 	 */
-	private List<ProspectorAgent> prospectorAgents;
+	private List<AID> prospectorAgents;
 
 	public ProspectorCoordinatorAgent() {
 		super(AgentType.PROSPECTOR_COORDINATOR);
@@ -74,13 +84,56 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
         }
 
         // search CoordinatorAgent
-        ServiceDescription searchCriterion = new ServiceDescription();
+        //commented out, coordinator agent is passed as parameter
+       /* ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.COORDINATOR.toString());
-        this.coordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
+        this.coordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);*/
         // searchAgent is a blocking method, so we will obtain always a correct AID
         this.addBehaviour(new CreateProspectorAgentBehaviour(this, AgentType.PROSPECTOR));
+        MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
 
+        this.addBehaviour(new RequestResponseBehaviour(this, mt));
     }
+    
+    public List<Movement> newStepResult() {
+    	this.movements = new ArrayList<>();
+    	
+    	for (AID agent : this.prospectorAgents) {
+    		this.addBehaviour(new BaseRequesterBehaviour<ProspectorCoordinatorAgent>(this,
+    				buildSimStepMessageForProspectorAgent(agent)) {
+
+    					private static final long serialVersionUID = 1L;
+    					
+    					@Override
+    					protected void handleInform(ACLMessage msg) {
+    						try {
+    							((ProspectorCoordinatorAgent) this.getAgent()).addMovement((Movement) msg.getContentObject());
+    						} catch (UnreadableException e) {
+    							e.printStackTrace();
+    						}
+    						super.handleInform(msg);
+    					}
+    		});
+    	}
+    	
+    	
+    	return this.movements;
+    }
+    
+    private ACLMessage buildSimStepMessageForProspectorAgent(AID agent) {
+		ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+		message.clearAllReceiver();
+		message.addReceiver(agent);
+		message.setProtocol(InteractionProtocol.FIPA_REQUEST);
+		this.log("Request message to a Digger agent");
+        try {
+        	message.setContent(MessageContent.NEW_STEP);
+        	this.log("Request message content:" + message.getContent());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return message;
+	}
     
     /**
      * Update the game settings.
@@ -100,23 +153,46 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
         return this.game;
     }
     
-    public void addProspectorAgent(ProspectorAgent prospectorAgent) {
+    public void addProspectorAgent(AID prospectorAgent) {
     	if(this.prospectorAgents == null) {
     		this.prospectorAgents = new ArrayList<>();
     	}
     	this.prospectorAgents.add(prospectorAgent);
     }
 
-    public List<ProspectorAgent> getProspectorAgents() {
+    public List<AID> getProspectorAgents() {
     	return this.prospectorAgents;
     }
     
-    public void setProspectorAgents(List<ProspectorAgent> prospectorAgents) {
+    public void setProspectorAgents(List<AID> prospectorAgents) {
     	this.prospectorAgents = prospectorAgents;
     }
 
     public void setCoordinatorAgent(AID coordinatorAgent) {
     	this.coordinatorAgent = coordinatorAgent;
     }
+    
+    public List<Movement> getMovements() {
+		return movements;
+	}
+
+	public void setMovements(List<Movement> movements) {
+		this.movements = movements;
+	}
+    
+	public void addMovement(Movement movement) {
+		if (this.movements == null) {
+			this.movements = new ArrayList<>();
+		}
+		this.movements.add(movement);
+	}
+	
+	public void addMovements(List<Movement> movements) {
+		if (this.movements == null) {
+			this.movements = new ArrayList<>();
+		}
+		this.movements.addAll(movements);
+	}
+    
 
 }

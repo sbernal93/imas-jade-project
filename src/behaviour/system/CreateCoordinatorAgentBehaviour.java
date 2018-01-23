@@ -5,6 +5,7 @@ import agent.CoordinatorAgent;
 import agent.ImasAgent;
 import agent.SystemAgent;
 import behaviour.BaseCreateAgentBehaviour;
+import jade.core.AID;
 import onthology.GameSettings;
 
 public class CreateCoordinatorAgentBehaviour extends BaseCreateAgentBehaviour<CoordinatorAgent>{
@@ -24,7 +25,7 @@ public class CreateCoordinatorAgentBehaviour extends BaseCreateAgentBehaviour<Co
 	}
 
 	@Override
-	public void addAgent(CoordinatorAgent agent) {
+	public void addAgent(AID agent) {
 		//((SystemAgent) this.getAgent()).setCoordinatorAgent(agent);
 		
 	}

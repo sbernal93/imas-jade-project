@@ -1,9 +1,12 @@
-package behaviour.coordinator;
+package behaviour.prospector;
 
 import java.io.IOException;
 import java.io.Serializable;
 
 import agent.CoordinatorAgent;
+import agent.DiggerCoordinatorAgent;
+import agent.ProspectorAgent;
+import agent.ProspectorCoordinatorAgent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREResponder;
@@ -19,18 +22,18 @@ public class RequestResponseBehaviour extends AchieveREResponder {
 	private static final long serialVersionUID = 1L;
 
 	/**
-     * Sets up the System agent and the template of messages to catch.
+     * Sets up the ProspectorAgent agent and the template of messages to catch.
      *
      * @param agent The agent owning this behaviour
      * @param mt Template to receive future responses in this conversation
      */
-    public RequestResponseBehaviour(CoordinatorAgent agent, MessageTemplate mt) {
+    public RequestResponseBehaviour(ProspectorAgent agent, MessageTemplate mt) {
         super(agent, mt);
         agent.log("Waiting REQUESTs from authorized agents");
     }
 
     /**
-     * When the Coordinator Agent receives a REQUEST message, it agrees. Only if
+     * When the DiggerCoordinator Agent receives a REQUEST message, it agrees. Only if
      * message type is AGREE, method prepareResultNotification() will be invoked.
      *
      * @param msg message received.
@@ -38,22 +41,11 @@ public class RequestResponseBehaviour extends AchieveREResponder {
      */
     @Override
     protected ACLMessage prepareResponse(ACLMessage msg) {
-    	CoordinatorAgent agent = (CoordinatorAgent)this.getAgent();
+    	ProspectorAgent agent = (ProspectorAgent)this.getAgent();
         ACLMessage reply = msg.createReply();
         try {
             Object content = (Object) msg.getContent();
             agent.log("Request received");
-            if (content.equals(MessageContent.GET_MAP)) {
-                agent.log("GET MAP received");
-                //deprecated
-                /*if(agent.getGame() == null) {
-                	agent.log("Game is null, need to get it from SystemAgent first");
-                    reply.setPerformative(ACLMessage.FAILURE);
-                } else {
-                    reply.setPerformative(ACLMessage.AGREE);
-                }*/
-                reply.setPerformative(ACLMessage.AGREE);
-            }
             if(content.equals(MessageContent.NEW_STEP)) {
             	agent.log("NEW_STEP request message received");
             	reply.setPerformative(ACLMessage.AGREE);
@@ -85,13 +77,13 @@ public class RequestResponseBehaviour extends AchieveREResponder {
 
         // it is important to make the createReply in order to keep the same context of
         // the conversation
-    	CoordinatorAgent agent = (CoordinatorAgent) this.getAgent();
+    	ProspectorAgent agent = (ProspectorAgent) this.getAgent();
         ACLMessage reply = msg.createReply();
         if (reply.getPerformative() != ACLMessage.FAILURE) {
 	        reply.setPerformative(ACLMessage.INFORM);
 	        try {
-				reply.setContentObject((Serializable) agent.newStepResult());
-		        //agent.log("Content: " + reply.getContent());
+				reply.setContentObject(agent.newStepResult());
+		       // agent.log("Content: " + reply.getContent());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -5,6 +5,7 @@ import agent.CoordinatorAgent;
 import agent.DiggerCoordinatorAgent;
 import agent.ImasAgent;
 import behaviour.BaseCreateAgentBehaviour;
+import jade.core.AID;
 import onthology.GameSettings;
 
 public class CreateDiggerCoordinatorBehaviour extends BaseCreateAgentBehaviour<DiggerCoordinatorAgent>{
@@ -24,7 +25,7 @@ public class CreateDiggerCoordinatorBehaviour extends BaseCreateAgentBehaviour<D
 	}
 
 	@Override
-	public void addAgent(DiggerCoordinatorAgent agent) {
+	public void addAgent(AID agent) {
 		//((CoordinatorAgent) this.getAgent()).setDiggerCoordinatorAgent(agent);
 	}
 

@@ -1,12 +1,17 @@
 package agent;
 
+import behaviour.digger.RequestResponseBehaviour;
 import jade.core.AID;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.domain.FIPANames.InteractionProtocol;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import map.Cell;
 import onthology.GameSettings;
+import onthology.Movement;
 
 public class DiggerAgent extends ImasMobileAgent{
 
@@ -30,7 +35,7 @@ public class DiggerAgent extends ImasMobileAgent{
 
         // Registers the agent to the DF
         ServiceDescription sd1 = new ServiceDescription();
-        sd1.setType(AgentType.DIGGER.toString());
+        sd1.setType((String)this.getArguments()[3]);
         sd1.setName(getLocalName());
         sd1.setOwnership(OWNER);
         
@@ -46,13 +51,25 @@ public class DiggerAgent extends ImasMobileAgent{
         }
 
         // Searches for the DiggerCoordinator Agent
+        //commented out, coordinator agent is passed as param
+        /*
         ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.DIGGER_COORDINATOR.toString());
-        this.diggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
+        this.diggerCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);*/
+        MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
+
+        this.addBehaviour(new RequestResponseBehaviour(this, mt));
+
         System.out.println("Digger agent setup finished");
 
 
     }
+    
+	public Movement newStepResult() {
+		//TODO: setup movement, should be taken from a plan
+		return new Movement(this, getCell(), getCell());
+	}
+
 
 	/**
 	 * 

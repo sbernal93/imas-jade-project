@@ -1,12 +1,19 @@
 package agent;
 
+import java.io.Serializable;
+
+import behaviour.prospector.RequestResponseBehaviour;
 import jade.core.AID;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.domain.FIPANames.InteractionProtocol;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import map.Cell;
 import onthology.GameSettings;
+import onthology.Movement;
 
 public class ProspectorAgent extends ImasMobileAgent {
 
@@ -30,7 +37,7 @@ public class ProspectorAgent extends ImasMobileAgent {
 
         // Registers the agent to the DF
         ServiceDescription sd1 = new ServiceDescription();
-        sd1.setType(AgentType.DIGGER.toString());
+        sd1.setType((String) this.getArguments()[3]);
         sd1.setName(getLocalName());
         sd1.setOwnership(OWNER);
         
@@ -46,13 +53,23 @@ public class ProspectorAgent extends ImasMobileAgent {
         }
 
         // Searches for the ProspectorCoordinator Agent
-        ServiceDescription searchCriterion = new ServiceDescription();
+        //commented out, not needed coordinator agent is passed as param
+       /* ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.PROSPECTOR_COORDINATOR.toString());
-        this.prospectorCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);
+        this.prospectorCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);*/
         System.out.println("Prospector agent setup finished");
+        MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
+
+        this.addBehaviour(new RequestResponseBehaviour(this, mt));
 
 
     }
+    
+
+	public Movement newStepResult() {
+		//TODO: setup movement, should be taken from a plan
+		return new Movement(this, getCell(), getCell());
+	}
 
 	/**
 	 * 
@@ -70,5 +87,6 @@ public class ProspectorAgent extends ImasMobileAgent {
 	public void setProspectorCoordinatorAgent(AID prospectorCoordinatorAgent) {
 		this.prospectorCoordinatorAgent = prospectorCoordinatorAgent;
 	}
+
 
 }

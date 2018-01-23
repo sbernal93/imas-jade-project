@@ -4,7 +4,10 @@ import java.util.List;
 
 import agent.AgentType;
 import agent.ImasAgent;
+import agent.UtilsAgents;
+import jade.core.AID;
 import jade.core.behaviours.SimpleBehaviour;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.wrapper.AgentController;
 import map.Cell;
 import onthology.GameSettings;
@@ -31,11 +34,18 @@ public abstract class BaseCreateAgentBehaviour<T> extends SimpleBehaviour {
 			 int count = 0;
 			 List<Cell> agentCells = getGame().getAgentList().get(type);
 			 for(Cell cell : agentCells) {
-				 Object[] args = {getGame(), cell, this.agent.getAID()};
+				 agent.log("Creating new agent");
+				 Object[] args = {getGame(), cell, this.agent.getAID(), type.name() + count};
 				 AgentController controller = this.agent.getContainerController()
 						 .createNewAgent(type.name() + count, "agent." + getAgentToCreateClass().getSimpleName(), args);
-				 controller.start();
-	       		 addAgent(controller.getO2AInterface(getAgentToCreateClass()));
+				 controller.start(); 
+				
+	       		 //addAgent(controller.getO2AInterface(getAgentToCreateClass()));
+				 agent.log("Started agent, searching for it");
+				 ServiceDescription searchCriterion = new ServiceDescription();
+			     searchCriterion.setType(type.name() + count);
+			     addAgent(UtilsAgents.searchAgent(this.agent, searchCriterion));
+			     agent.log("Agent found");
 	       		 count++;	
 			 }
 			 this.agent.log("Sub agents created");
@@ -86,7 +96,7 @@ public abstract class BaseCreateAgentBehaviour<T> extends SimpleBehaviour {
 	
 	public abstract Class<T> getAgentToCreateClass();
 	
-	public abstract void addAgent(T agent);
+	public abstract void addAgent(AID agent);
 	
 	public abstract GameSettings getGame();
 	
