@@ -75,6 +75,8 @@ public class CoordinatorAgent extends ImasAgent {
     @Override
     protected void setup() {
     	this.setGame((GameSettings) this.getArguments()[0]);
+    	this.setSystemAgent((AID) this.getArguments()[1]);
+    	
     	this.addBehaviour(new CreateDiggerCoordinatorBehaviour(this, AgentType.DIGGER_COORDINATOR));
         this.addBehaviour(new CreateProspectorCoordinatorBehaviour(this, AgentType.PROSPECTOR_COORDINATOR));
         
@@ -184,6 +186,10 @@ public class CoordinatorAgent extends ImasAgent {
     
     public void setProspectorCoordinatorAgent(AID prospectorCoordinatorAgent) {
     	this.prospectorCoordinatorAgent = prospectorCoordinatorAgent;
+    }
+    
+    public void setSystemAgent(AID systemAgent) {
+    	this.systemAgent = systemAgent;
     }
 }
 

@@ -24,6 +24,7 @@ public class ProspectorAgent extends ImasMobileAgent {
     protected void setup() {
     	this.setCell((Cell) this.getArguments()[1]);
     	this.setGame((GameSettings) this.getArguments()[0]);
+    	this.setProspectorCoordinatorAgent((AID) this.getArguments()[2]);
     	
         this.setEnabledO2ACommunication(true, 1);
 
@@ -66,5 +67,8 @@ public class ProspectorAgent extends ImasMobileAgent {
 		this.game = game;
 	}
 	
+	public void setProspectorCoordinatorAgent(AID prospectorCoordinatorAgent) {
+		this.prospectorCoordinatorAgent = prospectorCoordinatorAgent;
+	}
 
 }

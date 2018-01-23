@@ -24,6 +24,7 @@ public class DiggerAgent extends ImasMobileAgent{
     protected void setup() {
     	this.setCell((Cell) this.getArguments()[1]);
     	this.setGame((GameSettings) this.getArguments()[0]);
+    	this.setDiggerCoordinatorAgent((AID) this.getArguments()[2]);
     	
         this.setEnabledO2ACommunication(true, 1);
 
@@ -66,6 +67,9 @@ public class DiggerAgent extends ImasMobileAgent{
 		this.game = game;
 	}
 	
+	public void setDiggerCoordinatorAgent(AID diggerCoordinatorAgent) {
+		this.diggerCoordinatorAgent = diggerCoordinatorAgent;
+	}
 	
 
 }

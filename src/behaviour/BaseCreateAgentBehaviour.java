@@ -31,7 +31,7 @@ public abstract class BaseCreateAgentBehaviour<T> extends SimpleBehaviour {
 			 int count = 0;
 			 List<Cell> agentCells = getGame().getAgentList().get(type);
 			 for(Cell cell : agentCells) {
-				 Object[] args = {getGame(), cell};
+				 Object[] args = {getGame(), cell, this.agent.getAID()};
 				 AgentController controller = this.agent.getContainerController()
 						 .createNewAgent(type.name() + count, "agent." + getAgentToCreateClass().getSimpleName(), args);
 				 controller.start();
@@ -48,7 +48,7 @@ public abstract class BaseCreateAgentBehaviour<T> extends SimpleBehaviour {
 	
 	private void createIndividualAgent() {
 		try {
-			Object[] args = {getGame()};
+			Object[] args = {getGame(), this.agent.getAID()};
 			AgentController controller = this.agent.getContainerController()
 					.createNewAgent(type.name(), "agent." + getAgentToCreateClass().getSimpleName(), args);
 			this.agent.log("Starting agent");

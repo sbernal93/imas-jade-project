@@ -51,6 +51,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
     protected void setup() {
 
     	this.setGame((GameSettings) this.getArguments()[0]);
+    	this.setCoordinatorAgent((AID) this.getArguments()[1]);
         /* ** Very Important Line (VIL) ***************************************/
         this.setEnabledO2ACommunication(true, 1);
         /* ********************************************************************/
@@ -113,6 +114,9 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
     public void setProspectorAgents(List<ProspectorAgent> prospectorAgents) {
     	this.prospectorAgents = prospectorAgents;
     }
-	
+
+    public void setCoordinatorAgent(AID coordinatorAgent) {
+    	this.coordinatorAgent = coordinatorAgent;
+    }
 
 }

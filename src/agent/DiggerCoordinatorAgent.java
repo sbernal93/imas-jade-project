@@ -49,7 +49,7 @@ public class DiggerCoordinatorAgent extends ImasAgent{
     @Override
     protected void setup() {
     	this.setGame((GameSettings) this.getArguments()[0]);
-    	
+    	this.setCoordinatorAgent((AID) this.getArguments()[1]);
 
         /* ** Very Important Line (VIL) ***************************************/
         this.setEnabledO2ACommunication(true, 1);
@@ -111,5 +111,9 @@ public class DiggerCoordinatorAgent extends ImasAgent{
     
     public void setDiggerAgents(List<DiggerAgent> diggerAgents) {
     	this.diggerAgents = diggerAgents;
+    }
+    
+    public void setCoordinatorAgent(AID coordinatorAgent) {
+    	this.coordinatorAgent = coordinatorAgent;
     }
 }
