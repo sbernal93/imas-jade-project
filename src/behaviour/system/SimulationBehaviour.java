@@ -2,6 +2,9 @@ package behaviour.system;
 
 import agent.SystemAgent;
 import jade.core.behaviours.FSMBehaviour;
+import jade.domain.FIPANames.InteractionProtocol;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
 /**
  * The Simulation behaviour is a FSM behaviour with the following states:
@@ -30,6 +33,9 @@ public class SimulationBehaviour extends FSMBehaviour{
 	//Notifies the coordinator agent to init step, waits for response
 	private static final String SIM_STEP_STATE = "SIM_STEP";
 	
+	//Waits for a message from the coordinator agent telling him the information of the step
+	private static final String WAIT_STEP_FINISHED = "WAIT_STEP";
+	
 	//Attempts to apply a simulation step
 	private static final String APPLY_STEP_STATE = "APPLY_STEP";
 	
@@ -42,14 +48,17 @@ public class SimulationBehaviour extends FSMBehaviour{
 	}
 	
 	private void setupFSM(){
+		MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
 
 		registerFirstState(new SetupBehaviour(this.agent), SETUP_STATE);
 		registerState(new SimStepRequesterCoordinatorAgentBehaviour(this.agent), SIM_STEP_STATE);
+		registerState(new WaitStepEndBehaviour(this.agent, mt), WAIT_STEP_FINISHED);
 		registerState(new ApplySimulationStepBehaviour(this.agent), APPLY_STEP_STATE);
 		registerLastState(new EndSimulationBehaviour(this.agent), FINISHED_STATE);
 		
 		registerDefaultTransition(SETUP_STATE, SIM_STEP_STATE);
-		registerDefaultTransition(SIM_STEP_STATE, APPLY_STEP_STATE);
+		registerDefaultTransition(SIM_STEP_STATE, WAIT_STEP_FINISHED);
+		registerDefaultTransition(WAIT_STEP_FINISHED, APPLY_STEP_STATE);
 		registerTransition(APPLY_STEP_STATE, SIM_STEP_STATE, ApplySimulationStepBehaviour.CONTINUE_SIMULATION);
 		registerTransition(APPLY_STEP_STATE, FINISHED_STATE, ApplySimulationStepBehaviour.FINISHED_SIMULATION);
 		
