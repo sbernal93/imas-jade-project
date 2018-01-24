@@ -36,7 +36,7 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import onthology.GameSettings;
 import onthology.MessageContent;
-import onthology.Movement;
+import util.Movement;
 
 /**
  * The main Coordinator agent. 

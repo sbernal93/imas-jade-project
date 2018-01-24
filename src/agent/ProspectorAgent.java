@@ -13,7 +13,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import map.Cell;
 import onthology.GameSettings;
-import onthology.Movement;
+import util.Movement;
 
 public class ProspectorAgent extends ImasMobileAgent {
 

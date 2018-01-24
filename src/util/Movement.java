@@ -1,4 +1,4 @@
-package onthology;
+package util;
 
 import java.io.Serializable;
 
