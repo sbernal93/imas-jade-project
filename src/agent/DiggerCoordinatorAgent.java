@@ -5,7 +5,6 @@ import java.util.List;
 
 import behaviour.BaseRequesterBehaviour;
 import behaviour.digger.coordinator.CreateDiggerAgentBehaviour;
-import behaviour.digger.coordinator.PrepareNewStepBehaviour;
 import behaviour.digger.coordinator.RequestResponseBehaviour;
 import jade.core.AID;
 import jade.core.behaviours.SequentialBehaviour;
@@ -97,7 +96,7 @@ public class DiggerCoordinatorAgent extends ImasAgent{
         this.addBehaviour(new RequestResponseBehaviour(this, mt));
     }
     
-    public List<Movement> newStepResult() {
+    public void informNewStep() {
     	this.movements = new ArrayList<>();
     	SequentialBehaviour seq = new SequentialBehaviour();
     	
@@ -109,17 +108,11 @@ public class DiggerCoordinatorAgent extends ImasAgent{
     					
     					@Override
     					protected void handleInform(ACLMessage msg) {
-    						try {
-    							((DiggerCoordinatorAgent) this.getAgent()).addMovement((Movement) msg.getContentObject());
-    						} catch (UnreadableException e) {
-    							e.printStackTrace();
-    						}
+    						((DiggerCoordinatorAgent) this.getAgent()).log("Inform received from: " + msg.getSender().getName());
     					}
     		});
     	}
     	this.addBehaviour(seq);
-    	this.log("Got all movements from diggers");
-    	return this.movements;
     }
     
     private ACLMessage buildSimStepMessageForDiggerAgent(AID agent) {

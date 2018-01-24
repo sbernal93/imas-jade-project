@@ -82,13 +82,6 @@ public class RequestResponseBehaviour extends AchieveREResponder {
         ACLMessage reply = msg.createReply();
         if (reply.getPerformative() != ACLMessage.FAILURE) {
 	        reply.setPerformative(ACLMessage.INFORM);
-	        try {
-				reply.setContentObject(agent.newStepResult());
-				agent.log("Response to INFORM prepared");
-		       // agent.log("Content: " + reply.getContent());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 	        agent.log("INFORM message sent");
         }
         return reply;

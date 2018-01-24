@@ -7,6 +7,7 @@ import behaviour.BaseRequesterBehaviour;
 import behaviour.prospector.coordinator.CreateProspectorAgentBehaviour;
 import behaviour.prospector.coordinator.RequestResponseBehaviour;
 import jade.core.AID;
+import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -95,29 +96,24 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
         this.addBehaviour(new RequestResponseBehaviour(this, mt));
     }
     
-    public List<Movement> newStepResult() {
+    public void informNewStep() {
     	this.movements = new ArrayList<>();
+    	SequentialBehaviour seq = new SequentialBehaviour();
     	
     	for (AID agent : this.prospectorAgents) {
-    		this.addBehaviour(new BaseRequesterBehaviour<ProspectorCoordinatorAgent>(this,
+    		seq.addSubBehaviour(new BaseRequesterBehaviour<ProspectorCoordinatorAgent>(this,
     				buildSimStepMessageForProspectorAgent(agent)) {
 
     					private static final long serialVersionUID = 1L;
     					
     					@Override
     					protected void handleInform(ACLMessage msg) {
-    						try {
-    							((ProspectorCoordinatorAgent) this.getAgent()).addMovement((Movement) msg.getContentObject());
-    						} catch (UnreadableException e) {
-    							e.printStackTrace();
-    						}
-    						super.handleInform(msg);
+    						((ProspectorCoordinatorAgent) this.getAgent()).log("Inform received from: " + msg.getSender().getName());
+        					
     					}
     		});
     	}
-    	
-    	
-    	return this.movements;
+    	this.addBehaviour(seq);
     }
     
     private ACLMessage buildSimStepMessageForProspectorAgent(AID agent) {

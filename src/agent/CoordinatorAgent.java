@@ -173,7 +173,7 @@ public class CoordinatorAgent extends ImasAgent {
         
     }
     
-    public List<Movement> newStepResult() {
+    public void informNewStep() {
     	this.movements = new ArrayList<>();
     	//Sends messages to both coordinator agents to start a new step and waits for proposed movements,
     	//once an INFORM message is received, then gets the movements from the message content
@@ -184,12 +184,9 @@ public class CoordinatorAgent extends ImasAgent {
 					
 					@Override
 					protected void handleInform(ACLMessage msg) {
-						try {
-							((CoordinatorAgent) this.getAgent()).log("Inform received");
-							((CoordinatorAgent) this.getAgent()).addMovements((List<Movement>) msg.getContentObject());
-						} catch (UnreadableException e) {
-							e.printStackTrace();
-						}
+							((CoordinatorAgent) this.getAgent()).log("Inform received from DiggerCoordinator");
+							//((CoordinatorAgent) this.getAgent()).addMovements((List<Movement>) msg.getContentObject());
+
 						super.handleInform(msg);
 					}
 		});
@@ -200,18 +197,13 @@ public class CoordinatorAgent extends ImasAgent {
 					
 					@Override
 					protected void handleInform(ACLMessage msg) {
-						try {
-							((CoordinatorAgent) this.getAgent()).log("Inform received");
-							((CoordinatorAgent) this.getAgent()).addMovements((List<Movement>) msg.getContentObject());
-						} catch (UnreadableException e) {
-							e.printStackTrace();
-						}
+							((CoordinatorAgent) this.getAgent()).log("Inform received from ProspectorCoordinator");
+							//((CoordinatorAgent) this.getAgent()).addMovements((List<Movement>) msg.getContentObject());
+
 						super.handleInform(msg);
 					}
 		});
     	
-    	//TODO will return the list of proposed movements
-    	return this.movements;
     }
     
     private ACLMessage buildMessageForCoordinatorsAgent(AID agent) {

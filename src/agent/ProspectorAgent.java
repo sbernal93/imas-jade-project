@@ -66,9 +66,7 @@ public class ProspectorAgent extends ImasMobileAgent {
     }
     
 
-	public Movement newStepResult() {
-		//TODO: setup movement, should be taken from a plan
-		return new Movement(this, getCell(), getCell());
+	public void informNewStep() {
 	}
 
 	/**
