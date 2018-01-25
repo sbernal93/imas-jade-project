@@ -12,6 +12,7 @@ import jade.lang.acl.MessageTemplate;
 import map.Cell;
 import onthology.GameSettings;
 import util.Movement;
+import util.Plan;
 
 public class DiggerAgent extends ImasMobileAgent{
 
@@ -20,6 +21,8 @@ public class DiggerAgent extends ImasMobileAgent{
 	}
 	
 	private GameSettings game;
+	
+	private Plan plan;
 	  /**
      * Digger Coordinator agent id.
      */
@@ -84,6 +87,18 @@ public class DiggerAgent extends ImasMobileAgent{
 	
 	public void setDiggerCoordinatorAgent(AID diggerCoordinatorAgent) {
 		this.diggerCoordinatorAgent = diggerCoordinatorAgent;
+	}
+
+	public Plan getPlan() {
+		return plan;
+	}
+
+	public void setPlan(Plan plan) {
+		this.plan = plan;
+	}
+
+	public AID getDiggerCoordinatorAgent() {
+		return diggerCoordinatorAgent;
 	}
 	
 

@@ -1,6 +1,8 @@
 package agent;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import behaviour.prospector.RequestResponseBehaviour;
 import jade.core.AID;
@@ -14,6 +16,7 @@ import jade.lang.acl.MessageTemplate;
 import map.Cell;
 import onthology.GameSettings;
 import util.Movement;
+import util.Plan;
 
 public class ProspectorAgent extends ImasMobileAgent {
 
@@ -22,6 +25,8 @@ public class ProspectorAgent extends ImasMobileAgent {
 	}
 
 	private GameSettings game;
+	
+	private List<Plan> plans;
 	  /**
      * Prospector Coordinator agent id.
      */
@@ -67,6 +72,14 @@ public class ProspectorAgent extends ImasMobileAgent {
     
 
 	public void informNewStep() {
+		//TODO: this method tells us that a new step has started, prospector agent should 
+		//send based on his current plan, his next move to the Prospector Coordinator
+	}
+	
+	public void applyNewStep(){
+		//TODO: this method tells us that the movement was accepted and we can apply it 
+		//so we apply the first movement in the current plan (which should be the first
+		//plan on the list), and the agent moves 
 	}
 
 	/**
@@ -86,5 +99,24 @@ public class ProspectorAgent extends ImasMobileAgent {
 		this.prospectorCoordinatorAgent = prospectorCoordinatorAgent;
 	}
 
+	public List<Plan> getPlan() {
+		return plans;
+	}
 
+	public void setPlan(List<Plan> plans) {
+		this.plans = plans;
+	}
+	
+	public void addPlan(Plan plan) {
+		if(this.plans == null) {
+			this.plans = new ArrayList<>();
+		}
+		this.plans.add(plan);
+	}
+	
+	public void removePlan(Plan plan) {
+		if(this.plans != null) {
+			this.plans.remove(plan);
+		}
+	}
 }

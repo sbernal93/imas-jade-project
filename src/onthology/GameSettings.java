@@ -20,6 +20,8 @@ package onthology;
 import agent.AgentType;
 import map.Cell;
 import map.CellType;
+import util.Movement;
+
 import java.util.List;
 import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
@@ -248,4 +250,7 @@ public class GameSettings implements java.io.Serializable {
         return max;
     }
 
+    public void moveAgent(Movement movement) {
+    	//TODO:
+    }
 }
