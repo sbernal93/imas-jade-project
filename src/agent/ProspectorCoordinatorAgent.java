@@ -1,15 +1,18 @@
 package agent;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import behaviour.BaseRequesterBehaviour;
 import behaviour.prospector.coordinator.CreateProspectorAgentBehaviour;
+import behaviour.prospector.coordinator.ProspectorContractNetInitiatorBehaviour;
 import behaviour.prospector.coordinator.RequestResponseBehaviour;
 import jade.core.AID;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
+import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPANames.InteractionProtocol;
@@ -114,6 +117,21 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
     		});
     	}
     	this.addBehaviour(seq);
+    }
+    
+    public void performContractNet(){
+    	ACLMessage msg = new ACLMessage(ACLMessage.CFP);
+        msg.setLanguage(ImasAgent.LANGUAGE);
+        msg.setOntology(ImasAgent.ONTOLOGY);
+        for (AID prospectorAgent : this.getProspectorAgents()) {
+            msg.addReceiver(prospectorAgent);
+        }
+        int nResponders = this.getProspectorAgents().size();
+        msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
+        msg.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
+        //TODO: define objects to send
+        //msg.setContentObject();
+        this.addBehaviour(new ProspectorContractNetInitiatorBehaviour(this, msg, nResponders));
     }
     
     private ACLMessage buildSimStepMessageForProspectorAgent(AID agent) {
