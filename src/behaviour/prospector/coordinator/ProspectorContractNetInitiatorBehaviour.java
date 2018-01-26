@@ -43,7 +43,12 @@ public class ProspectorContractNetInitiatorBehaviour extends SimpleBehaviour{
         //msg.setContentObject();
         agent.addBehaviour(new ContractNetInitiator(agent, msg) {
 
-            protected void handlePropose(ACLMessage propose, Vector v) {
+            /**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			protected void handlePropose(ACLMessage propose, Vector v) {
                 agent.log("Agent "+propose.getSender().getLocalName()+" proposed "+propose.getContent());
             }
 
