@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import agent.ImasMobileAgent;
 import map.Cell;
+import onthology.InfoAgent;
 
 /**
  * Class for handling the movement of agents
@@ -60,6 +61,10 @@ public class Movement implements Serializable{
 
 	public void setStatus(MovementStatus status) {
 		this.status = status;
+	}
+	
+	public InfoAgent getInfoAgent() {
+		return new InfoAgent(this.getAgent().getType(), this.getAgent().getAID());
 	}
 
 	@Override

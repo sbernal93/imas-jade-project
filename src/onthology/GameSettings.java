@@ -18,6 +18,7 @@
 package onthology;
 
 import agent.AgentType;
+import agent.ImasMobileAgent;
 import map.Cell;
 import map.CellType;
 import map.PathCell;
@@ -261,8 +262,24 @@ public class GameSettings implements java.io.Serializable {
         return max;
     }
 
-    public void moveAgent(Movement movement) {
-    	//TODO:
+    /**
+     * Moves an agent from an old cell to a new cell based on the 
+     * {@link Movement}. The new cell is assumed to already be validated as a 
+     * {@link PathCell} and that they are next to each other
+     * @param movement
+     * @throws Exception 
+     */
+    public void moveAgent(Movement movement) throws Exception {
+    	InfoAgent agent = movement.getInfoAgent();
+        PathCell newCell = (PathCell) movement.getNewCell();
+        PathCell oldCell = (PathCell) movement.getOldCell();
+        newCell.addAgent(agent);
+        oldCell.removeAgent(agent);
+        movement.getAgent().setCell(newCell);
+        if(!agentList.get(agent.getType()).contains(newCell)) {
+            this.agentList.get(agent.getType()).add(newCell);
+            this.agentList.get(agent.getType()).remove(oldCell);
+        }
     }
     
     /**

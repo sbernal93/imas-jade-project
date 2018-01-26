@@ -127,6 +127,10 @@ public abstract class Cell implements java.io.Serializable {
     public String getMapMessage() {
         return "";
     }
+    
+    public boolean nextTo(Cell cell) {
+        return Math.abs(row - cell.getRow())+Math.abs(col - cell.getCol()) == 1;
+    }
 
 	@Override
 	public int hashCode() {
