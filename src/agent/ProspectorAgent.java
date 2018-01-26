@@ -23,10 +23,6 @@ public class ProspectorAgent extends ImasMobileAgent {
 	public ProspectorAgent() {
 		super(AgentType.PROSPECTOR);
 	}
-
-	private GameSettings game;
-	
-	private List<Plan> plans;
 	  /**
      * Prospector Coordinator agent id.
      */
@@ -87,36 +83,10 @@ public class ProspectorAgent extends ImasMobileAgent {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public GameSettings getGame() {
-		return game;
-	}
-
-	public void setGame(GameSettings game) {
-		this.game = game;
-	}
-	
 	public void setProspectorCoordinatorAgent(AID prospectorCoordinatorAgent) {
 		this.prospectorCoordinatorAgent = prospectorCoordinatorAgent;
 	}
 
-	public List<Plan> getPlan() {
-		return plans;
-	}
 
-	public void setPlan(List<Plan> plans) {
-		this.plans = plans;
-	}
-	
-	public void addPlan(Plan plan) {
-		if(this.plans == null) {
-			this.plans = new ArrayList<>();
-		}
-		this.plans.add(plan);
-	}
-	
-	public void removePlan(Plan plan) {
-		if(this.plans != null) {
-			this.plans.remove(plan);
-		}
-	}
+
 }

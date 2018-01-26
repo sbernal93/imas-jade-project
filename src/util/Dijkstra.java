@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import agent.ImasAgent;
+import agent.ImasMobileAgent;
+
 public class Dijkstra {
 
     private final List<Vertex> nodes;
@@ -120,6 +123,28 @@ public class Dijkstra {
         // Put it into the correct order
         Collections.reverse(path);
         return path;
+    }
+    
+    /**
+     * Gets the path of Vertex to a Movement list
+     * @param vertices
+     * @param agent
+     * @return
+     */
+    public List<Movement> getMovementsFromVertices(List<Vertex> vertices, ImasMobileAgent agent) {
+    	List<Movement> movements = new LinkedList<>();
+    	Movement prevMovement = null;
+    	for(Vertex vertex : vertices) {
+    		Movement movement = null;
+    		if(prevMovement == null) {
+    			movement = new Movement(agent, agent.getCell(), vertex.getCell());
+    		} else {
+    			movement = new Movement(agent, prevMovement.getNewCell(), vertex.getCell());
+    		}
+    		movements.add(movement);
+    		prevMovement = movement;
+    	}
+    	return movements;
     }
 
 }

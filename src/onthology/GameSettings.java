@@ -310,6 +310,11 @@ public class GameSettings implements java.io.Serializable {
     	return this.graph;
     }
     
+    /**
+     * Builds the {@link Graph} object from the map.
+     * Path cells should be the only ones with edges calculated
+     * @return
+     */
     public Graph buildGraphFromMap(){
     	 List<Vertex> vertices = new ArrayList<>();
     	 List<Edge> edgy = new ArrayList<>();

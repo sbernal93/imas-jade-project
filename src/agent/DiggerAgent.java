@@ -20,9 +20,7 @@ public class DiggerAgent extends ImasMobileAgent{
 		super(AgentType.DIGGER);
 	}
 	
-	private GameSettings game;
-	
-	private Plan plan;
+
 	  /**
      * Digger Coordinator agent id.
      */
@@ -77,29 +75,13 @@ public class DiggerAgent extends ImasMobileAgent{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public GameSettings getGame() {
-		return game;
-	}
-
-	public void setGame(GameSettings game) {
-		this.game = game;
-	}
-	
-	public void setDiggerCoordinatorAgent(AID diggerCoordinatorAgent) {
-		this.diggerCoordinatorAgent = diggerCoordinatorAgent;
-	}
-
-	public Plan getPlan() {
-		return plan;
-	}
-
-	public void setPlan(Plan plan) {
-		this.plan = plan;
-	}
 
 	public AID getDiggerCoordinatorAgent() {
 		return diggerCoordinatorAgent;
 	}
-	
+
+	public void setDiggerCoordinatorAgent(AID diggerCoordinatorAgent) {
+		this.diggerCoordinatorAgent = diggerCoordinatorAgent;
+	}
 
 }

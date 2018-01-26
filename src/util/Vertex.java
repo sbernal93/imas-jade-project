@@ -26,10 +26,7 @@ public class Vertex {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        return result;
+        return this.cell.hashCode();
     }
 
     @Override
@@ -41,10 +38,10 @@ public class Vertex {
         if (getClass() != obj.getClass())
             return false;
         Vertex other = (Vertex) obj;
-        if (id == null) {
-            if (other.id != null)
+        if (cell == null) {
+            if (other.cell != null)
                 return false;
-        } else if (!id.equals(other.id))
+        } else if (!cell.equals(other.cell))
             return false;
         return true;
     }
