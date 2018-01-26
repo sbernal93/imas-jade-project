@@ -20,10 +20,19 @@ package onthology;
 import agent.AgentType;
 import map.Cell;
 import map.CellType;
+import map.PathCell;
+import util.Edge;
+import util.Graph;
 import util.Movement;
+import util.Vertex;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -99,6 +108,8 @@ public class GameSettings implements java.io.Serializable {
      * List of cells per type of cell.
      */
     protected Map<CellType, List<Cell>> cellsOfType;
+    
+    private Graph graph;
 
 
     public long getSeed() {
@@ -252,5 +263,70 @@ public class GameSettings implements java.io.Serializable {
 
     public void moveAgent(Movement movement) {
     	//TODO:
+    }
+    
+    /**
+     * Gets all the cells next to a Cell that are PathCells
+     * @param cell
+     * @return
+     */
+    public List<PathCell> getPathCellsNextTo(Cell cell) {
+    	return getCellsNextTo(cell).stream().filter(c -> c.getCellType().equals(CellType.PATH)).map(c -> (PathCell) c).collect(Collectors.toList());
+    }
+    
+    /**
+     * Gets all the cells next to a cell.
+     * Does not return diagonal cells
+     * @param cell
+     * @return
+     */
+    public List<Cell> getCellsNextTo(Cell cell) {
+    	List<Cell> neighbors = new ArrayList<>();
+    	int [] positions = {0,1,-1};
+    	for(int posX : positions) {
+    		if(posX == 0) {
+    			if((cell.getCol() + 1) < map.length) {
+        			neighbors.add(map[cell.getRow()][cell.getCol()+1]);
+    			}
+    			if((cell.getCol() - 1) >= 0 ) {
+        			neighbors.add(map[cell.getRow()][cell.getCol()-1]);
+    			}
+    		} else {
+    			if((cell.getRow() + 1) < map[0].length) {
+    				neighbors.add(map[cell.getRow() + 1][cell.getCol()]);
+    			}
+    			if((cell.getRow() -1) >= 0 ) {
+    				neighbors.add(map[cell.getRow() - 1][cell.getCol()]);
+    			}
+    		}
+    	}
+        return neighbors;
+    }
+    
+    public Graph getMapGraph(){
+    	if(this.graph == null) {
+    		this.graph = buildGraphFromMap();
+    	}
+    	return this.graph;
+    }
+    
+    public Graph buildGraphFromMap(){
+    	 List<Vertex> vertices = new ArrayList<>();
+    	 List<Edge> edgy = new ArrayList<>();
+    	 //first we create the vertex list, so then we can create the edges
+         for(Cell[] cellRow: map) {
+             for(Cell cell : cellRow) {
+                 vertices.add( new Vertex("", cell));
+             }
+         }
+         //with the vertex list, we have the source and destination vertices needed
+         //to create the edge
+         for(Vertex vertex : vertices) {
+             Cell cell = vertex.getCell();
+             for(PathCell pc : getPathCellsNextTo(cell)) {
+                edgy.add(new Edge("", vertex, vertices.stream().filter(v -> v.getCell().equals(pc)).findFirst().get(), 1));
+             }
+         }
+         return new Graph(vertices, edgy);
     }
 }

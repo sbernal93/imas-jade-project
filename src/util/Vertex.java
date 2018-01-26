@@ -1,5 +1,7 @@
 package util;
 
+import map.Cell;
+
 /**
  * Vertice for a graph structure
  * @author santiagobernal
@@ -7,19 +9,19 @@ package util;
  */
 public class Vertex {
     final private String id;
-    final private String name;
+    final private Cell cell;
 
 
-    public Vertex(String id, String name) {
+    public Vertex(String id, Cell cell) {
         this.id = id;
-        this.name = name;
+        this.cell = cell;
     }
     public String getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public Cell getCell() {
+        return cell;
     }
 
     @Override
@@ -49,7 +51,7 @@ public class Vertex {
 
     @Override
     public String toString() {
-        return name;
+        return cell.toString();
     }
 
 }
