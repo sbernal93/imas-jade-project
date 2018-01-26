@@ -1,16 +1,30 @@
 package util;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import agent.ImasMobileAgent;
 
 /**
  * A plan for mobile agents
  * @author santiagobernal
  *
  */
-public class Plan {
+public class Plan implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private ImasMobileAgent agent;
 	private List<Movement> movements;
+
+	public Plan(ImasMobileAgent agent, List<Movement> movements) {
+		super();
+		this.agent = agent;
+		this.movements = movements;
+	}
 
 	public List<Movement> getMovements() {
 		return movements;
@@ -32,4 +46,13 @@ public class Plan {
 			this.movements.remove(movement);
 		}
 	}
+
+	public ImasMobileAgent getAgent() {
+		return agent;
+	}
+
+	public void setAgent(ImasMobileAgent agent) {
+		this.agent = agent;
+	}
+	
 }
