@@ -83,28 +83,24 @@ public class ProspectorAgent extends ImasMobileAgent {
     }
     
 
-	public void informNewStep() {
+	public Movement informNewStep() {
 		//TODO: this method tells us that a new step has started, prospector agent should 
 		//send based on his current plan, his next move to the Prospector Coordinator
+		return this.getPlans().get(0).getMovements().get(0);
 	}
 	
 	public void applyNewStep(){
-		//TODO: this method tells us that the movement was accepted and we can apply it 
-		//so we apply the first movement in the current plan (which should be the first
-		//plan on the list), and the agent moves 
-		//while(this.getPlans().size()>0) {
-			Movement movementToMake = this.getPlans().get(0).getMovements().get(0);
-			try {
-				this.getGame().moveAgent(movementToMake);
-				if(this.getPlans().get(0).getMovements().size() == 1) {
-					this.getPlans().remove(0);
-				} else {
-					this.getPlans().get(0).getMovements().remove(0);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
+		Movement movementToMake = this.getPlans().get(0).getMovements().get(0);
+		try {
+			this.getGame().moveAgent(movementToMake);
+			if(this.getPlans().get(0).getMovements().size() == 1) {
+				this.getPlans().remove(0);
+			} else {
+				this.getPlans().get(0).getMovements().remove(0);
 			}
-		//}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	

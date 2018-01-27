@@ -18,14 +18,19 @@
 package agent;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import behaviour.BaseRequesterBehaviour;
 import behaviour.BaseSearchAgentBehaviour;
 import behaviour.coordinator.CreateDiggerCoordinatorBehaviour;
 import behaviour.coordinator.CreateProspectorCoordinatorBehaviour;
+import behaviour.coordinator.ProspectorCoordinatorRequesterBehaviour;
 import behaviour.coordinator.RequestResponseBehaviour;
+import behaviour.coordinator.WaitProspectorCoordinatorResponseBehaviour;
+import behaviour.prospector.coordinator.ProspectorNewStepRequesterBehaviour;
 import jade.core.AID;
+import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames.InteractionProtocol;
@@ -177,7 +182,8 @@ public class CoordinatorAgent extends ImasAgent {
     	this.movements = new ArrayList<>();
     	//Sends messages to both coordinator agents to start a new step and waits for proposed movements,
     	//once an INFORM message is received, then gets the movements from the message content
-    	this.addBehaviour(new BaseRequesterBehaviour<CoordinatorAgent>(this,
+    	SequentialBehaviour seq = new SequentialBehaviour();
+    	seq.addSubBehaviour(new BaseRequesterBehaviour<CoordinatorAgent>(this,
     			buildMessageForCoordinatorsAgent(getDiggerCoordinatorAgent())) {
 
 					private static final long serialVersionUID = 1L;
@@ -190,7 +196,7 @@ public class CoordinatorAgent extends ImasAgent {
 						super.handleInform(msg);
 					}
 		});
-    	this.addBehaviour(new BaseRequesterBehaviour<CoordinatorAgent>(this,
+    	/*seq.addSubBehaviour(new BaseRequesterBehaviour<CoordinatorAgent>(this,
     			buildMessageForCoordinatorsAgent(getProspectorCoordinatorAgent())) {
 
 					private static final long serialVersionUID = 1L;
@@ -202,8 +208,12 @@ public class CoordinatorAgent extends ImasAgent {
 
 						super.handleInform(msg);
 					}
-		});
+		});*/
+    	seq.addSubBehaviour(new ProspectorCoordinatorRequesterBehaviour(this, buildMessageForCoordinatorsAgent(getProspectorCoordinatorAgent())));
+    	/*MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
     	
+    	seq.addSubBehaviour(new WaitProspectorCoordinatorResponseBehaviour(this, mt));*/
+    	this.addBehaviour(seq);
     }
     
     private ACLMessage buildMessageForCoordinatorsAgent(AID agent) {
@@ -211,6 +221,7 @@ public class CoordinatorAgent extends ImasAgent {
 		message.clearAllReceiver();
 		message.addReceiver(agent);
 		message.setProtocol(InteractionProtocol.FIPA_REQUEST);
+		message.setReplyByDate(new Date(System.currentTimeMillis() + 20000));
 		this.log("Request message to a Coordinator agent");
         try {
         	message.setContent(MessageContent.NEW_STEP);

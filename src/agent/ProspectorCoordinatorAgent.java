@@ -6,8 +6,10 @@ import java.util.Date;
 import java.util.List;
 
 import behaviour.BaseRequesterBehaviour;
+import behaviour.TimeoutBehaviour;
 import behaviour.prospector.coordinator.CreateProspectorAgentBehaviour;
 import behaviour.prospector.coordinator.ProspectorContractNetInitiatorBehaviour;
+import behaviour.prospector.coordinator.ProspectorNewStepRequesterBehaviour;
 import behaviour.prospector.coordinator.RequestResponseBehaviour;
 import jade.core.AID;
 import jade.core.behaviours.SequentialBehaviour;
@@ -104,21 +106,17 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
         this.addBehaviour(new RequestResponseBehaviour(this, mt));
     }
     
+    /**
+     * Setups the behaviour to start contract net and/or inform prospector agents of new step.
+     * Cant return inform inmediatly since the behaviours created wont execute until the 
+     * response is finished
+     * @param seq
+     */
     public void informNewStep(SequentialBehaviour seq) {
     	if(!firstStep) {
 	    	this.movements = new ArrayList<>();
 	    	for (AID agent : this.prospectorAgents) {
-	    		seq.addSubBehaviour(new BaseRequesterBehaviour<ProspectorCoordinatorAgent>(this,
-	    				buildSimStepMessageForProspectorAgent(agent)) {
-	
-	    					private static final long serialVersionUID = 1L;
-	    					
-	    					@Override
-	    					protected void handleInform(ACLMessage msg) {
-	    						((ProspectorCoordinatorAgent) this.getAgent()).log("Inform received from: " + msg.getSender().getName());
-	        					
-	    					}
-	    		});
+	    		seq.addSubBehaviour(new ProspectorNewStepRequesterBehaviour(this, buildSimStepMessageForProspectorAgent(agent)));
 	    	}
 	    	this.addBehaviour(seq);
     	} else {
@@ -176,6 +174,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 		message.clearAllReceiver();
 		message.addReceiver(agent);
 		message.setProtocol(InteractionProtocol.FIPA_REQUEST);
+		message.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
 		this.log("Request message to a Digger agent");
         try {
         	message.setContent(MessageContent.NEW_STEP);
