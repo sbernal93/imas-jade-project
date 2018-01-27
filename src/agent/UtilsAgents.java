@@ -18,6 +18,10 @@
 package agent;
 
 import jade.core.Agent;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import jade.core.AID;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
@@ -144,6 +148,22 @@ public class UtilsAgents {
             e.printStackTrace();
         }
         return container;
+    }
+    
+    /**
+     * Splits a list by n amounts
+     * @param list
+     * @param n
+     * @return
+     */
+	public static <T> List<List<T>> splitList (List<T> list, int n) {
+    	 ArrayList<List<T>> chunks = new ArrayList<List<T>>();
+
+    	    for (int i = 0; i < list.size(); i += n) {
+    	        List<T> chunk = list.subList(i, Math.min(list.size(), i + n));         
+    	        chunks.add(chunk);
+    	    }
+    	    return chunks;
     }
 
 }

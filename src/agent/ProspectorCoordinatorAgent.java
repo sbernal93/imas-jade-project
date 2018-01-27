@@ -1,5 +1,6 @@
 package agent;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +20,7 @@ import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import map.PathCell;
 import onthology.GameSettings;
 import onthology.MessageContent;
 import util.Movement;
@@ -121,32 +123,39 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
     
     /**
      * How it works: For contract net in the exploration of field cells, we would have the following structure:
-	 *  -Recognition: Prospector coordinator groups the field cells by the amount of prospector agents
-	 *  -Announcement: For each group, make a broadcast to the prospector
-	 *  -Bidding: Each prospector responds with a “tender” (avg. distance) if they currently don’t have a task
+	 *  -Recognition: Prospector coordinator groups the path cells next to field cells by the amount of prospector agents
+	 *  -Announcement: For each group, make a broadcast to the prospectors
+	 *  -Bidding: Each prospector responds with a “tender” (a {@link Plan}) if they currently don’t have a task
 	 *  -Awarding: Assign the group of field cells to the best bidder
 	 *  -Expediting: Prospector coordinator tells the agent to do the task
-	 *  - Announce the next group of field cells 
+	 *  -Announce the next group of field cells 
 	 * Note: prospector agents will explore its assigned group of field cells indefinitely 
 	 * Pros: All the prospectors will have a list of field cells to discover so they won’t need to do any extra calculations
 	 * Cons: Not optimal (shortest total distance), may not choose the optimal distance to a group since the 
 	 * choice is selected one by one. But for this case this isn’t very important since the priority is to explore all the field cells.
+     * @throws IOException 
      */
-    public void performContractNet(){
-    	
-    	
-    	ACLMessage msg = new ACLMessage(ACLMessage.CFP);
-        msg.setLanguage(ImasAgent.LANGUAGE);
-        msg.setOntology(ImasAgent.ONTOLOGY);
-        for (AID prospectorAgent : this.getProspectorAgents()) {
-            msg.addReceiver(prospectorAgent);
-        }
+    public void performContractNet() throws IOException{
+    	SequentialBehaviour seq = new SequentialBehaviour();
         int nResponders = this.getProspectorAgents().size();
-        msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
-        msg.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
-        //TODO: define objects to send ?
-        //msg.setContentObject();
-        this.addBehaviour(new ProspectorContractNetInitiatorBehaviour(this, msg, nResponders));
+    	List<PathCell> pathCellsToExplore = game.getPathCellsNextToFieldCells();
+    	List<List<PathCell>> splitted = UtilsAgents.splitList(pathCellsToExplore, nResponders);
+    	
+    	for(List<PathCell> group : splitted) {
+    		ACLMessage msg = new ACLMessage(ACLMessage.CFP);
+            msg.setLanguage(ImasAgent.LANGUAGE);
+            msg.setOntology(ImasAgent.ONTOLOGY);
+            for (AID prospectorAgent : this.getProspectorAgents()) {
+                msg.addReceiver(prospectorAgent);
+            }
+            msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
+            msg.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
+            //Sets the first path cell of the group to be sent, the prospectors will respond with
+            //their distance to that field cell
+            msg.setContentObject(group.get(0));
+            seq.addSubBehaviour(new ProspectorContractNetInitiatorBehaviour(this, msg, nResponders));
+    	}
+    	
     }
     
     private ACLMessage buildSimStepMessageForProspectorAgent(AID agent) {
