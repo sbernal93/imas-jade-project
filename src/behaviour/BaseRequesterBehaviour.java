@@ -11,9 +11,11 @@ import jade.proto.AchieveREInitiator;
  */
 public abstract class BaseRequesterBehaviour<T extends ImasAgent> extends AchieveREInitiator{
 	
+	private T agent;
 
 	public BaseRequesterBehaviour(T a, ACLMessage msg) {
 		super(a, msg);
+		agent = a;
 	}
 
 
@@ -78,5 +80,9 @@ public abstract class BaseRequesterBehaviour<T extends ImasAgent> extends Achiev
     protected void handleRefuse(ACLMessage msg) {
     	T agent = (T) this.getAgent();
         agent.log("Action refused.");
+    }
+    
+    public T getTypeAgent() {
+    	return agent;
     }
 }

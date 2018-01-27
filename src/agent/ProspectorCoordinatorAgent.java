@@ -118,6 +118,15 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 	    	for (AID agent : this.prospectorAgents) {
 	    		seq.addSubBehaviour(new ProspectorNewStepRequesterBehaviour(this, buildSimStepMessageForProspectorAgent(agent)));
 	    	}
+	    	seq.addSubBehaviour(new BaseRequesterBehaviour<ProspectorCoordinatorAgent>(this,
+	    			UtilsAgents.buildMessage(this.coordinatorAgent, MessageContent.STEP_FINISHED)) {
+
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = 1L;
+			});
+	    	
 	    	this.addBehaviour(seq);
     	} else {
     		try {

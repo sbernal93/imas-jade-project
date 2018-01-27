@@ -20,6 +20,7 @@ package agent;
 import jade.core.Agent;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import jade.core.AID;
@@ -30,9 +31,12 @@ import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.domain.FIPANames.InteractionProtocol;
+import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
+import onthology.MessageContent;
 
 /**
  * Utility class for agents.
@@ -166,4 +170,18 @@ public class UtilsAgents {
     	    return chunks;
     }
 
+    public static ACLMessage buildMessage(AID agent, String content) {
+		ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+		message.clearAllReceiver();
+		message.addReceiver(agent);
+		message.setProtocol(InteractionProtocol.FIPA_REQUEST);
+		message.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
+        try {
+        	message.setContent(content);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return message;
+	}
+    
 }

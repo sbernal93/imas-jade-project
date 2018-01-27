@@ -210,10 +210,31 @@ public class CoordinatorAgent extends ImasAgent {
 					}
 		});*/
     	seq.addSubBehaviour(new ProspectorCoordinatorRequesterBehaviour(this, buildMessageForCoordinatorsAgent(getProspectorCoordinatorAgent())));
-    	/*MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
-    	
-    	seq.addSubBehaviour(new WaitProspectorCoordinatorResponseBehaviour(this, mt));*/
+
     	this.addBehaviour(seq);
+    }
+    
+    public void requestStepResultFromProspectorCoordinator() {
+    	this.addBehaviour(new BaseRequesterBehaviour<CoordinatorAgent>(this,
+    			UtilsAgents.buildMessage(getProspectorCoordinatorAgent(), MessageContent.STEP_RESULT)) {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@SuppressWarnings("unchecked")
+			@Override
+			protected void handleInform(ACLMessage msg) {
+				try {
+					this.getTypeAgent().log("INFORM received");
+					this.getTypeAgent().addMovements((List<Movement>) msg.getContentObject());
+				} catch (UnreadableException e) {
+					e.printStackTrace();
+				}
+			}
+			
+		});
     }
     
     private ACLMessage buildMessageForCoordinatorsAgent(AID agent) {
@@ -231,6 +252,7 @@ public class CoordinatorAgent extends ImasAgent {
         }
         return message;
 	}
+
     
 
     /**

@@ -58,6 +58,10 @@ public class RequestResponseBehaviour extends AchieveREResponder {
             	agent.log("NEW_STEP request message received");
             	reply.setPerformative(ACLMessage.AGREE);
             }
+            if(content.equals(MessageContent.STEP_FINISHED)) {
+            	agent.log("STEP_FINISHED request message received");
+            	reply.setPerformative(ACLMessage.AGREE);
+            }
         } catch (Exception e) {
             reply.setPerformative(ACLMessage.FAILURE);
             agent.errorLog(e.getMessage());
@@ -85,10 +89,16 @@ public class RequestResponseBehaviour extends AchieveREResponder {
         // it is important to make the createReply in order to keep the same context of
         // the conversation
     	CoordinatorAgent agent = (CoordinatorAgent) this.getAgent();
+    	Object content = (Object) msg.getContent();
         ACLMessage reply = msg.createReply();
         if (reply.getPerformative() != ACLMessage.FAILURE) {
 	        reply.setPerformative(ACLMessage.INFORM);
-        	agent.informNewStep();
+	        if(content.equals(MessageContent.NEW_STEP)) {
+	        	agent.informNewStep();
+	        }
+	        if(content.equals(MessageContent.STEP_FINISHED)) {
+	        	agent.requestStepResultFromProspectorCoordinator();
+	        }
 	        agent.log("INFORM message sent");
         }
         return reply;

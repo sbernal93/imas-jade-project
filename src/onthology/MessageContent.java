@@ -33,4 +33,11 @@ public class MessageContent {
      */
     public static String NEW_STEP = "New step";
     
+    
+    /**
+     * MEssage for requesting the step result
+     */
+    public static String STEP_RESULT = "Step result";
+    
+    public static String STEP_FINISHED = "Step finished";
 }
