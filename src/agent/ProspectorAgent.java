@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import behaviour.prospector.ProspectorContractNetResponder;
 import behaviour.prospector.RequestResponseBehaviour;
@@ -17,7 +18,9 @@ import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import map.Cell;
+import map.PathCell;
 import onthology.GameSettings;
+import onthology.InfoAgent;
 import util.Movement;
 import util.Plan;
 
@@ -61,6 +64,17 @@ public class ProspectorAgent extends ImasMobileAgent {
        /* ServiceDescription searchCriterion = new ServiceDescription();
         searchCriterion.setType(AgentType.PROSPECTOR_COORDINATOR.toString());
         this.prospectorCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);*/
+        try {
+    		//we update our cell so it has the correct AID 
+			Optional<InfoAgent> infoAgent = ((PathCell) this.getCell()).getAgents().get(AgentType.PROSPECTOR).stream().filter(a -> a.getAID() == null).findFirst();
+			InfoAgent ia = infoAgent.orElse(null);
+			if(ia!=null) {
+				ia.setAID(this.getAID());
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
         System.out.println("Prospector agent setup finished");
         MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
         MessageTemplate cnmt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_CONTRACT_NET), MessageTemplate.MatchPerformative(ACLMessage.CFP));
@@ -78,6 +92,19 @@ public class ProspectorAgent extends ImasMobileAgent {
 		//TODO: this method tells us that the movement was accepted and we can apply it 
 		//so we apply the first movement in the current plan (which should be the first
 		//plan on the list), and the agent moves 
+		//while(this.getPlans().size()>0) {
+			Movement movementToMake = this.getPlans().get(0).getMovements().get(0);
+			try {
+				this.getGame().moveAgent(movementToMake);
+				if(this.getPlans().get(0).getMovements().size() == 1) {
+					this.getPlans().remove(0);
+				} else {
+					this.getPlans().get(0).getMovements().remove(0);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		//}
 	}
 	
 	

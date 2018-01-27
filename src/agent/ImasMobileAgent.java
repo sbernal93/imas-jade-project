@@ -5,7 +5,9 @@ import java.util.List;
 
 import jade.core.AID;
 import map.Cell;
+import map.PathCell;
 import onthology.GameSettings;
+import onthology.InfoAgent;
 import util.Dijkstra;
 import util.Movement;
 import util.Plan;

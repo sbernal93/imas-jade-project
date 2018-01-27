@@ -48,7 +48,7 @@ public class RequestResponseBehaviour extends AchieveREResponder {
             if(content.equals(MessageContent.NEW_STEP)) {
             	agent.log("NEW_STEP request message received");
             	reply.setPerformative(ACLMessage.AGREE);
-            	agent.informNewStep();
+            	agent.informNewStep(null);
             }
         } catch (Exception e) {
             reply.setPerformative(ACLMessage.FAILURE);

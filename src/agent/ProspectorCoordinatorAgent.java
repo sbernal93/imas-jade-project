@@ -104,11 +104,9 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
         this.addBehaviour(new RequestResponseBehaviour(this, mt));
     }
     
-    public void informNewStep() {
+    public void informNewStep(SequentialBehaviour seq) {
     	if(!firstStep) {
 	    	this.movements = new ArrayList<>();
-	    	SequentialBehaviour seq = new SequentialBehaviour();
-	    	
 	    	for (AID agent : this.prospectorAgents) {
 	    		seq.addSubBehaviour(new BaseRequesterBehaviour<ProspectorCoordinatorAgent>(this,
 	    				buildSimStepMessageForProspectorAgent(agent)) {
@@ -126,8 +124,10 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
     	} else {
     		try {
     			this.log("Attempting contract net");
-				performContractNet();
+    			seq  = performContractNet();
 				this.firstStep = false;
+				//does contract net, then informs the agent they can start
+				informNewStep(seq);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -148,7 +148,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 	 * choice is selected one by one. But for this case this isn’t very important since the priority is to explore all the field cells.
      * @throws IOException 
      */
-    public void performContractNet() throws IOException{
+    public SequentialBehaviour performContractNet() throws IOException{
     	SequentialBehaviour seq = new SequentialBehaviour();
         int nResponders = this.getProspectorAgents().size();
     	List<PathCell> pathCellsToExplore = game.getPathCellsNextToFieldCells();
@@ -168,7 +168,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
             msg.setContentObject(group.get(0));
             seq.addSubBehaviour(new ProspectorContractNetInitiatorBehaviour(this, msg, nResponders));
     	}
-    	this.addBehaviour(seq);
+    	return seq;
     }
     
     private ACLMessage buildSimStepMessageForProspectorAgent(AID agent) {
