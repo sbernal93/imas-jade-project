@@ -119,7 +119,22 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
     	this.addBehaviour(seq);
     }
     
+    /**
+     * How it works: For contract net in the exploration of field cells, we would have the following structure:
+	 *  -Recognition: Prospector coordinator groups the field cells by the amount of prospector agents
+	 *  -Announcement: For each group, make a broadcast to the prospector
+	 *  -Bidding: Each prospector responds with a “tender” (avg. distance) if they currently don’t have a task
+	 *  -Awarding: Assign the group of field cells to the best bidder
+	 *  -Expediting: Prospector coordinator tells the agent to do the task
+	 *  - Announce the next group of field cells 
+	 * Note: prospector agents will explore its assigned group of field cells indefinitely 
+	 * Pros: All the prospectors will have a list of field cells to discover so they won’t need to do any extra calculations
+	 * Cons: Not optimal (shortest total distance), may not choose the optimal distance to a group since the 
+	 * choice is selected one by one. But for this case this isn’t very important since the priority is to explore all the field cells.
+     */
     public void performContractNet(){
+    	
+    	
     	ACLMessage msg = new ACLMessage(ACLMessage.CFP);
         msg.setLanguage(ImasAgent.LANGUAGE);
         msg.setOntology(ImasAgent.ONTOLOGY);
@@ -129,7 +144,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
         int nResponders = this.getProspectorAgents().size();
         msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
         msg.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
-        //TODO: define objects to send
+        //TODO: define objects to send ?
         //msg.setContentObject();
         this.addBehaviour(new ProspectorContractNetInitiatorBehaviour(this, msg, nResponders));
     }

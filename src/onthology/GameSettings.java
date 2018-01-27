@@ -351,4 +351,27 @@ public class GameSettings implements java.io.Serializable {
          }
          return new Graph(vertices, edgy);
     }
+    
+    /**
+     * Gets all the path cells that are next to field cells, 
+     * if a path cell is next to 2 or more field cells, it only adds the 
+     * path cell once to the list. 
+     * @return
+     */
+    public List<PathCell> getPathCellsNextToFieldCells(){
+    	List<Cell> fieldCells = this.getCellsOfType().get(CellType.FIELD);
+    	List<PathCell> pathCells = new ArrayList<>();
+    	
+    	for(Cell cell : fieldCells) {
+    		List<PathCell> neighbours = getPathCellsNextTo(cell);
+    		for(PathCell pc : neighbours) {
+    			if(!pathCells.stream().anyMatch(p -> p.equals(pc))) {
+    				pathCells.add(pc);
+    			}
+    		}
+    	}
+    	
+    	return pathCells;
+    }
+    
 }
