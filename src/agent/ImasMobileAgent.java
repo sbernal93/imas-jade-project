@@ -39,11 +39,11 @@ public abstract class ImasMobileAgent extends ImasAgent{
 	public void setGame(GameSettings game) {
 		this.game = game;
 	}
-	public List<Plan> getPlan() {
+	public List<Plan> getPlans() {
 		return plans;
 	}
 
-	public void setPlan(List<Plan> plans) {
+	public void setPlans(List<Plan> plans) {
 		this.plans = plans;
 	}
 	

@@ -2,6 +2,7 @@ package agent;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import behaviour.prospector.RequestResponseBehaviour;
@@ -77,6 +78,8 @@ public class ProspectorAgent extends ImasMobileAgent {
 		//so we apply the first movement in the current plan (which should be the first
 		//plan on the list), and the agent moves 
 	}
+	
+	
 
 	/**
 	 * 
@@ -85,6 +88,29 @@ public class ProspectorAgent extends ImasMobileAgent {
 	
 	public void setProspectorCoordinatorAgent(AID prospectorCoordinatorAgent) {
 		this.prospectorCoordinatorAgent = prospectorCoordinatorAgent;
+	}
+
+
+	/**
+	 * We override the method because we want the prospector agent to repeat the plan set
+	 * until the simulation ends
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public void addPlan(Plan plan) {
+		int simSteps = this.getGame().getSimulationSteps();
+		int movementSteps = plan.getMovements().size();
+		this.setPlans(new ArrayList<>());
+		this.getPlans().add(plan);
+		ArrayList<Movement> prevPlansMovements = (ArrayList<Movement>) plan.getMovements();
+		while(movementSteps < simSteps) {
+			//we create a copy so we dont modify the original list, we then reverse it
+			ArrayList<Movement> copy = (ArrayList<Movement>) prevPlansMovements.clone();
+			Collections.reverse(copy);
+			this.getPlans().add(new Plan(this, copy));
+			prevPlansMovements = copy;
+			movementSteps += copy.size();
+		}
 	}
 
 
