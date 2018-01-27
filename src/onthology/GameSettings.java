@@ -299,21 +299,21 @@ public class GameSettings implements java.io.Serializable {
      */
     public List<Cell> getCellsNextTo(Cell cell) {
     	List<Cell> neighbors = new ArrayList<>();
-    	int [] positions = {0,1,-1};
+    	int [] positions = {0,1};
     	for(int posX : positions) {
     		if(posX == 0) {
-    			if((cell.getCol() + 1) < map.length) {
-        			neighbors.add(map[cell.getRow()][cell.getCol()+1]);
+    			if((cell.getRow() + 1) < map.length) {
+        			neighbors.add(map[cell.getRow() + 1][cell.getCol()]);
     			}
-    			if((cell.getCol() - 1) >= 0 ) {
-        			neighbors.add(map[cell.getRow()][cell.getCol()-1]);
+    			if((cell.getRow() - 1) >= 0 ) {
+        			neighbors.add(map[cell.getRow() - 1][cell.getCol()]);
     			}
     		} else {
-    			if((cell.getRow() + 1) < map[0].length) {
-    				neighbors.add(map[cell.getRow() + 1][cell.getCol()]);
+    			if((cell.getCol() + 1) < map[0].length) {
+    				neighbors.add(map[cell.getRow()][cell.getCol() + 1]);
     			}
-    			if((cell.getRow() -1) >= 0 ) {
-    				neighbors.add(map[cell.getRow() - 1][cell.getCol()]);
+    			if((cell.getCol() -1) >= 0 ) {
+    				neighbors.add(map[cell.getRow()][cell.getCol() - 1]);
     			}
     		}
     	}
