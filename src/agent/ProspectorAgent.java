@@ -3,8 +3,10 @@ package agent;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
+import behaviour.prospector.ProspectorContractNetResponder;
 import behaviour.prospector.RequestResponseBehaviour;
 import jade.core.AID;
 import jade.domain.DFService;
@@ -61,10 +63,9 @@ public class ProspectorAgent extends ImasMobileAgent {
         this.prospectorCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);*/
         System.out.println("Prospector agent setup finished");
         MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
-
+        MessageTemplate cnmt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_CONTRACT_NET), MessageTemplate.MatchPerformative(ACLMessage.CFP));
         this.addBehaviour(new RequestResponseBehaviour(this, mt));
-
-
+        this.addBehaviour(new ProspectorContractNetResponder(this, cnmt));
     }
     
 
@@ -102,10 +103,10 @@ public class ProspectorAgent extends ImasMobileAgent {
 		int movementSteps = plan.getMovements().size();
 		this.setPlans(new ArrayList<>());
 		this.getPlans().add(plan);
-		ArrayList<Movement> prevPlansMovements = (ArrayList<Movement>) plan.getMovements();
+		LinkedList<Movement> prevPlansMovements = (LinkedList<Movement>) plan.getMovements();
 		while(movementSteps < simSteps) {
 			//we create a copy so we dont modify the original list, we then reverse it
-			ArrayList<Movement> copy = (ArrayList<Movement>) prevPlansMovements.clone();
+			LinkedList<Movement> copy = (LinkedList<Movement>) prevPlansMovements.clone();
 			Collections.reverse(copy);
 			this.getPlans().add(new Plan(this, copy));
 			prevPlansMovements = copy;

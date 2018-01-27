@@ -168,6 +168,9 @@ public class SystemAgent extends ImasAgent {
 		return currentStep;
 	}
 	
+	public void setCurrentStep(int step) {
+		currentStep = step;
+	}
 	
     
 

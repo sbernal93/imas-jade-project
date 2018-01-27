@@ -29,16 +29,13 @@ public class ApplySimulationStepBehaviour extends OneShotBehaviour{
 	@Override
 	public int onEnd() {
 		this.agent.log("ApplySimulationStepBehaviour finished" );
-		//commented out while steps not yet implemented
-		/*
 		if(this.agent.getGame().getSimulationSteps() >= this.agent.getCurrentStep()) {
 			this.agent.log("Simulation finished");
+			this.agent.setCurrentStep(this.agent.getCurrentStep() + 1);
 			return FINISHED_SIMULATION;
 		}
 		this.agent.log("Simulation continues");
-		return CONTINUE_SIMULATION;*/
-		
-		return FINISHED_SIMULATION;
+		return CONTINUE_SIMULATION;
 	}
 
 }

@@ -1,5 +1,7 @@
 package util;
 
+import java.io.Serializable;
+
 import map.Cell;
 
 /**
@@ -7,8 +9,14 @@ import map.Cell;
  * @author santiagobernal
  *
  */
-public class Vertex {
-    final private String id;
+public class Vertex implements Serializable{ 
+	
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	final private String id;
     final private Cell cell;
 
 

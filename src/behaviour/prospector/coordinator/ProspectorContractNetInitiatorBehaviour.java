@@ -24,15 +24,16 @@ public class ProspectorContractNetInitiatorBehaviour extends ContractNetInitiato
 		super(a, cfp);
 	}
 	
-	public ProspectorContractNetInitiatorBehaviour(Agent a, ACLMessage cfp, int nResponders) {
+	public ProspectorContractNetInitiatorBehaviour(ProspectorCoordinatorAgent a, ACLMessage cfp, int nResponders) {
 		super(a, cfp);
 		this.nResponders = nResponders;
+		this.agent = a;
 	}
 	
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected void handlePropose(ACLMessage propose, Vector v) {
-        agent.log("Agent "+propose.getSender().getLocalName()+" proposed "+propose.getContent());
+        agent.log("Agent "+propose.getSender().getLocalName()+" proposed ");
     }
 	
 	@Override
@@ -74,7 +75,6 @@ public class ProspectorContractNetInitiatorBehaviour extends ContractNetInitiato
                 acceptances.addElement(reply);
                 try {
 					Plan proposal = (Plan) msg.getContentObject();
-					
 	                int time = proposal.getMovements().size();
 	                if (time < bestTime) {
 	                    bestTime = time;
@@ -88,7 +88,7 @@ public class ProspectorContractNetInitiatorBehaviour extends ContractNetInitiato
         }
         // Accept the proposal of the best proposer
         if (accept != null) {
-            agent.log("Accepting proposal " + bestProposal + " from " + bestProposal.getAgent().getLocalName());
+            agent.log("Accepting proposal " + bestProposal.getMovements().size() + " from " + bestProposal.getAgent().getName());
             accept.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
         }
     }

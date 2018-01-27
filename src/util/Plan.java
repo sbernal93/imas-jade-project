@@ -54,5 +54,12 @@ public class Plan implements Serializable{
 	public void setAgent(ImasMobileAgent agent) {
 		this.agent = agent;
 	}
+
+	@Override
+	public String toString() {
+		return "Plan [agent=" + agent + ", movements=" + movements + "]";
+	}
+	
+	
 	
 }

@@ -47,6 +47,8 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 	
 	private AID coordinatorAgent;
 	
+	private boolean firstStep;
+	
 
 	private List<Movement> movements;
 	/**
@@ -57,6 +59,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 
 	public ProspectorCoordinatorAgent() {
 		super(AgentType.PROSPECTOR_COORDINATOR);
+		this.firstStep = true;
 	}
 
 	   /**
@@ -102,23 +105,33 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
     }
     
     public void informNewStep() {
-    	this.movements = new ArrayList<>();
-    	SequentialBehaviour seq = new SequentialBehaviour();
-    	
-    	for (AID agent : this.prospectorAgents) {
-    		seq.addSubBehaviour(new BaseRequesterBehaviour<ProspectorCoordinatorAgent>(this,
-    				buildSimStepMessageForProspectorAgent(agent)) {
-
-    					private static final long serialVersionUID = 1L;
-    					
-    					@Override
-    					protected void handleInform(ACLMessage msg) {
-    						((ProspectorCoordinatorAgent) this.getAgent()).log("Inform received from: " + msg.getSender().getName());
-        					
-    					}
-    		});
+    	if(!firstStep) {
+	    	this.movements = new ArrayList<>();
+	    	SequentialBehaviour seq = new SequentialBehaviour();
+	    	
+	    	for (AID agent : this.prospectorAgents) {
+	    		seq.addSubBehaviour(new BaseRequesterBehaviour<ProspectorCoordinatorAgent>(this,
+	    				buildSimStepMessageForProspectorAgent(agent)) {
+	
+	    					private static final long serialVersionUID = 1L;
+	    					
+	    					@Override
+	    					protected void handleInform(ACLMessage msg) {
+	    						((ProspectorCoordinatorAgent) this.getAgent()).log("Inform received from: " + msg.getSender().getName());
+	        					
+	    					}
+	    		});
+	    	}
+	    	this.addBehaviour(seq);
+    	} else {
+    		try {
+    			this.log("Attempting contract net");
+				performContractNet();
+				this.firstStep = false;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
     	}
-    	this.addBehaviour(seq);
     }
     
     /**
@@ -139,8 +152,8 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
     	SequentialBehaviour seq = new SequentialBehaviour();
         int nResponders = this.getProspectorAgents().size();
     	List<PathCell> pathCellsToExplore = game.getPathCellsNextToFieldCells();
-    	List<List<PathCell>> splitted = UtilsAgents.splitList(pathCellsToExplore, nResponders);
-    	
+    	double size = Math.ceil(pathCellsToExplore.size() / Double.valueOf(nResponders));
+    	List<List<PathCell>> splitted = UtilsAgents.splitList(pathCellsToExplore, (int) size);
     	for(List<PathCell> group : splitted) {
     		ACLMessage msg = new ACLMessage(ACLMessage.CFP);
             msg.setLanguage(ImasAgent.LANGUAGE);
@@ -155,7 +168,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
             msg.setContentObject(group.get(0));
             seq.addSubBehaviour(new ProspectorContractNetInitiatorBehaviour(this, msg, nResponders));
     	}
-    	
+    	this.addBehaviour(seq);
     }
     
     private ACLMessage buildSimStepMessageForProspectorAgent(AID agent) {

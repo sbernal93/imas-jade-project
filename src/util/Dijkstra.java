@@ -1,5 +1,6 @@
 package util;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,9 +13,14 @@ import java.util.Set;
 import agent.ImasAgent;
 import agent.ImasMobileAgent;
 
-public class Dijkstra {
+public class Dijkstra implements Serializable{
 
-    private final List<Vertex> nodes;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private final List<Vertex> nodes;
     private final List<Edge> edges;
     private Set<Vertex> settledNodes;
     private Set<Vertex> unSettledNodes;

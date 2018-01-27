@@ -38,15 +38,17 @@ public class ProspectorContractNetResponder extends ContractNetResponder{
 	protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept)
 			throws FailureException {
 		agent.log("Proposal accepted");
+		ACLMessage inform = accept.createReply();
+        inform.setPerformative(ACLMessage.INFORM);
 		if(planProposed.getMovements().size()>= agent.getGame().getSimulationSteps() ) {
 			//shouldnt enter here but just in case, it should ignore the plan 
 			//TODO: validate that it never enters here, and if it does, then handle this better
 			//since it means some cells arent going to be explored
 			agent.log("DANGER: proposed plan was not supposed to be accepted.");
-			return super.handleAcceptProposal(cfp, propose, accept);
+			return inform;
 		}
 		agent.addPlan(planProposed);
-		return super.handleAcceptProposal(cfp, propose, accept);
+		return inform;
 	}
 
 	/**
@@ -74,6 +76,9 @@ public class ProspectorContractNetResponder extends ContractNetResponder{
 			ACLMessage proposal = cfp.createReply();
 			proposal.setPerformative(ACLMessage.PROPOSE);
 			proposal.setContentObject(planProposed);
+			//proposal.setContent("Size: "+ planProposed.getMovements().size());
+			proposal.setSender(agent.getAID());
+			agent.log("Returning created proposal");
 			return proposal;
 		} catch (UnreadableException e) {
 			e.printStackTrace();

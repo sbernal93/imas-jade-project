@@ -1,12 +1,20 @@
 package util;
 
+import java.io.Serializable;
+
 /**
  * Edge of a graph structure
  * @author santiagobernal
  *
  */
-public class Edge  {
-    private final String id;
+public class Edge  implements Serializable{
+	
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private final String id;
     private final Vertex source;
     private final Vertex destination;
     private final int weight;
