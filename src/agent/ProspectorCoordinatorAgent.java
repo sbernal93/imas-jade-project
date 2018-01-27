@@ -26,33 +26,33 @@ import onthology.MessageContent;
 import util.Movement;
 
 /**
- * 
+ *
  * Prospector Coordinator Agent.
- * Gets the initial Game Settings from the CoordinatorAgent, 
- * initializes the Prospector Agents and sends directions to the 
+ * Gets the initial Game Settings from the CoordinatorAgent,
+ * initializes the Prospector Agents and sends directions to the
  * them according to: New mines found and new mines created
- * Updates the CoordinatorAgent with the 
+ * Updates the CoordinatorAgent with the
  * information that each Propspector did each turn
  *
  */
 public class ProspectorCoordinatorAgent extends ImasAgent{
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	
-	
+
+
 	private GameSettings game;
-	
+
 	private AID coordinatorAgent;
-	
+
 	private boolean firstStep;
-	
+
 
 	private List<Movement> movements;
 	/**
-	 * The Agent has a list of all the prospector agents that 
+	 * The Agent has a list of all the prospector agents that
 	 * are currently in the map
 	 */
 	private List<AID> prospectorAgents;
@@ -80,7 +80,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
         sd1.setType(AgentType.PROSPECTOR_COORDINATOR.toString());
         sd1.setName(getLocalName());
         sd1.setOwnership(OWNER);
-        
+
         DFAgentDescription dfd = new DFAgentDescription();
         dfd.addServices(sd1);
         dfd.setName(getAID());
@@ -103,22 +103,22 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 
         this.addBehaviour(new RequestResponseBehaviour(this, mt));
     }
-    
+
     public void informNewStep() {
     	if(!firstStep) {
 	    	this.movements = new ArrayList<>();
 	    	SequentialBehaviour seq = new SequentialBehaviour();
-	    	
+
 	    	for (AID agent : this.prospectorAgents) {
 	    		seq.addSubBehaviour(new BaseRequesterBehaviour<ProspectorCoordinatorAgent>(this,
 	    				buildSimStepMessageForProspectorAgent(agent)) {
-	
+
 	    					private static final long serialVersionUID = 1L;
-	    					
+
 	    					@Override
 	    					protected void handleInform(ACLMessage msg) {
 	    						((ProspectorCoordinatorAgent) this.getAgent()).log("Inform received from: " + msg.getSender().getName());
-	        					
+
 	    					}
 	    		});
 	    	}
@@ -133,7 +133,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 			}
     	}
     }
-    
+
     /**
      * How it works: For contract net in the exploration of field cells, we would have the following structure:
 	 *  -Recognition: Prospector coordinator groups the path cells next to field cells by the amount of prospector agents
@@ -141,12 +141,12 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 	 *  -Bidding: Each prospector responds with a “tender” (a {@link Plan}) if they currently don’t have a task
 	 *  -Awarding: Assign the group of field cells to the best bidder
 	 *  -Expediting: Prospector coordinator tells the agent to do the task
-	 *  -Announce the next group of field cells 
-	 * Note: prospector agents will explore its assigned group of field cells indefinitely 
+	 *  -Announce the next group of field cells
+	 * Note: prospector agents will explore its assigned group of field cells indefinitely
 	 * Pros: All the prospectors will have a list of field cells to discover so they won’t need to do any extra calculations
-	 * Cons: Not optimal (shortest total distance), may not choose the optimal distance to a group since the 
+	 * Cons: Not optimal (shortest total distance), may not choose the optimal distance to a group since the
 	 * choice is selected one by one. But for this case this isn’t very important since the priority is to explore all the field cells.
-     * @throws IOException 
+     * @throws IOException
      */
     public void performContractNet() throws IOException{
     	SequentialBehaviour seq = new SequentialBehaviour();
@@ -170,13 +170,13 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
     	}
     	this.addBehaviour(seq);
     }
-    
+
     private ACLMessage buildSimStepMessageForProspectorAgent(AID agent) {
 		ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 		message.clearAllReceiver();
 		message.addReceiver(agent);
 		message.setProtocol(InteractionProtocol.FIPA_REQUEST);
-		this.log("Request message to a Digger agent");
+		this.log("Request message to a Prospector agent");
         try {
         	message.setContent(MessageContent.NEW_STEP);
         	this.log("Request message content:" + message.getContent());
@@ -185,7 +185,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
         }
         return message;
 	}
-    
+
     /**
      * Update the game settings.
      *
@@ -203,7 +203,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
     public GameSettings getGame() {
         return this.game;
     }
-    
+
     public void addProspectorAgent(AID prospectorAgent) {
     	if(this.prospectorAgents == null) {
     		this.prospectorAgents = new ArrayList<>();
@@ -214,7 +214,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
     public List<AID> getProspectorAgents() {
     	return this.prospectorAgents;
     }
-    
+
     public void setProspectorAgents(List<AID> prospectorAgents) {
     	this.prospectorAgents = prospectorAgents;
     }
@@ -222,7 +222,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
     public void setCoordinatorAgent(AID coordinatorAgent) {
     	this.coordinatorAgent = coordinatorAgent;
     }
-    
+
     public List<Movement> getMovements() {
 		return movements;
 	}
@@ -230,20 +230,20 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 	public void setMovements(List<Movement> movements) {
 		this.movements = movements;
 	}
-    
+
 	public void addMovement(Movement movement) {
 		if (this.movements == null) {
 			this.movements = new ArrayList<>();
 		}
 		this.movements.add(movement);
 	}
-	
+
 	public void addMovements(List<Movement> movements) {
 		if (this.movements == null) {
 			this.movements = new ArrayList<>();
 		}
 		this.movements.addAll(movements);
 	}
-    
+
 
 }

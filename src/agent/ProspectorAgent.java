@@ -30,13 +30,13 @@ public class ProspectorAgent extends ImasMobileAgent {
      * Prospector Coordinator agent id.
      */
     private AID prospectorCoordinatorAgent;
-	
+
     @Override
     protected void setup() {
     	this.setCell((Cell) this.getArguments()[1]);
     	this.setGame((GameSettings) this.getArguments()[0]);
     	this.setProspectorCoordinatorAgent((AID) this.getArguments()[2]);
-    	
+
         this.setEnabledO2ACommunication(true, 1);
 
         // Registers the agent to the DF
@@ -44,7 +44,7 @@ public class ProspectorAgent extends ImasMobileAgent {
         sd1.setType((String) this.getArguments()[3]);
         sd1.setName(getLocalName());
         sd1.setOwnership(OWNER);
-        
+
         DFAgentDescription dfd = new DFAgentDescription();
         dfd.addServices(sd1);
         dfd.setName(getAID());
@@ -67,26 +67,27 @@ public class ProspectorAgent extends ImasMobileAgent {
         this.addBehaviour(new RequestResponseBehaviour(this, mt));
         this.addBehaviour(new ProspectorContractNetResponder(this, cnmt));
     }
-    
 
-	public void informNewStep() {
-		//TODO: this method tells us that a new step has started, prospector agent should 
+
+	public Movement informNewStep() {
+		//TODO: this method tells us that a new step has started, prospector agent should
 		//send based on his current plan, his next move to the Prospector Coordinator
+		return this.getPlan().get(0).getMovements().get(0);
 	}
-	
+
 	public void applyNewStep(){
-		//TODO: this method tells us that the movement was accepted and we can apply it 
+		//TODO: this method tells us that the movement was accepted and we can apply it
 		//so we apply the first movement in the current plan (which should be the first
-		//plan on the list), and the agent moves 
+		//plan on the list), and the agent moves
 	}
-	
-	
+
+
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	public void setProspectorCoordinatorAgent(AID prospectorCoordinatorAgent) {
 		this.prospectorCoordinatorAgent = prospectorCoordinatorAgent;
 	}

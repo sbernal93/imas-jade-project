@@ -17,7 +17,7 @@ import onthology.MessageContent;
 public class RequestResponseBehaviour extends AchieveREResponder {
 
     /**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -49,7 +49,7 @@ public class RequestResponseBehaviour extends AchieveREResponder {
             if(content.equals(MessageContent.NEW_STEP)) {
             	agent.log("NEW_STEP request message received");
             	reply.setPerformative(ACLMessage.AGREE);
-            	
+
             }
         } catch (Exception e) {
             reply.setPerformative(ACLMessage.FAILURE);
@@ -82,6 +82,12 @@ public class RequestResponseBehaviour extends AchieveREResponder {
         if (reply.getPerformative() != ACLMessage.FAILURE) {
 	        reply.setPerformative(ACLMessage.INFORM);
 	        agent.log("INFORM message sent");
+					try {
+							reply.setContentObject(agent.informNewStep());
+					} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+					}
         }
         return reply;
 
