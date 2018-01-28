@@ -25,13 +25,15 @@ public class DiggerAgent extends ImasMobileAgent{
      * Digger Coordinator agent id.
      */
     private AID diggerCoordinatorAgent;
+    
+    private boolean isDigging;
 	
     @Override
     protected void setup() {
     	this.setCell((Cell) this.getArguments()[1]);
     	this.setGame((GameSettings) this.getArguments()[0]);
     	this.setDiggerCoordinatorAgent((AID) this.getArguments()[2]);
-    	
+    	isDigging = false;
         this.setEnabledO2ACommunication(true, 1);
 
         // Registers the agent to the DF
@@ -82,6 +84,14 @@ public class DiggerAgent extends ImasMobileAgent{
 
 	public void setDiggerCoordinatorAgent(AID diggerCoordinatorAgent) {
 		this.diggerCoordinatorAgent = diggerCoordinatorAgent;
+	}
+
+	public boolean isDigging() {
+		return isDigging;
+	}
+
+	public void setDigging(boolean isDigging) {
+		this.isDigging = isDigging;
 	}
 
 }

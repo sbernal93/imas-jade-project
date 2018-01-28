@@ -37,6 +37,9 @@ public class SimulationBehaviour extends FSMBehaviour{
 	private static final String WAIT_STEP_FINISHED = "WAIT_STEP";
 	
 	//Attempts to apply a simulation step
+	private static final String VALIDATES_STEP = "VALIDATES_STEP";
+	
+	//Attempts to apply a simulation step
 	private static final String APPLY_STEP_STATE = "APPLY_STEP";
 	
 	//All steps are finished
@@ -53,14 +56,16 @@ public class SimulationBehaviour extends FSMBehaviour{
 		registerFirstState(new SetupBehaviour(this.agent), SETUP_STATE);
 		registerState(new SimStepRequesterCoordinatorAgentBehaviour(this.agent), SIM_STEP_STATE);
 		registerState(new WaitStepEndBehaviour(this.agent, mt), WAIT_STEP_FINISHED);
+		registerState(new ValidateSimulationStepBehaviour(this.agent), VALIDATES_STEP);
 		registerState(new ApplySimulationStepBehaviour(this.agent), APPLY_STEP_STATE);
 		registerLastState(new EndSimulationBehaviour(this.agent), FINISHED_STATE);
 		
 		registerDefaultTransition(SETUP_STATE, SIM_STEP_STATE);
 		registerDefaultTransition(SIM_STEP_STATE, WAIT_STEP_FINISHED);
-		registerDefaultTransition(WAIT_STEP_FINISHED, APPLY_STEP_STATE);
-		registerTransition(APPLY_STEP_STATE, SIM_STEP_STATE, ApplySimulationStepBehaviour.CONTINUE_SIMULATION);
-		registerTransition(APPLY_STEP_STATE, FINISHED_STATE, ApplySimulationStepBehaviour.FINISHED_SIMULATION);
+		registerDefaultTransition(WAIT_STEP_FINISHED, VALIDATES_STEP);
+		registerDefaultTransition(VALIDATES_STEP, APPLY_STEP_STATE);
+		registerTransition(APPLY_STEP_STATE, SIM_STEP_STATE, ValidateSimulationStepBehaviour.CONTINUE_SIMULATION);
+		registerTransition(APPLY_STEP_STATE, FINISHED_STATE, ValidateSimulationStepBehaviour.FINISHED_SIMULATION);
 		
 	}
 }

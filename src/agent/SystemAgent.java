@@ -17,6 +17,8 @@
  */
 package agent;
 
+import java.util.List;
+
 import behaviour.system.SimulationBehaviour;
 import gui.GraphicInterface;
 import jade.core.AID;
@@ -26,6 +28,7 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import onthology.GameSettings;
 import onthology.InitialGameSettings;
+import util.Movement;
 
 
 /**
@@ -49,6 +52,8 @@ public class SystemAgent extends ImasAgent {
      * round.
      */
     private AID coordinatorAgent;
+    
+    private List<Movement> movementsProposed;
     
     /**
      * Current amount of steps in the game
@@ -170,6 +175,14 @@ public class SystemAgent extends ImasAgent {
 	
 	public void setCurrentStep(int step) {
 		currentStep = step;
+	}
+
+	public List<Movement> getMovementsProposed() {
+		return movementsProposed;
+	}
+
+	public void setMovementsProposed(List<Movement> movementsProposed) {
+		this.movementsProposed = movementsProposed;
 	}
 	
     

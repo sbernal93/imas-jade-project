@@ -18,7 +18,9 @@
 package onthology;
 
 import agent.AgentType;
+import agent.DiggerAgent;
 import agent.ImasMobileAgent;
+import agent.ProspectorAgent;
 import map.Cell;
 import map.CellType;
 import map.PathCell;
@@ -31,6 +33,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -110,10 +113,31 @@ public class GameSettings implements java.io.Serializable {
      */
     protected Map<CellType, List<Cell>> cellsOfType;
     
+    protected List<DiggerAgent> diggerAgents;
+    
+    protected List<ProspectorAgent> prospectorAgents;
+    
+    
     private Graph graph;
 
 
-    public long getSeed() {
+    public List<DiggerAgent> getDiggerAgents() {
+		return diggerAgents;
+	}
+
+	public void setDiggerAgents(List<DiggerAgent> diggerAgents) {
+		this.diggerAgents = diggerAgents;
+	}
+
+	public List<ProspectorAgent> getProspectorAgents() {
+		return prospectorAgents;
+	}
+
+	public void setProspectorAgents(List<ProspectorAgent> prospectorAgents) {
+		this.prospectorAgents = prospectorAgents;
+	}
+
+	public long getSeed() {
         return seed;
     }
 
@@ -372,6 +396,25 @@ public class GameSettings implements java.io.Serializable {
     	}
     	
     	return pathCells;
+    }
+    
+    /**
+     * Validates that the new cell is a {@link PathCell}, that the new cell
+     * is neighbour to the old cell and that no digger agent is digging in that cell
+     * @param movement
+     * @return
+     */
+    public boolean isValidMovement(Movement movement) {
+    	if(!(movement.getNewCell() instanceof PathCell)) {
+    		return false;
+    	}
+    	if(!getPathCellsNextTo(movement.getOldCell()).stream().anyMatch(c -> c.equals(movement.getNewCell()))) {
+    		return false;
+    	}
+		if(getDiggerAgents().stream().anyMatch(d -> d.getCell().equals(movement.getNewCell()) && d.isDigging())) {
+			return false;
+		}
+    	return true;
     }
     
 }

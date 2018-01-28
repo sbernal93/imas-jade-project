@@ -17,6 +17,7 @@
  */
 package agent;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -196,20 +197,17 @@ public class CoordinatorAgent extends ImasAgent {
 						super.handleInform(msg);
 					}
 		});
-    	/*seq.addSubBehaviour(new BaseRequesterBehaviour<CoordinatorAgent>(this,
+    	seq.addSubBehaviour(new BaseRequesterBehaviour<CoordinatorAgent>(this,
     			buildMessageForCoordinatorsAgent(getProspectorCoordinatorAgent())) {
 
 					private static final long serialVersionUID = 1L;
 					
 					@Override
 					protected void handleInform(ACLMessage msg) {
-							((CoordinatorAgent) this.getAgent()).log("Inform received from ProspectorCoordinator");
-							//((CoordinatorAgent) this.getAgent()).addMovements((List<Movement>) msg.getContentObject());
-
-						super.handleInform(msg);
+							this.getTypeAgent().log("Inform received from ProspectorCoordinator");
 					}
-		});*/
-    	seq.addSubBehaviour(new ProspectorCoordinatorRequesterBehaviour(this, buildMessageForCoordinatorsAgent(getProspectorCoordinatorAgent())));
+		});
+    	//seq.addSubBehaviour(new ProspectorCoordinatorRequesterBehaviour(this, buildMessageForCoordinatorsAgent(getProspectorCoordinatorAgent())));
 
     	this.addBehaviour(seq);
     }
@@ -235,6 +233,33 @@ public class CoordinatorAgent extends ImasAgent {
 			}
 			
 		});
+    	//TODO: make one of this methods for digger coordinator, the last one to execute should trigger the 
+    	//message to be sent to the system agent
+    	communicateStepWithSystemAgent();
+    }
+    
+    private void communicateStepWithSystemAgent() {
+    	ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+		message.clearAllReceiver();
+		message.addReceiver(getSystemAgent());
+		message.setProtocol(InteractionProtocol.FIPA_REQUEST);
+		message.setReplyByDate(new Date(System.currentTimeMillis() + 20000));
+		this.log("Request message to a Coordinator agent");
+        try {
+        	message.setContent(MessageContent.STEP_FINISHED);
+        	this.log("Request message content:" + message.getContent());
+        	message.setContentObject((Serializable) this.getMovements());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    	this.addBehaviour(new BaseRequesterBehaviour<CoordinatorAgent>(this, message) {
+
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+    		
+    	});
     }
     
     private ACLMessage buildMessageForCoordinatorsAgent(AID agent) {

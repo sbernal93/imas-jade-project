@@ -1,9 +1,17 @@
 package behaviour.system;
 
+import java.util.List;
+
+import agent.CoordinatorAgent;
 import agent.SystemAgent;
+import agent.UtilsAgents;
+import behaviour.BaseRequesterBehaviour;
 import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
+import onthology.MessageContent;
+import util.Movement;
 
 public class WaitStepEndBehaviour extends SimpleBehaviour{
 
@@ -25,10 +33,18 @@ public class WaitStepEndBehaviour extends SimpleBehaviour{
 	@Override
 	public void action() {
 		ACLMessage message = agent.receive(mt);
-		
 		if(message != null){
 			//TODO: extract info from message, maybe also validate its the message we are waiting for
-			finished = true;
+			Object content = (Object) message.getContent();
+			if(content.equals(MessageContent.STEP_FINISHED)) {
+				try {
+					agent.setMovementsProposed((List<Movement>) message.getContentObject());
+					agent.log("Got movements :" + agent.getMovementsProposed().size());
+				} catch (UnreadableException e) {
+					e.printStackTrace();
+				}
+				finished = true;
+			}
 		} else {
 			block(5000);
 		}

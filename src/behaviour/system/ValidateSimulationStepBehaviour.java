@@ -3,8 +3,9 @@ package behaviour.system;
 import agent.SystemAgent;
 import jade.core.behaviours.OneShotBehaviour;
 import util.Movement;
+import util.Movement.MovementStatus;
 
-public class ApplySimulationStepBehaviour extends OneShotBehaviour{
+public class ValidateSimulationStepBehaviour extends OneShotBehaviour{
 
 	/**
 	 * 
@@ -16,15 +17,22 @@ public class ApplySimulationStepBehaviour extends OneShotBehaviour{
 	
 	private SystemAgent agent;
 	
-	public ApplySimulationStepBehaviour(SystemAgent agent) {
+	public ValidateSimulationStepBehaviour(SystemAgent agent) {
 		super(agent);
 		this.agent = agent;
 	}
 
 	@Override
 	public void action() {
-		this.agent.log("ApplySimulationStepBehaviour started");
-
+		//validate movements
+		this.agent.log("ValidateSimulationStepBehaviour started");
+		for(Movement movement : this.agent.getMovementsProposed()) {
+			if(this.agent.getGame().isValidMovement(movement)) {
+				movement.setStatus(MovementStatus.ACCEPTED);
+			} else {
+				movement.setStatus(MovementStatus.REJECTED);
+			}
+		}
 	}
 	
 	@Override
@@ -32,10 +40,10 @@ public class ApplySimulationStepBehaviour extends OneShotBehaviour{
 		this.agent.log("ApplySimulationStepBehaviour finished" );
 		if(this.agent.getGame().getSimulationSteps() >= this.agent.getCurrentStep()) {
 			this.agent.log("Simulation finished");
+			this.agent.setCurrentStep(this.agent.getCurrentStep() + 1);
 			return FINISHED_SIMULATION;
 		}
 		this.agent.log("Simulation continues");
-		this.agent.setCurrentStep(this.agent.getCurrentStep() + 1);
 		return CONTINUE_SIMULATION;
 	}
 

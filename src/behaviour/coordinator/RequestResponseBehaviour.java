@@ -62,6 +62,10 @@ public class RequestResponseBehaviour extends AchieveREResponder {
             	agent.log("STEP_FINISHED request message received");
             	reply.setPerformative(ACLMessage.AGREE);
             }
+            if(content.equals(MessageContent.STEP_RESULT)) {
+            	agent.log("STEP_RESULT request message received");
+            	reply.setPerformative(ACLMessage.AGREE);
+            }
         } catch (Exception e) {
             reply.setPerformative(ACLMessage.FAILURE);
             agent.errorLog(e.getMessage());
@@ -98,6 +102,13 @@ public class RequestResponseBehaviour extends AchieveREResponder {
 	        }
 	        if(content.equals(MessageContent.STEP_FINISHED)) {
 	        	agent.requestStepResultFromProspectorCoordinator();
+	        }
+	        if(content.equals(MessageContent.STEP_RESULT)) {
+	        	try {
+	        		reply.setContentObject((Serializable) agent.getMovements());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 	        }
 	        agent.log("INFORM message sent");
         }
