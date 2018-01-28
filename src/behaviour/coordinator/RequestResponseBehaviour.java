@@ -110,6 +110,7 @@ public class RequestResponseBehaviour extends AchieveREResponder {
 	            			}
 	            			if(list.get(0) instanceof Cell) {
 	            				agent.log("MINE_DISCOVERY request message received");
+	        	            	reply.setPerformative(ACLMessage.AGREE);;
 	            				
 	            			}
 	            		}
@@ -118,7 +119,7 @@ public class RequestResponseBehaviour extends AchieveREResponder {
             } else {
             	agent.log("Got null content from: " + msg.getSender());
             	agent.log("failure message");
-                reply.setPerformative(ACLMessage.FAILURE);
+                reply.setPerformative(ACLMessage.AGREE);
             }
         } catch (Exception e) {
         	agent.log("failure message");

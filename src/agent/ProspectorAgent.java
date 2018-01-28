@@ -111,6 +111,7 @@ public class ProspectorAgent extends ImasMobileAgent {
 			});
 		} else {
 			//TODO: should do something so movement is validated
+			this.log("Movement not valid");
 		}
 		
 		return this.foundMines;
@@ -134,22 +135,45 @@ public class ProspectorAgent extends ImasMobileAgent {
 	 * until the simulation ends
 	 */
 	@SuppressWarnings("unchecked")
-	@Override
-	public void addPlan(Plan plan) {
+	public void addPlan(Plan plan, List<PathCell> pathReceived) {
 		int simSteps = this.getGame().getSimulationSteps();
-		int movementSteps = plan.getMovements().size();
+		
 		this.setPlans(new ArrayList<>());
-		this.getPlans().add(plan);
-		LinkedList<Movement> prevPlansMovements = (LinkedList<Movement>) plan.getMovements();
+		Movement prevLastMovement = null;
+		int movementSteps = 0;
+		Plan newPlan = null;
+		while(movementSteps <= simSteps) {
+			for(PathCell cell :  pathReceived) {
+				if(prevLastMovement == null) {
+					newPlan = new Plan(this, this.findShortestPath(cell));
+					this.getPlans().add(newPlan);
+					//prevLastMovement = newPlan.getMovements().get(newPlan.getMovements().size() - 1);
+				} else {
+					newPlan = new Plan(this, this.findShortestPath(prevLastMovement.getNewCell(), cell));
+					this.getPlans().add(newPlan);
+				}
+				prevLastMovement = newPlan.getMovements().get(newPlan.getMovements().size() - 1);
+				movementSteps += newPlan.getMovements().size();
+			}
+		}
+		//this.getPlans().add(plan);
+		
+/*		int countBacktrack = 1;
 		while(movementSteps < simSteps) {
 			//we create a copy so we dont modify the original list, we then reverse it
+			LinkedList<Movement> prevPlansMovements = (LinkedList<Movement>) this.getPlans().get(this.getPlans().size()-countBacktrack).getMovements();
 			LinkedList<Movement> copy = (LinkedList<Movement>) prevPlansMovements.clone();
 			Collections.reverse(copy);
 			this.getPlans().add(new Plan(this, copy));
 			prevPlansMovements = copy;
 			movementSteps += copy.size();
-		}
+			if(countBacktrack - this.getPlans().size() - 2 >= 0) {
+				countBacktrack = countBacktrack - 2;
+			}
+		}*/
+		this.log("Plan made");
 	}
+	
 
 
 	public List<FieldCell> getFoundMines() {

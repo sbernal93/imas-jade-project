@@ -25,6 +25,7 @@ public class ProspectorContractNetResponder extends ContractNetResponder{
 	
 	private ProspectorAgent agent;
 	private Plan planProposed;
+	private List<PathCell> pathsReceived;
 	
 	public ProspectorContractNetResponder(ProspectorAgent a, MessageTemplate mt) {
 		super(a, mt);
@@ -47,7 +48,7 @@ public class ProspectorContractNetResponder extends ContractNetResponder{
 			agent.log("DANGER: proposed plan was not supposed to be accepted.");
 			return inform;
 		}
-		agent.addPlan(planProposed);
+		agent.addPlan(planProposed, pathsReceived);
 		return inform;
 	}
 
@@ -55,6 +56,7 @@ public class ProspectorContractNetResponder extends ContractNetResponder{
 	 * Sends a proposal of a plan to the prospector coordinator based on the 
 	 * {@linkplain PathCell} received
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	protected ACLMessage handleCfp(ACLMessage cfp) throws RefuseException, FailureException, NotUnderstoodException {
 		try {
@@ -68,8 +70,8 @@ public class ProspectorContractNetResponder extends ContractNetResponder{
 				agent.log("Proposing plan with high number of steps so its rejected");
 				planProposed = new Plan(agent, movements);
 			} else {
-				PathCell cell = (PathCell) cfp.getContentObject();
-				List<Movement> path = this.agent.findShortestPath(cell);
+				this.pathsReceived = (List<PathCell>) cfp.getContentObject();
+				List<Movement> path = this.agent.findShortestPath(this.pathsReceived.get(0));
 				agent.log("Proposing a plan with: " + path.size() + " steps");
 				planProposed = new Plan(agent, path);
 			}

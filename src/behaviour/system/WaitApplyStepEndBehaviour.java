@@ -47,7 +47,7 @@ public class WaitApplyStepEndBehaviour extends SimpleBehaviour{
 				finished = true;
 			//}
 		} else {
-			block(1000);
+			block(5000);
 		}
 		
 	}

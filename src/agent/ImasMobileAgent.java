@@ -78,5 +78,15 @@ public abstract class ImasMobileAgent extends ImasAgent{
 		
 		return dijkstra.getMovementsFromVertices(path, this);
 	}
+	
+	public List<Movement> findShortestPath(Cell source, Cell destination) {
+		if(dijkstra == null) {
+			dijkstra = new Dijkstra(game.buildGraphFromMap());
+		}
+		dijkstra.execute(new Vertex("", source));
+		List<Vertex> path = dijkstra.getPath(new Vertex("", destination));
+		
+		return dijkstra.getMovementsFromVertices(path, this, source);
+	}
 
 }

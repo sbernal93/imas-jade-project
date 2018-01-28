@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Vector;
 
 import behaviour.BaseRequesterBehaviour;
 import behaviour.TimeoutBehaviour;
@@ -195,7 +196,8 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
             msg.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
             //Sets the first path cell of the group to be sent, the prospectors will respond with
             //their distance to that field cell
-            msg.setContentObject(group.get(0));
+            ArrayList<PathCell> list = new ArrayList<PathCell>(group);
+            msg.setContentObject((Serializable) list);
             seq.addSubBehaviour(new ProspectorContractNetInitiatorBehaviour(this, msg, nResponders));
     	}
     	return seq;
@@ -257,6 +259,14 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
     			buildNewMinesMessage()) {
 
 					private static final long serialVersionUID = 1L;
+					
+					
+					@Override
+					protected Vector<ACLMessage> prepareRequests(ACLMessage request) {
+						Vector<ACLMessage> v = new Vector<>();
+						v.add(buildNewMinesMessage());
+						return v;
+					}
 		});
     	
     	seq.addSubBehaviour(new BaseRequesterBehaviour<ProspectorCoordinatorAgent>(this,
@@ -266,6 +276,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 			 * 
 			 */
 			private static final long serialVersionUID = 1L;
+
 		});
     	
     	this.addBehaviour(seq);
@@ -298,7 +309,9 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
         try {
         	message.setContent(MessageContent.MINE_DISCOVERY);
         	this.log("Request message content:" + message.getContent());
-        	message.setContentObject((Serializable) this.getNewMines());
+        	if(this.getNewMines() != null && this.getNewMines().size()>0) {
+        		message.setContentObject((Serializable) this.getNewMines());
+        	}
         } catch (Exception e) {
             e.printStackTrace();
         }
