@@ -140,6 +140,24 @@ public class Dijkstra implements Serializable{
     public List<Movement> getMovementsFromVertices(List<Vertex> vertices, ImasMobileAgent agent) {
     	List<Movement> movements = new LinkedList<>();
     	Movement prevMovement = null;
+    	boolean firstIt = true;
+    	for(Vertex vertex : vertices) {
+    		Movement movement = null;
+    		if(!firstIt) {
+    			if(prevMovement == null) {
+        			movement = new Movement(agent, agent.getCell(), vertex.getCell());
+        		} else {
+        			movement = new Movement(agent, prevMovement.getNewCell(), vertex.getCell());
+        		}
+        		movements.add(movement);
+        		prevMovement = movement;
+    		} else {
+    			firstIt = false;
+    		}
+    	}
+    	return movements;/*
+    	List<Movement> movements = new LinkedList<>();
+    	Movement prevMovement = null;
     	for(Vertex vertex : vertices) {
     		Movement movement = null;
     		if(prevMovement == null) {
@@ -150,7 +168,7 @@ public class Dijkstra implements Serializable{
     		movements.add(movement);
     		prevMovement = movement;
     	}
-    	return movements;
+    	return movements;*/
     }
 
 }
