@@ -133,6 +133,9 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
     	this.newMines = new ArrayList<>();
     	validateDepletedMines();
     	if(!firstStep) {
+    		if(seq == null) {
+    			seq = new SequentialBehaviour();
+    		}
 	    	this.movements = new ArrayList<>();
 	    	for (AID agent : this.prospectorAgents) {
 	    		seq.addSubBehaviour(new ProspectorNewStepRequesterBehaviour(this,
@@ -214,11 +217,12 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
         return message;
 	}
     
-    public void informApplyStep(){
+    public void informApplyStep(List<Movement> movements){
     	SequentialBehaviour seq = new SequentialBehaviour();
     	for (AID agent : this.prospectorAgents) {
+    		Movement movement = movements.stream().filter(m -> m.getAgent().getAID().equals(agent)).findFirst().get();
     		seq.addSubBehaviour(new BaseRequesterBehaviour<ProspectorCoordinatorAgent>(this,
-    				UtilsAgents.buildMessage(agent, MessageContent.APPLY_STEP)) {
+    				buildApplyStepMessage(agent, movement)) {
 
 						/**
 						 * 
@@ -265,6 +269,23 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 		});
     	
     	this.addBehaviour(seq);
+    }
+    
+    private ACLMessage buildApplyStepMessage(AID agent, Movement movement) {
+    	ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+		message.clearAllReceiver();
+		message.addReceiver(agent);
+		message.setProtocol(InteractionProtocol.FIPA_REQUEST);
+		message.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
+		this.log("Request message to a prospector agent");
+        try {
+        	message.setContent(MessageContent.APPLY_STEP);
+        	this.log("Request message content:" + message.getContent());
+        	message.setContentObject((Serializable) movement);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return message;
     }
     
     private ACLMessage buildNewMinesMessage() {

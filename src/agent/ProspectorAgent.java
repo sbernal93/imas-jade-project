@@ -93,10 +93,10 @@ public class ProspectorAgent extends ImasMobileAgent {
 		return this.getPlans().get(0).getMovements().get(0);
 	}
 	
-	public List<FieldCell> applyNewStep(){
+	public List<FieldCell> applyNewStep(Movement movement){
 		this.foundMines = new ArrayList<>();
 		Movement movementToMake = this.getPlans().get(0).getMovements().get(0);
-		if(movementToMake.getStatus().equals(MovementStatus.ACCEPTED)) {
+		if(movement.getStatus().equals(MovementStatus.ACCEPTED)) {
 			if(this.getPlans().get(0).getMovements().size() == 1) {
 				this.getPlans().remove(0);
 			} else {

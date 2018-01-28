@@ -2,6 +2,7 @@ package behaviour.prospector;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 
 import agent.CoordinatorAgent;
 import agent.DiggerCoordinatorAgent;
@@ -11,6 +12,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREResponder;
 import onthology.MessageContent;
+import util.Movement;
 
 /**.
  */
@@ -46,13 +48,24 @@ public class RequestResponseBehaviour extends AchieveREResponder {
         try {
             Object content = (Object) msg.getContent();
             agent.log("Request received");
+            boolean found = false;
             if(content.equals(MessageContent.NEW_STEP)) {
             	agent.log("NEW_STEP request message received");
             	reply.setPerformative(ACLMessage.AGREE);
+            	found = true;
             }
-            if(content.equals(MessageContent.APPLY_STEP)) {
+            /*if(content.equals(MessageContent.APPLY_STEP)) {
             	agent.log("APPLY_STEP request message received");
             	reply.setPerformative(ACLMessage.AGREE);
+            	found = true;
+            }*/
+            if(!found) {
+            	Object contentObj = (Object) msg.getContentObject();
+            	if(contentObj instanceof Movement) {
+            		agent.log("APPLY_STEP request message received");
+                	reply.setPerformative(ACLMessage.AGREE);
+                	reply.setContentObject((Serializable) agent.applyNewStep((Movement) contentObj));
+            	}
             }
         } catch (Exception e) {
             reply.setPerformative(ACLMessage.FAILURE);
@@ -91,13 +104,13 @@ public class RequestResponseBehaviour extends AchieveREResponder {
 					e.printStackTrace();
 				}
 	        }
-	        if(msg.getContent().equals(MessageContent.APPLY_STEP)){
+	        /*if(msg.getContent().equals(MessageContent.APPLY_STEP)){
 	        	try {
 					reply.setContentObject((Serializable) agent.applyNewStep());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-	        }
+	        }*/
 	        agent.log("INFORM message sent");
         }
         return reply;

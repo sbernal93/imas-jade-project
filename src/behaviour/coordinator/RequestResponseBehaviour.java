@@ -2,12 +2,15 @@ package behaviour.coordinator;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 
 import agent.CoordinatorAgent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREResponder;
+import map.Cell;
 import onthology.MessageContent;
+import util.Movement;
 
 /**.
  */
@@ -36,57 +39,87 @@ public class RequestResponseBehaviour extends AchieveREResponder {
      * @param msg message received.
      * @return AGREE message when all was ok, or FAILURE otherwise.
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     protected ACLMessage prepareResponse(ACLMessage msg) {
     	CoordinatorAgent agent = (CoordinatorAgent)this.getAgent();
         ACLMessage reply = msg.createReply();
         try {
             Object content = (Object) msg.getContent();
+            boolean found = false;
             agent.log("Request received");
-            if (content.equals(MessageContent.GET_MAP)) {
-                agent.log("GET MAP received");
-                //deprecated
-                /*if(agent.getGame() == null) {
-                	agent.log("Game is null, need to get it from SystemAgent first");
-                    reply.setPerformative(ACLMessage.FAILURE);
-                } else {
-                    reply.setPerformative(ACLMessage.AGREE);
-                }*/
-                reply.setPerformative(ACLMessage.AGREE);
+            if(content!=null) {
+            	if (content.equals(MessageContent.GET_MAP)) {
+            		agent.log("GET MAP received");
+	                //deprecated
+	                /*if(agent.getGame() == null) {
+	                	agent.log("Game is null, need to get it from SystemAgent first");
+	                    reply.setPerformative(ACLMessage.FAILURE);
+	                } else {
+	                    reply.setPerformative(ACLMessage.AGREE);
+	                }*/
+	                reply.setPerformative(ACLMessage.AGREE);
+	                found = true;
+	            }
+	            if(content.equals(MessageContent.NEW_STEP)) {
+	            	agent.log("NEW_STEP request message received");
+	            	reply.setPerformative(ACLMessage.AGREE);
+	                found = true;
+	            }
+	            if(content.equals(MessageContent.STEP_FINISHED)) {
+	            	agent.log("STEP_FINISHED request message received");
+	            	reply.setPerformative(ACLMessage.AGREE);
+	                found = true;
+	            }
+	            if(content.equals(MessageContent.STEP_RESULT)) {
+	            	agent.log("STEP_RESULT request message received");
+	            	reply.setPerformative(ACLMessage.AGREE);
+	                found = true;
+	            }
+	            /*if(content.equals(MessageContent.APPLY_STEP)) {
+	            	agent.log("APPLY_STEP request message received");
+	            	reply.setPerformative(ACLMessage.AGREE);
+	            	agent.informApplyStep();
+	            }*/
+	            if(content.equals(MessageContent.APPLY_STEP_FINISHED)) {
+	            	agent.log("APPLY_STEP_FINISHED request message received");
+	            	reply.setPerformative(ACLMessage.AGREE);
+	            	if(msg.getSender().equals(agent.getDiggerCoordinatorAgent())){
+	            		agent.setDcApplyStepFinished(true);
+	            	} else {
+	            		agent.setPcApplyStepFinished(true);
+	            	}
+	            	agent.applyStepFinished();
+	                found = true;
+	            }
+	            if(content.equals(MessageContent.MINE_DISCOVERY)) {
+	            	//TODO
+	            	agent.log("MINE_DISCOVERY request message received");
+	            	reply.setPerformative(ACLMessage.AGREE);
+	                found = true;
+	            }
+	            if(!found) {
+	            	Object contentObj = (Object) msg.getContentObject();
+	            	if(contentObj instanceof List<?>) {
+	            		List<?> list = (List<?>) contentObj;
+	            		if(list != null && list.size()>0) {
+	            			if(list.get(0) instanceof Movement) {
+	            				agent.log("APPLY_STEP request message received");
+	        	            	reply.setPerformative(ACLMessage.AGREE);
+	        	            	agent.informApplyStep((List<Movement>) list);	
+	            			}
+	            			if(list.get(0) instanceof Cell) {
+	            				agent.log("MINE_DISCOVERY request message received");
+	            				
+	            			}
+	            		}
+	            	}
+	            }
+            } else {
+            	agent.log("Got null content from: " + msg.getSender());
+            	agent.log("failure message");
+                reply.setPerformative(ACLMessage.FAILURE);
             }
-            if(content.equals(MessageContent.NEW_STEP)) {
-            	agent.log("NEW_STEP request message received");
-            	reply.setPerformative(ACLMessage.AGREE);
-            }
-            if(content.equals(MessageContent.STEP_FINISHED)) {
-            	agent.log("STEP_FINISHED request message received");
-            	reply.setPerformative(ACLMessage.AGREE);
-            }
-            if(content.equals(MessageContent.STEP_RESULT)) {
-            	agent.log("STEP_RESULT request message received");
-            	reply.setPerformative(ACLMessage.AGREE);
-            }
-            if(content.equals(MessageContent.APPLY_STEP)) {
-            	agent.log("APPLY_STEP request message received");
-            	reply.setPerformative(ACLMessage.AGREE);
-            	agent.informApplyStep();
-            }
-            if(content.equals(MessageContent.APPLY_STEP_FINISHED)) {
-            	agent.log("APPLY_STEP_FINISHED request message received");
-            	reply.setPerformative(ACLMessage.AGREE);
-            	if(msg.getSender().equals(agent.getDiggerCoordinatorAgent())){
-            		agent.setDcApplyStepFinished(true);
-            	} else {
-            		agent.setPcApplyStepFinished(true);
-            	}
-            	agent.applyStepFinished();
-            }
-            if(content.equals(MessageContent.MINE_DISCOVERY)) {
-            	//TODO
-            	agent.log("MINE_DISCOVERY request message received");
-            	reply.setPerformative(ACLMessage.AGREE);
-            }
-            
         } catch (Exception e) {
         	agent.log("failure message");
             reply.setPerformative(ACLMessage.FAILURE);

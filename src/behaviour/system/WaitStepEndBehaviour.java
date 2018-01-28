@@ -45,7 +45,7 @@ public class WaitStepEndBehaviour extends SimpleBehaviour{
 			}
 			finished = true;
 		} else {
-			block(5000);
+			block(1000);
 		}
 		
 	}
@@ -61,4 +61,13 @@ public class WaitStepEndBehaviour extends SimpleBehaviour{
 		return finished;
 	}
 
+	@Override
+	public int onEnd() {
+		reset();
+		return super.onEnd();
+	}
+	
+	 public void onStart() {
+	        reset();
+	    }
 }

@@ -59,6 +59,10 @@ public class SystemAgent extends ImasAgent {
      * Current amount of steps in the game
      */
     private int currentStep;
+    
+    private long stepStartTime;
+    
+    private long totalTime;
 
     /**
      * Builds the System agent.
@@ -195,6 +199,22 @@ public class SystemAgent extends ImasAgent {
 
 	public void setGame(InitialGameSettings game) {
 		this.game = game;
+	}
+
+	public long getStepStartTime() {
+		return stepStartTime;
+	}
+
+	public void setStepStartTime(long stepStartTime) {
+		this.stepStartTime = stepStartTime;
+	}
+
+	public long getTotalTime() {
+		return totalTime;
+	}
+
+	public void setTotalTime(long totalTime) {
+		this.totalTime = totalTime;
 	}
 	
     

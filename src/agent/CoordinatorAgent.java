@@ -292,7 +292,7 @@ public class CoordinatorAgent extends ImasAgent {
         return message;
 	}
     
-    public void informApplyStep(){
+    public void informApplyStep(List<Movement> movements){
     	this.dcApplyStepFinished = true;
     	//this.dcApplyStepFinished = false;
     	this.pcApplyStepFinished = false;
@@ -309,7 +309,7 @@ public class CoordinatorAgent extends ImasAgent {
 					}
 		});*/
     	seq.addSubBehaviour(new BaseRequesterBehaviour<CoordinatorAgent>(this,
-    			UtilsAgents.buildMessage(this.getProspectorCoordinatorAgent(), MessageContent.APPLY_STEP)) {
+    			buildMessageApplyStepForProspectorCoordinator(prospectorCoordinatorAgent, movements)) {
 
 					private static final long serialVersionUID = 1L;
 					
@@ -322,6 +322,24 @@ public class CoordinatorAgent extends ImasAgent {
 
     	this.addBehaviour(seq);
     }
+    
+    private ACLMessage buildMessageApplyStepForProspectorCoordinator(AID agent, List<Movement> movements) {
+		ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+		message.clearAllReceiver();
+		message.addReceiver(agent);
+		message.setProtocol(InteractionProtocol.FIPA_REQUEST);
+		message.setReplyByDate(new Date(System.currentTimeMillis() + 20000));
+		this.log("Request message to a ProspectorCoordinator agent");
+        try {
+        	message.setContent(MessageContent.APPLY_STEP);
+        	this.log("Request message content:" + message.getContent());
+        	message.setContentObject((Serializable) movements);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return message;
+	}
+    
     
     public void informNewMines(){
     	//TODO informs the digger coordinator of new mines, 

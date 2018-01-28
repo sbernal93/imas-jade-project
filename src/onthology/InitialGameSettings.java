@@ -19,6 +19,8 @@ package onthology;
 
 import agent.AgentType;
 import map.*;
+import util.Movement;
+
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -365,5 +367,20 @@ public class InitialGameSettings extends GameSettings {
             this.agentList.put(type, list);
         }
         list.add(cell);
+    }
+    
+    @Override
+    public void moveAgent(Movement movement) throws Exception {
+    	InfoAgent agent = movement.getInfoAgent();
+        PathCell newCell = (PathCell) get(movement.getNewCell().getRow(), movement.getNewCell().getCol());
+        PathCell oldCell = (PathCell) get(movement.getOldCell().getRow(), movement.getOldCell().getCol());
+        newCell.addAgent(agent);
+        oldCell.removeAgent(agent);
+        movement.getAgent().setCell(newCell);
+        //addAgentToList(movement.getAgent().getType(), newCell);
+        if(!agentList.get(agent.getType()).contains(newCell)) {
+            this.agentList.get(agent.getType()).add(newCell);
+            this.agentList.get(agent.getType()).remove(oldCell);
+        }
     }
 }

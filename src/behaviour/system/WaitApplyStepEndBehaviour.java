@@ -1,5 +1,6 @@
 package behaviour.system;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import agent.CoordinatorAgent;
@@ -10,6 +11,7 @@ import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import onthology.InitialGameSettings;
 import onthology.MessageContent;
 import util.Movement;
 
@@ -45,7 +47,7 @@ public class WaitApplyStepEndBehaviour extends SimpleBehaviour{
 				finished = true;
 			//}
 		} else {
-			block(5000);
+			block(1000);
 		}
 		
 	}
@@ -63,15 +65,29 @@ public class WaitApplyStepEndBehaviour extends SimpleBehaviour{
 	
 	@Override
 	public int onEnd() {
+		reset();
 		this.agent.log("WaitApplyStepEndBehaviour finished, current Step: " + this.agent.getCurrentStep() );
+		
+		long time = System.currentTimeMillis() - this.agent.getStepStartTime();
+		this.agent.setTotalTime(this.agent.getTotalTime() + time);
+		this.agent.getGui().showStatistics("Current step: " + this.agent.getCurrentStep() + ", of " 
+			+ this.agent.getGame().getSimulationSteps() + ", step time: " + time 
+			+ "ms, total time: " + this.agent.getTotalTime() + "ms \n");
+		
 		if(this.agent.getGame().getSimulationSteps() <= this.agent.getCurrentStep()) {
 			this.agent.log("Simulation finished");
 			return FINISHED_SIMULATION;
 		}
 		this.agent.log("Simulation continues");
 		this.agent.setCurrentStep(this.agent.getCurrentStep() + 1);
+		((InitialGameSettings) this.agent.getGame()).addElementsForThisSimulationStep();
+		this.agent.updateGUI();
+		this.agent.setMovementsProposed(new ArrayList<>());
 		return CONTINUE_SIMULATION;
 	}
-
+	
+	 public void onStart() {
+	    reset();
+	  }
 
 }

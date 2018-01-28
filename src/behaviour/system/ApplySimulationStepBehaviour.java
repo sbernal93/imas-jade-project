@@ -6,8 +6,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 
+import com.sun.org.apache.xml.internal.security.Init;
+
 import agent.SystemAgent;
 import jade.core.behaviours.OneShotBehaviour;
+import onthology.InitialGameSettings;
 import util.Movement;
 import util.Movement.MovementStatus;
 
@@ -31,14 +34,12 @@ public class ApplySimulationStepBehaviour extends OneShotBehaviour{
 		this.agent.log("ApplySimulationStepBehaviour started");
 		this.agent.getMovementsProposed().stream().filter(m -> m.getStatus().equals(MovementStatus.ACCEPTED)).forEach(m -> {
 			try {
-				this.agent.getGame().moveAgent(m);
+				((InitialGameSettings)this.agent.getGame()).moveAgent(m);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		});
-		this.agent.updateGUI();
-		this.agent.getGui().showStatistics("Current step: " + this.agent.getCurrentStep() );
-		this.agent.setMovementsProposed(new ArrayList<>());
+		//this.agent.updateGUI();
 
 	}
 	

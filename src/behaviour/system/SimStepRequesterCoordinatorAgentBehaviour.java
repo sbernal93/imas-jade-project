@@ -43,6 +43,8 @@ public class SimStepRequesterCoordinatorAgentBehaviour extends BaseRequesterBeha
 	}
 
 	private ACLMessage buildMessageForCoordinatorAgent() {
+		((SystemAgent) this.myAgent).setStepStartTime(System.currentTimeMillis());
+		
 		ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 		message.clearAllReceiver();
 		((SystemAgent) this.myAgent).log("AID: " +  ((SystemAgent) this.myAgent).getCoordinatorAgent());

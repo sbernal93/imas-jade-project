@@ -411,11 +411,9 @@ public class GameSettings implements java.io.Serializable {
      */
     public boolean isValidMovement(Movement movement) {
     	if(!(movement.getNewCell().getCellType().equals(CellType.PATH))) {
-    		System.out.println("Rejected 1");
     		return false;
     	}
     	if(!getPathCellsNextTo(movement.getOldCell()).stream().anyMatch(c -> c.equals(movement.getNewCell()))) {
-    		System.out.println("Rejected 2");
     		return false;
     	}
     	//TODO

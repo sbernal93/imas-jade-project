@@ -1,5 +1,6 @@
 package behaviour.system;
 
+import java.io.Serializable;
 import java.util.Vector;
 
 import agent.SystemAgent;
@@ -52,6 +53,7 @@ public class ApplyStepRequesterCoordinatorAgentBehaviour extends BaseRequesterBe
         try {
         	message.setContent(MessageContent.APPLY_STEP);
         	((SystemAgent) this.myAgent).log("Request message content:" + message.getContent());
+        	message.setContentObject((Serializable) ((SystemAgent) this.myAgent).getMovementsProposed());
         } catch (Exception e) {
             e.printStackTrace();
         }

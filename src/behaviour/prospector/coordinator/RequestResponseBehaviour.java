@@ -2,6 +2,7 @@ package behaviour.prospector.coordinator;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 
 import agent.CoordinatorAgent;
 import agent.DiggerCoordinatorAgent;
@@ -9,7 +10,9 @@ import agent.ProspectorCoordinatorAgent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREResponder;
+import map.Cell;
 import onthology.MessageContent;
+import util.Movement;
 
 /**.
  */
@@ -38,28 +41,47 @@ public class RequestResponseBehaviour extends AchieveREResponder {
      * @param msg message received.
      * @return AGREE message when all was ok, or FAILURE otherwise.
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     protected ACLMessage prepareResponse(ACLMessage msg) {
     	ProspectorCoordinatorAgent agent = (ProspectorCoordinatorAgent)this.getAgent();
         ACLMessage reply = msg.createReply();
         try {
             Object content = (Object) msg.getContent();
             agent.log("Request received");
+            boolean found = false;
             if(content!=null) {
 	            if(content.equals(MessageContent.NEW_STEP)) {
 	            	agent.log("NEW_STEP request message received");
 	            	reply.setPerformative(ACLMessage.AGREE);
 	            	agent.informNewStep(null);
+	            	found = true;
 	            }
 	            if(content.equals(MessageContent.STEP_RESULT)) {
 	            	agent.log("STEP_RESULT request message received");
 	            	reply.setPerformative(ACLMessage.AGREE);
+	            	found = true;
 	            }
-	            if(content.equals(MessageContent.APPLY_STEP)) {
+	           /* if(content.equals(MessageContent.APPLY_STEP)) {
 	            	agent.log("APPLY_STEP request message received");
 	            	reply.setPerformative(ACLMessage.AGREE);
-	            	agent.informApplyStep();
-	            } 
+	            	//agent.informApplyStep();
+	            	found = true;
+	            }*/
+	            if(!found) {
+	            	Object contentObj = (Object) msg.getContentObject();
+	            	if(contentObj instanceof List<?>) {
+	            		List<?> list = (List<?>) contentObj;
+	            		if(list != null && list.size()>0) {
+	            			if(list.get(0) instanceof Movement) {
+	            				agent.log("APPLY_STEP request message received");
+	        	            	reply.setPerformative(ACLMessage.AGREE);
+	        	            	agent.informApplyStep((List<Movement>) list);	
+	            			}
+	            		}
+	            	}
+	            }
+	            
             } else {
             	agent.log("Message with null content was from: " + msg.getSender());
             }
