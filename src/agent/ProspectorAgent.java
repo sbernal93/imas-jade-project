@@ -18,11 +18,13 @@ import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import map.Cell;
+import map.FieldCell;
 import map.PathCell;
 import onthology.GameSettings;
 import onthology.InfoAgent;
 import util.Movement;
 import util.Plan;
+import util.Movement.MovementStatus;
 
 public class ProspectorAgent extends ImasMobileAgent {
 
@@ -33,6 +35,8 @@ public class ProspectorAgent extends ImasMobileAgent {
      * Prospector Coordinator agent id.
      */
     private AID prospectorCoordinatorAgent;
+    
+    private List<FieldCell> foundMines;
 	
     @Override
     protected void setup() {
@@ -89,19 +93,29 @@ public class ProspectorAgent extends ImasMobileAgent {
 		return this.getPlans().get(0).getMovements().get(0);
 	}
 	
-	public void applyNewStep(){
+	public List<FieldCell> applyNewStep(){
+		this.foundMines = new ArrayList<>();
 		Movement movementToMake = this.getPlans().get(0).getMovements().get(0);
-		try {
-			this.getGame().moveAgent(movementToMake);
+		if(movementToMake.getStatus().equals(MovementStatus.ACCEPTED)) {
 			if(this.getPlans().get(0).getMovements().size() == 1) {
 				this.getPlans().remove(0);
 			} else {
 				this.getPlans().get(0).getMovements().remove(0);
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+			this.setCell(movementToMake.getNewCell());
+			this.getGame().getFieldCellsNextTo(this.getCell()).forEach( c -> {
+				c.detectMetal();
+				if(c.isFound()) {
+					this.foundMines.add(c);
+				}
+			});
+		} else {
+			//TODO: should do something so movement is validated
 		}
+		
+		return this.foundMines;
 	}
+	
 	
 	
 
@@ -135,6 +149,16 @@ public class ProspectorAgent extends ImasMobileAgent {
 			prevPlansMovements = copy;
 			movementSteps += copy.size();
 		}
+	}
+
+
+	public List<FieldCell> getFoundMines() {
+		return foundMines;
+	}
+
+
+	public void setFoundMines(List<FieldCell> foundMines) {
+		this.foundMines = foundMines;
 	}
 
 

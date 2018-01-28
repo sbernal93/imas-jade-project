@@ -12,9 +12,6 @@ public class ValidateSimulationStepBehaviour extends OneShotBehaviour{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public static final int FINISHED_SIMULATION = 1;
-	public static final int CONTINUE_SIMULATION = 0;
-	
 	private SystemAgent agent;
 	
 	public ValidateSimulationStepBehaviour(SystemAgent agent) {
@@ -33,18 +30,6 @@ public class ValidateSimulationStepBehaviour extends OneShotBehaviour{
 				movement.setStatus(MovementStatus.REJECTED);
 			}
 		}
-	}
-	
-	@Override
-	public int onEnd() {
-		this.agent.log("ApplySimulationStepBehaviour finished" );
-		if(this.agent.getGame().getSimulationSteps() >= this.agent.getCurrentStep()) {
-			this.agent.log("Simulation finished");
-			this.agent.setCurrentStep(this.agent.getCurrentStep() + 1);
-			return FINISHED_SIMULATION;
-		}
-		this.agent.log("Simulation continues");
-		return CONTINUE_SIMULATION;
 	}
 
 }

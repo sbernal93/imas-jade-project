@@ -23,6 +23,7 @@ import agent.ImasMobileAgent;
 import agent.ProspectorAgent;
 import map.Cell;
 import map.CellType;
+import map.FieldCell;
 import map.PathCell;
 import util.Edge;
 import util.Graph;
@@ -313,6 +314,10 @@ public class GameSettings implements java.io.Serializable {
      */
     public List<PathCell> getPathCellsNextTo(Cell cell) {
     	return getCellsNextTo(cell).stream().filter(c -> c.getCellType().equals(CellType.PATH)).map(c -> (PathCell) c).collect(Collectors.toList());
+    }
+    
+    public List<FieldCell> getFieldCellsNextTo(Cell cell) {
+    	return getCellsNextTo(cell).stream().filter(c -> c.getCellType().equals(CellType.FIELD)).map(c -> (FieldCell) c).collect(Collectors.toList());
     }
     
     /**

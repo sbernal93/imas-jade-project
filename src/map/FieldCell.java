@@ -75,7 +75,8 @@ public class FieldCell extends Cell {
 
     @Override
     public boolean isEmpty() {
-        return found;
+        //return found;
+    	return !found;
     }
 
 
@@ -124,4 +125,10 @@ public class FieldCell extends Cell {
         }
         return "";
     }
+
+	public boolean isFound() {
+		return found;
+	}
+    
+    
 }

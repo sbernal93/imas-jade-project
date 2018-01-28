@@ -184,6 +184,18 @@ public class SystemAgent extends ImasAgent {
 	public void setMovementsProposed(List<Movement> movementsProposed) {
 		this.movementsProposed = movementsProposed;
 	}
+
+	public GraphicInterface getGui() {
+		return gui;
+	}
+
+	public void setGui(GraphicInterface gui) {
+		this.gui = gui;
+	}
+
+	public void setGame(InitialGameSettings game) {
+		this.game = game;
+	}
 	
     
 

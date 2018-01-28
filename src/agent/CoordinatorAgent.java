@@ -75,6 +75,14 @@ public class CoordinatorAgent extends ImasAgent {
     private AID prospectorCoordinatorAgent;
     
     private List<Movement> movements;
+    
+    private boolean dcInformStepFinished;
+    
+    private boolean pcInformStepFinished;
+    
+    private boolean dcApplyStepFinished;
+    
+    private boolean pcApplyStepFinished;
 
     /**
      * Builds the coordinator agent.
@@ -181,6 +189,9 @@ public class CoordinatorAgent extends ImasAgent {
     
     public void informNewStep() {
     	this.movements = new ArrayList<>();
+    	//dcInformStepFinished = false;
+    	dcInformStepFinished = true;
+    	pcInformStepFinished = false;
     	//Sends messages to both coordinator agents to start a new step and waits for proposed movements,
     	//once an INFORM message is received, then gets the movements from the message content
     	SequentialBehaviour seq = new SequentialBehaviour();
@@ -227,7 +238,10 @@ public class CoordinatorAgent extends ImasAgent {
 				try {
 					this.getTypeAgent().log("INFORM received");
 					this.getTypeAgent().addMovements((List<Movement>) msg.getContentObject());
-					this.getTypeAgent().communicateStepWithSystemAgent();
+					this.getTypeAgent().setPcInformStepFinished(true);
+					if(this.getTypeAgent().isPcInformStepFinished() && this.getTypeAgent().isDcInformStepFinished()) {
+						this.getTypeAgent().communicateStepWithSystemAgent(MessageContent.STEP_FINISHED);
+					}
 				} catch (UnreadableException e) {
 					e.printStackTrace();
 				}
@@ -238,7 +252,7 @@ public class CoordinatorAgent extends ImasAgent {
     	//message to be sent to the system agent
     }
     
-    public void communicateStepWithSystemAgent() {
+    public void communicateStepWithSystemAgent(String content) {
     	ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 		message.clearAllReceiver();
 		message.addReceiver(getSystemAgent());
@@ -246,7 +260,7 @@ public class CoordinatorAgent extends ImasAgent {
 		message.setReplyByDate(new Date(System.currentTimeMillis() + 20000));
 		this.log("Request message to System agent");
         try {
-        	message.setContent(MessageContent.STEP_FINISHED);
+        	message.setContent(content);
         	this.log("Request message content:" + message.getContent());
         	message.setContentObject((Serializable) this.getMovements());
         } catch (Exception e) {
@@ -277,7 +291,47 @@ public class CoordinatorAgent extends ImasAgent {
         }
         return message;
 	}
+    
+    public void informApplyStep(){
+    	this.dcApplyStepFinished = true;
+    	//this.dcApplyStepFinished = false;
+    	this.pcApplyStepFinished = false;
+    	SequentialBehaviour seq = new SequentialBehaviour();
+    	//TODO:
+    	/*seq.addSubBehaviour(new BaseRequesterBehaviour<CoordinatorAgent>(this,
+    			UtilsAgents.buildMessage(this.getDiggerCoordinatorAgent(), MessageContent.APPLY_STEP)) {
 
+					private static final long serialVersionUID = 1L;
+					
+					@Override
+					protected void handleInform(ACLMessage msg) {
+							((CoordinatorAgent) this.getAgent()).log("Inform received from DiggerCoordinator for APPLY STEP");
+					}
+		});*/
+    	seq.addSubBehaviour(new BaseRequesterBehaviour<CoordinatorAgent>(this,
+    			UtilsAgents.buildMessage(this.getProspectorCoordinatorAgent(), MessageContent.APPLY_STEP)) {
+
+					private static final long serialVersionUID = 1L;
+					
+					@Override
+					protected void handleInform(ACLMessage msg) {
+							this.getTypeAgent().log("Inform received from ProspectorCoordinator for APPLY STEP");
+							
+					}
+		});
+
+    	this.addBehaviour(seq);
+    }
+    
+    public void informNewMines(){
+    	//TODO informs the digger coordinator of new mines, 
+    }
+
+    public void applyStepFinished(){
+    	if(this.dcApplyStepFinished && this.pcApplyStepFinished) {
+    		communicateStepWithSystemAgent(MessageContent.APPLY_STEP_FINISHED);
+    	}
+    }
     
 
     /**
@@ -342,6 +396,38 @@ public class CoordinatorAgent extends ImasAgent {
 			this.movements = new ArrayList<>();
 		}
 		this.movements.addAll(movements);
+	}
+
+	public boolean isDcInformStepFinished() {
+		return dcInformStepFinished;
+	}
+
+	public void setDcInformStepFinished(boolean dcInformStepFinished) {
+		this.dcInformStepFinished = dcInformStepFinished;
+	}
+
+	public boolean isPcInformStepFinished() {
+		return pcInformStepFinished;
+	}
+
+	public void setPcInformStepFinished(boolean pcInformStepFinished) {
+		this.pcInformStepFinished = pcInformStepFinished;
+	}
+
+	public boolean isDcApplyStepFinished() {
+		return dcApplyStepFinished;
+	}
+
+	public void setDcApplyStepFinished(boolean dcApplyStepFinished) {
+		this.dcApplyStepFinished = dcApplyStepFinished;
+	}
+
+	public boolean isPcApplyStepFinished() {
+		return pcApplyStepFinished;
+	}
+
+	public void setPcApplyStepFinished(boolean pcApplyStepFinished) {
+		this.pcApplyStepFinished = pcApplyStepFinished;
 	}
     
 }

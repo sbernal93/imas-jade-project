@@ -45,14 +45,23 @@ public class RequestResponseBehaviour extends AchieveREResponder {
         try {
             Object content = (Object) msg.getContent();
             agent.log("Request received");
-            if(content.equals(MessageContent.NEW_STEP)) {
-            	agent.log("NEW_STEP request message received");
-            	reply.setPerformative(ACLMessage.AGREE);
-            	agent.informNewStep(null);
-            }
-            if(content.equals(MessageContent.STEP_RESULT)) {
-            	agent.log("STEP_RESULT request message received");
-            	reply.setPerformative(ACLMessage.AGREE);
+            if(content!=null) {
+	            if(content.equals(MessageContent.NEW_STEP)) {
+	            	agent.log("NEW_STEP request message received");
+	            	reply.setPerformative(ACLMessage.AGREE);
+	            	agent.informNewStep(null);
+	            }
+	            if(content.equals(MessageContent.STEP_RESULT)) {
+	            	agent.log("STEP_RESULT request message received");
+	            	reply.setPerformative(ACLMessage.AGREE);
+	            }
+	            if(content.equals(MessageContent.APPLY_STEP)) {
+	            	agent.log("APPLY_STEP request message received");
+	            	reply.setPerformative(ACLMessage.AGREE);
+	            	agent.informApplyStep();
+	            } 
+            } else {
+            	agent.log("Message with null content was from: " + msg.getSender());
             }
         } catch (Exception e) {
             reply.setPerformative(ACLMessage.FAILURE);

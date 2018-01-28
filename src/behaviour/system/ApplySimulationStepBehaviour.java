@@ -1,8 +1,15 @@
 package behaviour.system;
 
+import java.sql.Array;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Map;
+
 import agent.SystemAgent;
 import jade.core.behaviours.OneShotBehaviour;
 import util.Movement;
+import util.Movement.MovementStatus;
 
 public class ApplySimulationStepBehaviour extends OneShotBehaviour{
 
@@ -11,8 +18,6 @@ public class ApplySimulationStepBehaviour extends OneShotBehaviour{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public static final int FINISHED_SIMULATION = 1;
-	public static final int CONTINUE_SIMULATION = 0;
 	
 	private SystemAgent agent;
 	
@@ -24,19 +29,18 @@ public class ApplySimulationStepBehaviour extends OneShotBehaviour{
 	@Override
 	public void action() {
 		this.agent.log("ApplySimulationStepBehaviour started");
+		this.agent.getMovementsProposed().stream().filter(m -> m.getStatus().equals(MovementStatus.ACCEPTED)).forEach(m -> {
+			try {
+				this.agent.getGame().moveAgent(m);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+		this.agent.updateGUI();
+		this.agent.getGui().showStatistics("Current step: " + this.agent.getCurrentStep() );
+		this.agent.setMovementsProposed(new ArrayList<>());
 
 	}
 	
-	@Override
-	public int onEnd() {
-		this.agent.log("ApplySimulationStepBehaviour finished" );
-		if(this.agent.getGame().getSimulationSteps() >= this.agent.getCurrentStep()) {
-			this.agent.log("Simulation finished");
-			return FINISHED_SIMULATION;
-		}
-		this.agent.log("Simulation continues");
-		this.agent.setCurrentStep(this.agent.getCurrentStep() + 1);
-		return CONTINUE_SIMULATION;
-	}
-
+	
 }

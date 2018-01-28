@@ -31,13 +31,21 @@ public class MessageContent {
     /**
      * MEssage sent from the system agent to the coordinator agent to start a new step
      */
-    public static String NEW_STEP = "New step";
+    public static final String NEW_STEP = "New step";
     
     
     /**
      * MEssage for requesting the step result
      */
-    public static String STEP_RESULT = "Step result";
+    public static final String STEP_RESULT = "Step result";
     
-    public static String STEP_FINISHED = "Step finished";
+    public static final String STEP_FINISHED = "Step finished";
+    
+    public static final String APPLY_STEP = "Apply Step";
+    
+    public static final String APPLY_STEP_FINISHED = "Apply Step Finished";
+    
+    public static final String MINE_DISCOVERY = "Mine discovery";
+    
+    
 }

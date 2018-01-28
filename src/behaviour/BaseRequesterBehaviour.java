@@ -85,4 +85,10 @@ public abstract class BaseRequesterBehaviour<T extends ImasAgent> extends Achiev
     public T getTypeAgent() {
     	return agent;
     }
+    
+    @Override
+    public int onEnd() {
+    	reset();
+    	return super.onEnd();
+    }
 }

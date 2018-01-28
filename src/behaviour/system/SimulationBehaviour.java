@@ -1,10 +1,15 @@
 package behaviour.system;
 
 import agent.SystemAgent;
+import agent.UtilsAgents;
+import behaviour.BaseRequesterBehaviour;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.FSMBehaviour;
+import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import onthology.MessageContent;
 
 /**
  * The Simulation behaviour is a FSM behaviour with the following states:
@@ -39,8 +44,12 @@ public class SimulationBehaviour extends FSMBehaviour{
 	//Attempts to apply a simulation step
 	private static final String VALIDATES_STEP = "VALIDATES_STEP";
 	
+	private static final String INFORM_APPLY_STEP = "INFORM_APPLY_STEP";
+	
 	//Attempts to apply a simulation step
 	private static final String APPLY_STEP_STATE = "APPLY_STEP";
+	
+	private static final String WAIT_APPLY_STEP_FINISHED = "WAIT_APPLY_STEP_FINISHED";
 	
 	//All steps are finished
 	private static final String FINISHED_STATE = "FINISHED";
@@ -53,19 +62,24 @@ public class SimulationBehaviour extends FSMBehaviour{
 	private void setupFSM(){
 		MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
 
+		
 		registerFirstState(new SetupBehaviour(this.agent), SETUP_STATE);
 		registerState(new SimStepRequesterCoordinatorAgentBehaviour(this.agent), SIM_STEP_STATE);
 		registerState(new WaitStepEndBehaviour(this.agent, mt), WAIT_STEP_FINISHED);
 		registerState(new ValidateSimulationStepBehaviour(this.agent), VALIDATES_STEP);
 		registerState(new ApplySimulationStepBehaviour(this.agent), APPLY_STEP_STATE);
+		registerState(new ApplyStepRequesterCoordinatorAgentBehaviour(this.agent), INFORM_APPLY_STEP);
+		registerState(new WaitApplyStepEndBehaviour(this.agent, mt), WAIT_APPLY_STEP_FINISHED);
 		registerLastState(new EndSimulationBehaviour(this.agent), FINISHED_STATE);
 		
 		registerDefaultTransition(SETUP_STATE, SIM_STEP_STATE);
 		registerDefaultTransition(SIM_STEP_STATE, WAIT_STEP_FINISHED);
 		registerDefaultTransition(WAIT_STEP_FINISHED, VALIDATES_STEP);
 		registerDefaultTransition(VALIDATES_STEP, APPLY_STEP_STATE);
-		registerTransition(APPLY_STEP_STATE, SIM_STEP_STATE, ValidateSimulationStepBehaviour.CONTINUE_SIMULATION);
-		registerTransition(APPLY_STEP_STATE, FINISHED_STATE, ValidateSimulationStepBehaviour.FINISHED_SIMULATION);
+		registerDefaultTransition(APPLY_STEP_STATE, INFORM_APPLY_STEP);
+		registerDefaultTransition(INFORM_APPLY_STEP, WAIT_APPLY_STEP_FINISHED);
+		registerTransition(WAIT_APPLY_STEP_FINISHED, SIM_STEP_STATE, WaitApplyStepEndBehaviour.CONTINUE_SIMULATION);
+		registerTransition(WAIT_APPLY_STEP_FINISHED, FINISHED_STATE, WaitApplyStepEndBehaviour.FINISHED_SIMULATION);
 		
 	}
 }

@@ -1,9 +1,11 @@
 package agent;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import behaviour.BaseRequesterBehaviour;
 import behaviour.TimeoutBehaviour;
@@ -22,6 +24,8 @@ import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import map.Cell;
+import map.FieldCell;
 import map.PathCell;
 import onthology.GameSettings;
 import onthology.MessageContent;
@@ -53,6 +57,10 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 	
 
 	private List<Movement> movements;
+	
+	private List<Cell> newMines;
+	
+	private List<Cell> discoveredMines;
 	/**
 	 * The Agent has a list of all the prospector agents that 
 	 * are currently in the map
@@ -73,6 +81,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 
     	this.setGame((GameSettings) this.getArguments()[0]);
     	this.setCoordinatorAgent((AID) this.getArguments()[1]);
+    	this.discoveredMines = new ArrayList<>();
         /* ** Very Important Line (VIL) ***************************************/
         this.setEnabledO2ACommunication(true, 1);
         /* ********************************************************************/
@@ -106,6 +115,14 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
         this.addBehaviour(new RequestResponseBehaviour(this, mt));
     }
     
+    private void validateDepletedMines() {
+    	for(Cell c : this.discoveredMines) {
+    		if(((FieldCell) c).isEmpty()) {
+    			this.discoveredMines.remove(c);
+    		}
+    	}
+    }
+    
     /**
      * Setups the behaviour to start contract net and/or inform prospector agents of new step.
      * Cant return inform inmediatly since the behaviours created wont execute until the 
@@ -113,10 +130,13 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
      * @param seq
      */
     public void informNewStep(SequentialBehaviour seq) {
+    	this.newMines = new ArrayList<>();
+    	validateDepletedMines();
     	if(!firstStep) {
 	    	this.movements = new ArrayList<>();
 	    	for (AID agent : this.prospectorAgents) {
-	    		seq.addSubBehaviour(new ProspectorNewStepRequesterBehaviour(this, buildSimStepMessageForProspectorAgent(agent)));
+	    		seq.addSubBehaviour(new ProspectorNewStepRequesterBehaviour(this,
+	    				buildSimStepMessageForProspectorAgent(agent)));
 	    	}
 	    	seq.addSubBehaviour(new BaseRequesterBehaviour<ProspectorCoordinatorAgent>(this,
 	    			UtilsAgents.buildMessage(this.coordinatorAgent, MessageContent.STEP_FINISHED)) {
@@ -184,7 +204,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 		message.addReceiver(agent);
 		message.setProtocol(InteractionProtocol.FIPA_REQUEST);
 		message.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
-		this.log("Request message to a Digger agent");
+		this.log("Request message to a prospector agent");
         try {
         	message.setContent(MessageContent.NEW_STEP);
         	this.log("Request message content:" + message.getContent());
@@ -193,6 +213,76 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
         }
         return message;
 	}
+    
+    public void informApplyStep(){
+    	SequentialBehaviour seq = new SequentialBehaviour();
+    	for (AID agent : this.prospectorAgents) {
+    		seq.addSubBehaviour(new BaseRequesterBehaviour<ProspectorCoordinatorAgent>(this,
+    				UtilsAgents.buildMessage(agent, MessageContent.APPLY_STEP)) {
+
+						/**
+						 * 
+						 */
+						private static final long serialVersionUID = 1L;
+
+						@SuppressWarnings("unchecked")
+						@Override
+						protected void handleInform(ACLMessage msg) {
+							this.getTypeAgent().log("Got inform for apply step");
+							try {
+								List<Cell> newMines = (List<Cell>) Optional.ofNullable(msg.getContentObject()).orElse(null);
+								if(newMines!=null) {
+									newMines.stream().forEach(mine -> {
+										if(this.getTypeAgent().getDiscoveredMines().stream().noneMatch(m -> m.equals(mine))) {
+											this.getTypeAgent().addDiscoveredMine(mine);
+											this.getTypeAgent().addNewMine(mine);
+										}
+									});
+									
+								}
+							} catch (UnreadableException e) {
+								e.printStackTrace();
+							}
+						}
+						
+						
+    			
+    		});
+    	}
+    	seq.addSubBehaviour(new BaseRequesterBehaviour<ProspectorCoordinatorAgent>(this, 
+    			buildNewMinesMessage()) {
+
+					private static final long serialVersionUID = 1L;
+		});
+    	
+    	seq.addSubBehaviour(new BaseRequesterBehaviour<ProspectorCoordinatorAgent>(this,
+    			UtilsAgents.buildMessage(this.coordinatorAgent, MessageContent.APPLY_STEP_FINISHED)) {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+		});
+    	
+    	this.addBehaviour(seq);
+    }
+    
+    private ACLMessage buildNewMinesMessage() {
+    	ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+		message.clearAllReceiver();
+		message.addReceiver(this.coordinatorAgent);
+		message.setProtocol(InteractionProtocol.FIPA_REQUEST);
+		message.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
+		this.log("Request message to a coordinator agent");
+        try {
+        	message.setContent(MessageContent.MINE_DISCOVERY);
+        	this.log("Request message content:" + message.getContent());
+        	message.setContentObject((Serializable) this.getNewMines());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return message;
+    }
     
     /**
      * Update the game settings.
@@ -252,6 +342,48 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 		}
 		this.movements.addAll(movements);
 	}
-    
 
+	public List<Cell> getNewMines() {
+		return newMines;
+	}
+
+	public void setNewMines(List<Cell> newMines) {
+		this.newMines = newMines;
+	}
+
+	public List<Cell> getDiscoveredMines() {
+		return discoveredMines;
+	}
+
+	public void setDiscoveredMines(List<Cell> discoveredMines) {
+		this.discoveredMines = discoveredMines;
+	}
+    
+	public void addNewMines(List<Cell> mines) {
+		if (this.newMines == null) {
+			this.newMines = new ArrayList<>();
+		}
+		this.newMines.addAll(mines);
+	}
+	
+	public void addNewMine(Cell mine) {
+		if (this.newMines == null) {
+			this.newMines = new ArrayList<>();
+		}
+		this.newMines.add(mine);
+	}
+	
+	public void addDiscoveredMines(List<Cell> mines) {
+		if (this.discoveredMines == null) {
+			this.discoveredMines = new ArrayList<>();
+		}
+		this.discoveredMines.addAll(mines);
+	}
+
+	public void addDiscoveredMine(Cell mine) {
+		if (this.discoveredMines == null) {
+			this.discoveredMines = new ArrayList<>();
+		}
+		this.discoveredMines.add(mine);
+	}
 }

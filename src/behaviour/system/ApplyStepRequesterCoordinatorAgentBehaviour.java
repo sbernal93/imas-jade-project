@@ -9,18 +9,18 @@ import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.ACLMessage;
 import onthology.MessageContent;
 
-public class SimStepRequesterCoordinatorAgentBehaviour extends BaseRequesterBehaviour<SystemAgent>{
+public class ApplyStepRequesterCoordinatorAgentBehaviour extends BaseRequesterBehaviour<SystemAgent>{
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public SimStepRequesterCoordinatorAgentBehaviour(SystemAgent a, ACLMessage msg) {
+	public ApplyStepRequesterCoordinatorAgentBehaviour(SystemAgent a, ACLMessage msg) {
 		super(a, msg);
 	}
 	
-	public SimStepRequesterCoordinatorAgentBehaviour(SystemAgent a) {
+	public ApplyStepRequesterCoordinatorAgentBehaviour(SystemAgent a) {
 		super(a, null);
 	}
 
@@ -50,7 +50,7 @@ public class SimStepRequesterCoordinatorAgentBehaviour extends BaseRequesterBeha
 		message.setProtocol(InteractionProtocol.FIPA_REQUEST);
 		((SystemAgent) this.myAgent).log("Request message to Coordinator agent");
         try {
-        	message.setContent(MessageContent.NEW_STEP);
+        	message.setContent(MessageContent.APPLY_STEP);
         	((SystemAgent) this.myAgent).log("Request message content:" + message.getContent());
         } catch (Exception e) {
             e.printStackTrace();
@@ -58,10 +58,10 @@ public class SimStepRequesterCoordinatorAgentBehaviour extends BaseRequesterBeha
         return message;
 	}
 	
+
 	@Override
 	public int onEnd() {
 		reset();
 		return super.onEnd();
 	}
-
 }

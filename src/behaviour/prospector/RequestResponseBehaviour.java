@@ -50,6 +50,10 @@ public class RequestResponseBehaviour extends AchieveREResponder {
             	agent.log("NEW_STEP request message received");
             	reply.setPerformative(ACLMessage.AGREE);
             }
+            if(content.equals(MessageContent.APPLY_STEP)) {
+            	agent.log("APPLY_STEP request message received");
+            	reply.setPerformative(ACLMessage.AGREE);
+            }
         } catch (Exception e) {
             reply.setPerformative(ACLMessage.FAILURE);
             agent.errorLog(e.getMessage());
@@ -80,11 +84,20 @@ public class RequestResponseBehaviour extends AchieveREResponder {
         ACLMessage reply = msg.createReply();
         if (reply.getPerformative() != ACLMessage.FAILURE) {
 	        reply.setPerformative(ACLMessage.INFORM);
-	        try {
-				reply.setContentObject(agent.informNewStep());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+	        if(msg.getContent().equals(MessageContent.NEW_STEP)) {
+		        try {
+					reply.setContentObject(agent.informNewStep());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+	        }
+	        if(msg.getContent().equals(MessageContent.APPLY_STEP)){
+	        	try {
+					reply.setContentObject((Serializable) agent.applyNewStep());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+	        }
 	        agent.log("INFORM message sent");
         }
         return reply;

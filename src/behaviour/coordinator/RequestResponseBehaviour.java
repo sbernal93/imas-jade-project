@@ -66,7 +66,29 @@ public class RequestResponseBehaviour extends AchieveREResponder {
             	agent.log("STEP_RESULT request message received");
             	reply.setPerformative(ACLMessage.AGREE);
             }
+            if(content.equals(MessageContent.APPLY_STEP)) {
+            	agent.log("APPLY_STEP request message received");
+            	reply.setPerformative(ACLMessage.AGREE);
+            	agent.informApplyStep();
+            }
+            if(content.equals(MessageContent.APPLY_STEP_FINISHED)) {
+            	agent.log("APPLY_STEP_FINISHED request message received");
+            	reply.setPerformative(ACLMessage.AGREE);
+            	if(msg.getSender().equals(agent.getDiggerCoordinatorAgent())){
+            		agent.setDcApplyStepFinished(true);
+            	} else {
+            		agent.setPcApplyStepFinished(true);
+            	}
+            	agent.applyStepFinished();
+            }
+            if(content.equals(MessageContent.MINE_DISCOVERY)) {
+            	//TODO
+            	agent.log("MINE_DISCOVERY request message received");
+            	reply.setPerformative(ACLMessage.AGREE);
+            }
+            
         } catch (Exception e) {
+        	agent.log("failure message");
             reply.setPerformative(ACLMessage.FAILURE);
             agent.errorLog(e.getMessage());
             e.printStackTrace();
