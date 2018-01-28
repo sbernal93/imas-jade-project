@@ -72,7 +72,7 @@ public class ProspectorAgent extends ImasMobileAgent {
 	public Movement informNewStep() {
 		//TODO: this method tells us that a new step has started, prospector agent should
 		//send based on his current plan, his next move to the Prospector Coordinator
-		return this.getPlan().get(0).getMovements().get(0);
+		return this.getPlans().get(0).getMovements().get(0);
 	}
 
 	public void applyNewStep(){
