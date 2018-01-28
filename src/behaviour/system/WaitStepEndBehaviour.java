@@ -32,19 +32,18 @@ public class WaitStepEndBehaviour extends SimpleBehaviour{
 
 	@Override
 	public void action() {
+		this.agent.log("WaitStepEndBehaviour");
 		ACLMessage message = agent.receive(mt);
 		if(message != null){
+			this.agent.log("Got message");
 			//TODO: extract info from message, maybe also validate its the message we are waiting for
-			Object content = (Object) message.getContent();
-			if(content.equals(MessageContent.STEP_FINISHED)) {
-				try {
-					agent.setMovementsProposed((List<Movement>) message.getContentObject());
-					agent.log("Got movements :" + agent.getMovementsProposed().size());
-				} catch (UnreadableException e) {
-					e.printStackTrace();
-				}
-				finished = true;
+			try {
+				agent.setMovementsProposed((List<Movement>) message.getContentObject());
+				agent.log("Got movements :" + agent.getMovementsProposed().size());
+			} catch (UnreadableException e) {
+				e.printStackTrace();
 			}
+			finished = true;
 		} else {
 			block(5000);
 		}

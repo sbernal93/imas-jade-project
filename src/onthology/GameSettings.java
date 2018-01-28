@@ -411,9 +411,10 @@ public class GameSettings implements java.io.Serializable {
     	if(!getPathCellsNextTo(movement.getOldCell()).stream().anyMatch(c -> c.equals(movement.getNewCell()))) {
     		return false;
     	}
-		if(getDiggerAgents().stream().anyMatch(d -> d.getCell().equals(movement.getNewCell()) && d.isDigging())) {
+    	//TODO
+		/*if(getDiggerAgents().stream().anyMatch(d -> d.getCell().equals(movement.getNewCell()) && d.isDigging())) {
 			return false;
-		}
+		}*/
     	return true;
     }
     

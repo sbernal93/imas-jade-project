@@ -227,6 +227,7 @@ public class CoordinatorAgent extends ImasAgent {
 				try {
 					this.getTypeAgent().log("INFORM received");
 					this.getTypeAgent().addMovements((List<Movement>) msg.getContentObject());
+					this.getTypeAgent().communicateStepWithSystemAgent();
 				} catch (UnreadableException e) {
 					e.printStackTrace();
 				}
@@ -235,16 +236,15 @@ public class CoordinatorAgent extends ImasAgent {
 		});
     	//TODO: make one of this methods for digger coordinator, the last one to execute should trigger the 
     	//message to be sent to the system agent
-    	communicateStepWithSystemAgent();
     }
     
-    private void communicateStepWithSystemAgent() {
+    public void communicateStepWithSystemAgent() {
     	ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 		message.clearAllReceiver();
 		message.addReceiver(getSystemAgent());
 		message.setProtocol(InteractionProtocol.FIPA_REQUEST);
 		message.setReplyByDate(new Date(System.currentTimeMillis() + 20000));
-		this.log("Request message to a Coordinator agent");
+		this.log("Request message to System agent");
         try {
         	message.setContent(MessageContent.STEP_FINISHED);
         	this.log("Request message content:" + message.getContent());
