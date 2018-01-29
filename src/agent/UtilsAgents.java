@@ -184,4 +184,8 @@ public class UtilsAgents {
         return message;
 	}
     
+	public static double calculatePrice(int amountOfMovements, int amountToMine, int price) {
+		return (amountToMine * price) / amountOfMovements;
+	}
+    
 }

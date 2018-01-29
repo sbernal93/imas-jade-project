@@ -18,6 +18,7 @@ import jade.proto.ContractNetInitiator;
 import map.Cell;
 import map.FieldCell;
 import onthology.MetalType;
+import util.MetalDiscovery;
 import util.Plan;
 
 public class DiggerContractNetInitiatorBehaviour extends ContractNetInitiator{
@@ -29,20 +30,18 @@ public class DiggerContractNetInitiatorBehaviour extends ContractNetInitiator{
 	
 	private DiggerCoordinatorAgent agent;
 	private int nResponders;
-	private FieldCell cell;
-	private MetalType type;
+	private MetalDiscovery metal;
 
 	public DiggerContractNetInitiatorBehaviour(Agent a, ACLMessage cfp) {
 		super(a, cfp);
 	}
 	
 	public DiggerContractNetInitiatorBehaviour(DiggerCoordinatorAgent a, ACLMessage cfp, int nResponders,
-			FieldCell cell, MetalType metalType) {
+			MetalDiscovery metal) {
 		super(a, cfp);
 		this.nResponders = nResponders;
 		this.agent = a;
-		this.cell = cell;
-		this.type = metalType;
+		this.metal = metal;
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -86,11 +85,11 @@ public class DiggerContractNetInitiatorBehaviour extends ContractNetInitiator{
             ACLMessage msg = (ACLMessage) e.nextElement();
             msgs.add(msg);
         }
-        //We sort the list, since we may have to form coalitions
+        //We sort the list, since we may have to form coalitions. The list is sorted by price outcome
         msgs.sort((m1, m2) -> {
 			try {
-				return Integer.compare(((Plan)m1.getContentObject()).getMovements().size(),
-						((Plan)m2.getContentObject()).getMovements().size());
+				return Double.compare(((Plan)m1.getContentObject()).getPriceOutcome(),
+						((Plan)m2.getContentObject()).getPriceOutcome());
 			} catch (UnreadableException e1) {
 				e1.printStackTrace();
 			}
@@ -101,32 +100,40 @@ public class DiggerContractNetInitiatorBehaviour extends ContractNetInitiator{
         List<ACLMessage> acceptedMessages = new LinkedList<>();
         try {
 			bestPlan = (Plan) msgs.get(0).getContentObject();
-			if(((DiggerAgent)bestPlan.getAgent()).getCapacity() < cell.getMetal().get(type)) {
+			if(((DiggerAgent)bestPlan.getAgent()).getCapacity() < metal.getCell().getMetal().get(metal.getType())) {
 				//the digger cant do it on his own, he needs a coalition
 				//we create coalitions and every other individual agents
 				List<List<ACLMessage>> combinations = getCombinations(msgs, msgs.size());
 				
 				//now we look for the best coalition
-				int bestTime = Integer.MAX_VALUE;
+				//int bestTime = Integer.MAX_VALUE;
+				double bestPrice = 0.00;
 		        List<ACLMessage> bestProposals = null;
 				for(List<ACLMessage> coalition : combinations) {
-					int coalitionTime = 0;
+					//int coalitionTime = 0;
+					double coalitionPriceOutcome = 0.00;
 					int totalCapacity = 0;
 					for(ACLMessage coalMsg : coalition) {
 						Plan agentPlan = ((Plan) coalMsg.getContentObject());
-						coalitionTime += agentPlan.getMovements().size();
+						//coalitionTime += agentPlan.getMovements().size();
+						coalitionPriceOutcome += agentPlan.getPriceOutcome();
 						totalCapacity += ((DiggerAgent) agentPlan.getAgent()).getCapacity();
 					}
 					//if its the best time, and the mine is going to be depleted
-					if(coalitionTime < bestTime && totalCapacity >= cell.getMetal().get(type)) {
+					/*if(coalitionTime < bestTime && totalCapacity >= metal.getCell().getMetal().get(metal.getType())) {
 						bestTime = coalitionTime;
+						bestProposals = coalition;
+					}*/
+					//if its the best price outcome,  and the mine is going to be depleted
+					if(coalitionPriceOutcome > bestPrice && totalCapacity >= metal.getCell().getMetal().get(metal.getType())) {
+						bestPrice = coalitionPriceOutcome;
 						bestProposals = coalition;
 					}
 				}
 				//maybe validate not null? but it shouldnt be
 				acceptedMessages = bestProposals;
 			} else {
-				//the digger is fine on his own
+				//the digger is fine on his own, hes all grown up
 				acceptedMessages.add(msgs.get(0));
 			}
 		} catch (UnreadableException e1) {

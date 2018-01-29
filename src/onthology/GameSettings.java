@@ -24,6 +24,7 @@ import agent.ProspectorAgent;
 import map.Cell;
 import map.CellType;
 import map.FieldCell;
+import map.ManufacturingCenterCell;
 import map.PathCell;
 import util.Edge;
 import util.Graph;
@@ -423,5 +424,7 @@ public class GameSettings implements java.io.Serializable {
     	return true;
     }
 
-    
+    public List<Cell> getManufacturingCenters(MetalType type) {
+    	return this.cellsOfType.get(CellType.MANUFACTURING_CENTER);
+    }
 }

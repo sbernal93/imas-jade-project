@@ -37,6 +37,8 @@ public class DiggerAgent extends ImasMobileAgent{
     
     private boolean isDigging;
     
+    private boolean isDroppingMetalOff;
+    
     private int capacity;
     
     private int carrying;
@@ -164,6 +166,14 @@ public class DiggerAgent extends ImasMobileAgent{
 
 	public void setCarrying(int carrying) {
 		this.carrying = carrying;
+	}
+
+	public boolean isDroppingMetalOff() {
+		return isDroppingMetalOff;
+	}
+
+	public void setDroppingMetalOff(boolean isDroppingMetalOff) {
+		this.isDroppingMetalOff = isDroppingMetalOff;
 	}
 
 

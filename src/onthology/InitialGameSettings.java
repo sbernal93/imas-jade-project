@@ -383,4 +383,6 @@ public class InitialGameSettings extends GameSettings {
             this.agentList.get(agent.getType()).remove(oldCell);
         }
     }
+    
+
 }

@@ -19,11 +19,19 @@ public class Plan implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private ImasMobileAgent agent;
 	private List<Movement> movements;
+	private double priceOutcome;
 
 	public Plan(ImasMobileAgent agent, List<Movement> movements) {
 		super();
 		this.agent = agent;
 		this.movements = movements;
+	}
+	
+	public Plan(ImasMobileAgent agent, List<Movement> movements, double priceOutcome) {
+		super();
+		this.agent = agent;
+		this.movements = movements;
+		this.priceOutcome = priceOutcome;
 	}
 
 	public List<Movement> getMovements() {
@@ -53,6 +61,14 @@ public class Plan implements Serializable{
 
 	public void setAgent(ImasMobileAgent agent) {
 		this.agent = agent;
+	}
+	
+	public double getPriceOutcome() {
+		return priceOutcome;
+	}
+
+	public void setPriceOutcome(double priceOutcome) {
+		this.priceOutcome = priceOutcome;
 	}
 
 	@Override

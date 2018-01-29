@@ -7,6 +7,7 @@ import java.util.List;
 
 import agent.DiggerAgent;
 import agent.ProspectorAgent;
+import agent.UtilsAgents;
 import jade.domain.FIPAAgentManagement.FailureException;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
@@ -14,9 +15,13 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import jade.proto.ContractNetResponder;
+import map.Cell;
 import map.FieldCell;
+import map.ManufacturingCenterCell;
 import map.PathCell;
+import util.MetalDiscovery;
 import util.Movement;
+import util.Movement.MovementType;
 import util.Plan;
 
 public class DiggerContractNetResponder extends ContractNetResponder{
@@ -62,11 +67,16 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 	@Override
 	protected ACLMessage handleCfp(ACLMessage cfp) throws RefuseException, FailureException, NotUnderstoodException {
 		try {
-			FieldCell mine = (FieldCell) cfp.getContentObject();
-			List<PathCell> pathCells = this.agent.getGame().getPathCellsNextTo(mine);
 			
-			List<Movement> movements = this.agent.findShortestPath(pathCells.get(0));
-			//TODO: add movement to manufacturing centers
+			MetalDiscovery mine = (MetalDiscovery) cfp.getContentObject();
+			List<PathCell> pathCells = this.agent.getGame().getPathCellsNextTo(mine.getCell());
+			
+			List<Movement> movements = new LinkedList<>();
+			//TODO: validate metal type. Although the way we are doing this is that 
+			//an agents plan is moving to the mine, digging and dropping off,
+			//so an agent will be able to dig any mine received because he isnt going to be 
+			//carrying anything after the plan is finished
+			
 			//finds closest path cell
 			for(PathCell pc : pathCells) {
 				List<Movement> pcMovements = this.agent.findShortestPath(pc);
@@ -74,7 +84,68 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 					movements = pcMovements;
 				}
 			}
-			planProposed = new Plan(agent, movements);
+			//now that movement to the mine is made, we need to add movements for digging the metal
+			Cell lastCell = movements.get(movements.size() - 1).getNewCell();
+			int unitsDugUp = 0;
+			for(int i=1; i<= mine.getAmount(); i++) {
+				if(unitsDugUp>=(this.agent.getCapacity() + this.agent.getCarrying())) {
+					break;
+				}
+				movements.add(new Movement(this.agent, lastCell, lastCell,  MovementType.DIGGING));
+				unitsDugUp++;
+			}
+			if(unitsDugUp<mine.getAmount()) {
+				//TODO: considering we are using coalitions, we shouldnt need this,
+				//leaving this here still in case we want to do something clever.
+				//maybe skip going to MC? but then what price should we bid
+			} 
+			//the digger dug up all he could, now to go to the nearest manufacturing center
+			//TODO: consider best manufacturing center based on price/movement
+			List<Cell> manufacturingCenters = this.agent.getGame().getManufacturingCenters(mine.getType());
+			
+			List<Movement> movementsToManufacturingCenter = new ArrayList<>();
+			double bestPrice = Double.MAX_VALUE;
+			
+			List<Movement> allMovs = new LinkedList<>();
+			this.agent.getPlans().stream().forEach(p -> {
+				allMovs.addAll(p.getMovements());
+			});
+			
+			//we look for the best manufacturing center to go based on price/distance
+			for(Cell manCenter : manufacturingCenters) {
+				List<PathCell> pathCellsNextToManCenter = this.agent.getGame().getPathCellsNextTo(manCenter);
+				List<Movement> closestPath = null;
+				//first we need the fastest way to get there
+				for(PathCell pc : pathCellsNextToManCenter) {
+					List<Movement> movementsToManCenter = this.agent.findShortestPath(pc);
+					if(closestPath == null) {
+						closestPath = movementsToManCenter;
+					} else {
+						if(movementsToManCenter.size() < closestPath.size()) {
+							closestPath = movementsToManCenter;
+						}
+					}
+				}
+				//now we look for the best price/distance
+				int price = ((ManufacturingCenterCell) manCenter).getPrice();
+				//we add also all the moves we have to make currently, since its going to change
+				//the price/movement outcome
+				double calcPrice = UtilsAgents.calculatePrice(allMovs.size() + movements.size() + closestPath.size(), mine.getAmount(), price);
+				if( calcPrice < bestPrice) {
+					bestPrice = calcPrice;
+					movementsToManufacturingCenter = closestPath;
+				}
+				
+			}
+			movements.addAll(movementsToManufacturingCenter);
+			
+			//add all the movements to drop off metals
+			for(int i=1; i<= unitsDugUp; i++) {
+				movements.add(new Movement(this.agent, lastCell, lastCell,  MovementType.DROP_OFF));
+			}
+			
+			//we propose the plan with the movements to the mine and the MC, and the amount earned
+			planProposed = new Plan(agent, movements, bestPrice);
 			
 			ACLMessage proposal = cfp.createReply();
 			proposal.setPerformative(ACLMessage.PROPOSE);
@@ -83,11 +154,8 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 			if(this.agent.getPlans() == null || this.agent.getPlans().isEmpty()) {
 				proposal.setContentObject(planProposed);
 			} else {
-				List<Movement> allMovs = new LinkedList<>();
-				this.agent.getPlans().stream().forEach(p -> {
-					allMovs.addAll(p.getMovements());
-				});
-				proposal.setContentObject(new Plan(this.agent, allMovs));
+				allMovs.addAll(movements);
+				proposal.setContentObject(new Plan(this.agent, allMovs, bestPrice));
 			}
 			return proposal;
 		} catch (UnreadableException e) {
@@ -98,7 +166,5 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 		return super.handleCfp(cfp);
 	}
 	
-	
-	
-	
+
 }
