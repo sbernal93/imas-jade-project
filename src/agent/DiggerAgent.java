@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import behaviour.digger.DiggerContractNetResponder;
 import behaviour.digger.RequestResponseBehaviour;
 import jade.core.AID;
 import jade.domain.DFService;
@@ -90,8 +91,10 @@ public class DiggerAgent extends ImasMobileAgent{
 		}
         
         MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
-
+        MessageTemplate cnmt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_CONTRACT_NET), MessageTemplate.MatchPerformative(ACLMessage.CFP));
+        
         this.addBehaviour(new RequestResponseBehaviour(this, mt));
+        this.addBehaviour(new DiggerContractNetResponder(this, cnmt));
 
         System.out.println("Digger agent setup finished");
 
@@ -110,20 +113,33 @@ public class DiggerAgent extends ImasMobileAgent{
 		//so no need to validate that plans size
 		Movement movementToMake = this.getPlans().get(0).getMovements().get(0);
 		if(movement.getStatus().equals(MovementStatus.ACCEPTED)) {
+			//first we delete it from the queue, it was accepted
 			if(this.getPlans().get(0).getMovements().size() == 1) {
 				this.getPlans().remove(0);
 			} else {
 				this.getPlans().get(0).getMovements().remove(0);
 			}
 			if(movementToMake.getType().equals(MovementType.NORMAL)) {
+				isDigging = false;
+				isDroppingMetalOff = false;
 				this.setCell(movementToMake.getNewCell());
 			}
 			if(movementToMake.getType().equals(MovementType.DIGGING)) {
 				//TODO: substract from mine? or should system agent do that?
+				//yes! exactly, system agent does that!
+				isDigging = true;
+				carrying++;
+				if(carrying>=capacity) {
+					isDigging = false;
+				}
 			}
 			if(movementToMake.getType().equals(MovementType.DROP_OFF)) {
 				//TODO: substract amount of metal being carried
+				isDroppingMetalOff = true;
 				carrying --;
+				if(carrying <= 0) {
+					isDroppingMetalOff = false;
+				}
 			}
 		}
 	}

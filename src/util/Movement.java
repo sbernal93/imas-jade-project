@@ -4,7 +4,9 @@ import java.io.Serializable;
 
 import agent.ImasMobileAgent;
 import map.Cell;
+import map.FieldCell;
 import onthology.InfoAgent;
+import onthology.MetalType;
 
 /**
  * Class for handling the movement of agents
@@ -26,6 +28,8 @@ public class Movement implements Serializable{
 	private Cell newCell;
 	private MovementStatus status;
 	private MovementType type;
+	private Cell mcCell;
+	private MetalDiscovery metal;
 	
 	public Movement(){
 	}
@@ -46,6 +50,29 @@ public class Movement implements Serializable{
 		this.newCell = newCell;
 		this.type = type;
 		this.status = MovementStatus.PROPOSAL;
+	}
+
+	
+	
+	public Movement(ImasMobileAgent agent, Cell oldCell, Cell newCell, MovementType type,
+			MetalDiscovery metal) {
+		super();
+		this.agent = agent;
+		this.oldCell = oldCell;
+		this.newCell = newCell;
+		this.status = MovementStatus.PROPOSAL;
+		this.type = type;
+		this.metal= metal;
+	}
+	
+	public Movement(ImasMobileAgent agent, Cell oldCell, Cell newCell, Cell mcCell, MovementType type) {
+		super();
+		this.agent = agent;
+		this.oldCell = oldCell;
+		this.newCell = newCell;
+		this.status = MovementStatus.PROPOSAL;
+		this.type = type;
+		this.mcCell = mcCell;
 	}
 
 	public ImasMobileAgent getAgent() {
@@ -91,6 +118,23 @@ public class Movement implements Serializable{
 	public String toString() {
 		return "Movement [agent=" + agent + ", oldCell=" + oldCell + ", newCell=" + newCell + ", status=" + status
 				+ ", type=" + type + "]";
+	}
+
+
+	public Cell getMcCell() {
+		return mcCell;
+	}
+
+	public void setMcCell(Cell mcCell) {
+		this.mcCell = mcCell;
+	}
+
+	public MetalDiscovery getMetal() {
+		return metal;
+	}
+
+	public void setMetal(MetalDiscovery metal) {
+		this.metal = metal;
 	}
 	
 	

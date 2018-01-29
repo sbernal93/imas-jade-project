@@ -78,7 +78,7 @@ public class RequestResponseBehaviour extends AchieveREResponder {
 	            				agent.log("MINE_DISCOVERY request message received");
 	        	            	reply.setPerformative(ACLMessage.AGREE);;
 	        	            	agent.log("new mines size is: " + list.size());
-	        	            	agent.informNewMines((List<Cell>) list);
+	        	            	agent.informNewMines((List<MetalDiscovery>) list);
 	            				
 	            			}
 	            		}

@@ -55,6 +55,10 @@ public class SystemAgent extends ImasAgent {
     
     private List<Movement> movementsProposed;
     
+    private double priceObtained;
+    
+    private int amountOfMineTurnedIn;
+    
     /**
      * Current amount of steps in the game
      */
@@ -157,7 +161,6 @@ public class SystemAgent extends ImasAgent {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         this.addBehaviour(new SimulationBehaviour(this));
     }
 
@@ -215,6 +218,22 @@ public class SystemAgent extends ImasAgent {
 
 	public void setTotalTime(long totalTime) {
 		this.totalTime = totalTime;
+	}
+
+	public double getPriceObtained() {
+		return priceObtained;
+	}
+
+	public void setPriceObtained(double priceObtained) {
+		this.priceObtained = priceObtained;
+	}
+
+	public int getAmountOfMineTurnedIn() {
+		return amountOfMineTurnedIn;
+	}
+
+	public void setAmountOfMineTurnedIn(int amountOfMineTurnedIn) {
+		this.amountOfMineTurnedIn = amountOfMineTurnedIn;
 	}
 	
     

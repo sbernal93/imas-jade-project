@@ -71,7 +71,7 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 			MetalDiscovery mine = (MetalDiscovery) cfp.getContentObject();
 			List<PathCell> pathCells = this.agent.getGame().getPathCellsNextTo(mine.getCell());
 			
-			List<Movement> movements = new LinkedList<>();
+			List<Movement> movements = null;
 			//TODO: validate metal type. Although the way we are doing this is that 
 			//an agents plan is moving to the mine, digging and dropping off,
 			//so an agent will be able to dig any mine received because he isnt going to be 
@@ -80,8 +80,12 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 			//finds closest path cell
 			for(PathCell pc : pathCells) {
 				List<Movement> pcMovements = this.agent.findShortestPath(pc);
-				if(pcMovements.size()<movements.size()) {
+				if(movements == null) {
 					movements = pcMovements;
+				} else {
+					if(pcMovements.size()<movements.size()) {
+						movements = pcMovements;
+					}
 				}
 			}
 			//now that movement to the mine is made, we need to add movements for digging the metal
@@ -91,7 +95,7 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 				if(unitsDugUp>=(this.agent.getCapacity() + this.agent.getCarrying())) {
 					break;
 				}
-				movements.add(new Movement(this.agent, lastCell, lastCell,  MovementType.DIGGING));
+				movements.add(new Movement(this.agent, lastCell, lastCell,  MovementType.DIGGING, mine));
 				unitsDugUp++;
 			}
 			if(unitsDugUp<mine.getAmount()) {
@@ -105,6 +109,7 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 			
 			List<Movement> movementsToManufacturingCenter = new ArrayList<>();
 			double bestPrice = Double.MAX_VALUE;
+			Cell bestMc = null;
 			
 			List<Movement> allMovs = new LinkedList<>();
 			this.agent.getPlans().stream().forEach(p -> {
@@ -134,6 +139,7 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 				if( calcPrice < bestPrice) {
 					bestPrice = calcPrice;
 					movementsToManufacturingCenter = closestPath;
+					bestMc = manCenter;
 				}
 				
 			}
@@ -141,7 +147,7 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 			
 			//add all the movements to drop off metals
 			for(int i=1; i<= unitsDugUp; i++) {
-				movements.add(new Movement(this.agent, lastCell, lastCell,  MovementType.DROP_OFF));
+				movements.add(new Movement(this.agent, lastCell, lastCell, bestMc,  MovementType.DROP_OFF));
 			}
 			
 			//we propose the plan with the movements to the mine and the MC, and the amount earned
@@ -164,6 +170,12 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 			e.printStackTrace();
 		}
 		return super.handleCfp(cfp);
+	}
+	
+	@Override
+	public int onEnd() {
+		reset();
+		return super.onEnd();
 	}
 	
 

@@ -29,6 +29,7 @@ import map.PathCell;
 import util.Edge;
 import util.Graph;
 import util.Movement;
+import util.Movement.MovementType;
 import util.Vertex;
 
 import java.nio.file.Path;
@@ -411,12 +412,15 @@ public class GameSettings implements java.io.Serializable {
      * @return
      */
     public boolean isValidMovement(Movement movement) {
-    	if(!(movement.getNewCell().getCellType().equals(CellType.PATH))) {
-    		return false;
+    	if(movement.getType().equals(MovementType.NORMAL)) {
+    		if(!(movement.getNewCell().getCellType().equals(CellType.PATH))) {
+        		return false;
+        	}
+        	if(!getPathCellsNextTo(movement.getOldCell()).stream().anyMatch(c -> c.equals(movement.getNewCell()))) {
+        		return false;
+        	}
     	}
-    	if(!getPathCellsNextTo(movement.getOldCell()).stream().anyMatch(c -> c.equals(movement.getNewCell()))) {
-    		return false;
-    	}
+    	//TODO: validate dig and drop off
     	//TODO
 		/*if(getDiggerAgents().stream().anyMatch(d -> d.getCell().equals(movement.getNewCell()) && d.isDigging())) {
 			return false;

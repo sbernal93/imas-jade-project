@@ -97,6 +97,26 @@ public class FieldCell extends Cell {
             }
         }
     }
+    
+    /**
+     * Removes an item of the current metal, if any.
+     * When there is no more metal after removing it, the set of
+     * metal is emptied.
+     */
+    public void removeMetal(MetalType type) {
+        if (found && metal.size() > 0) {
+            for (Map.Entry<MetalType, Integer> entry: metal.entrySet()) {
+            	if(entry.getKey().equals(type)) {
+            		if (entry.getValue() == 1) {
+                        metal.clear();
+                        found = false;
+                    } else {
+                        metal.replace(entry.getKey(), entry.getValue()-1);
+                    }
+            	}
+            }
+        }
+    }
 
     /* ***************** Map visualization API ********************************/
 

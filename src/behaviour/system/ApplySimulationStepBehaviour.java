@@ -13,6 +13,7 @@ import jade.core.behaviours.OneShotBehaviour;
 import onthology.InitialGameSettings;
 import util.Movement;
 import util.Movement.MovementStatus;
+import util.Movement.MovementType;
 
 public class ApplySimulationStepBehaviour extends OneShotBehaviour{
 
@@ -34,7 +35,19 @@ public class ApplySimulationStepBehaviour extends OneShotBehaviour{
 		this.agent.log("ApplySimulationStepBehaviour started");
 		this.agent.getMovementsProposed().stream().filter(m -> m.getStatus().equals(MovementStatus.ACCEPTED)).forEach(m -> {
 			try {
-				((InitialGameSettings)this.agent.getGame()).moveAgent(m);
+				if(m.getType().equals(MovementType.NORMAL)) {
+					((InitialGameSettings)this.agent.getGame()).moveAgent(m);
+				}
+				if(m.getType().equals(MovementType.DIGGING)) {
+					((InitialGameSettings)this.agent.getGame()).mineDug(m);
+				}
+				if(m.getType().equals(MovementType.DROP_OFF)) {
+					this.agent.setPriceObtained(this.agent.getPriceObtained() + 
+							((InitialGameSettings)this.agent.getGame()).dropOff(m));
+
+					this.agent.setAmountOfMineTurnedIn(this.agent.getAmountOfMineTurnedIn() + 
+							1);
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

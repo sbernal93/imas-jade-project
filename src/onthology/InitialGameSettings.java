@@ -384,5 +384,15 @@ public class InitialGameSettings extends GameSettings {
         }
     }
     
+    public void mineDug(Movement movement) {
+    	FieldCell cell = (FieldCell) get(movement.getMetal().getCell().getRow(), movement.getMetal().getCell().getCol());
+    	cell.removeMetal(movement.getMetal().getType());
+    }
+    
+    public double dropOff(Movement movement) {
+    	ManufacturingCenterCell mc = (ManufacturingCenterCell) movement.getMcCell();
+    	return mc.getPrice();
+    }
+    
 
 }

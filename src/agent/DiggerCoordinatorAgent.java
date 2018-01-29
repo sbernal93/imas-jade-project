@@ -1,16 +1,22 @@
 package agent;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import behaviour.BaseRequesterBehaviour;
 import behaviour.digger.coordinator.CreateDiggerAgentBehaviour;
+import behaviour.digger.coordinator.DiggerContractNetInitiatorBehaviour;
 import behaviour.digger.coordinator.RequestResponseBehaviour;
+import behaviour.prospector.coordinator.ProspectorContractNetInitiatorBehaviour;
 import jade.core.AID;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
+import jade.domain.FIPANames;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPANames.InteractionProtocol;
@@ -18,8 +24,10 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import map.Cell;
+import map.PathCell;
 import onthology.GameSettings;
 import onthology.MessageContent;
+import util.MetalDiscovery;
 import util.Movement;
 
 /**
@@ -152,6 +160,26 @@ public class DiggerCoordinatorAgent extends ImasAgent{
 	public void informApplyStep(List<Movement> list) {
 		SequentialBehaviour seq = new SequentialBehaviour();
 		//TODO: send apply step and movements to the digger agents
+		for(Movement movement :  list) {
+			if(movement.getAgent() instanceof DiggerAgent) {
+				seq.addSubBehaviour(new BaseRequesterBehaviour<DiggerCoordinatorAgent>(this, 
+						buildApplyStepMessage(movement.getAgent().getAID(), movement)) {
+
+							/**
+							 * 
+							 */
+							private static final long serialVersionUID = 1L;
+							
+							@Override
+							protected void handleInform(ACLMessage msg) {
+								this.getTypeAgent().log("Inform received");
+								super.handleInform(msg);
+							}
+					
+				});
+			}
+		}
+		
 		seq.addSubBehaviour(new BaseRequesterBehaviour<DiggerCoordinatorAgent>(this,
     			UtilsAgents.buildMessage(this.coordinatorAgent, MessageContent.APPLY_STEP_FINISHED)) {
 
@@ -166,9 +194,45 @@ public class DiggerCoordinatorAgent extends ImasAgent{
 		
 	}
 	
-	public void informNewMines(List<Cell> list) {
+	private ACLMessage buildApplyStepMessage(AID agent, Movement movement) {
+    	ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+		message.clearAllReceiver();
+		message.addReceiver(agent);
+		message.setProtocol(InteractionProtocol.FIPA_REQUEST);
+		message.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
+		this.log("Request message to a digger agent");
+        try {
+        	message.setContent(MessageContent.APPLY_STEP);
+        	this.log("Request message content:" + message.getContent());
+        	message.setContentObject((Serializable) movement);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return message;
+    }
+	
+	public void informNewMines(List<MetalDiscovery> list) {
 		SequentialBehaviour seq = new SequentialBehaviour();
 		//TODO: contract net for mine digging
+		int nResponders = this.getDiggerAgents().size();
+    	for(MetalDiscovery metal : list) {
+    		ACLMessage msg = new ACLMessage(ACLMessage.CFP);
+            msg.setLanguage(ImasAgent.LANGUAGE);
+            msg.setOntology(ImasAgent.ONTOLOGY);
+            for (AID diggerAgent : this.getDiggerAgents()) {
+                msg.addReceiver(diggerAgent);
+            }
+            msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
+            msg.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
+            //Sets the first path cell of the group to be sent, the prospectors will respond with
+            //their distance to that field cell
+            try {
+				msg.setContentObject((Serializable) metal);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+            seq.addSubBehaviour(new DiggerContractNetInitiatorBehaviour(this, msg, nResponders, metal));
+    	}
 		seq.addSubBehaviour(new BaseRequesterBehaviour<DiggerCoordinatorAgent>(this,
     			UtilsAgents.buildMessage(this.coordinatorAgent, MessageContent.MINE_DISCOVERY)) {
 
