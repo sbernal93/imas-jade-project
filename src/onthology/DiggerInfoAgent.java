@@ -28,7 +28,7 @@ public class DiggerInfoAgent extends InfoAgent {
     /**
      * Maximum units of metal of any type able to bring at a time.
      */
-    protected int capacity;
+    private int capacity;
 
     public DiggerInfoAgent(AgentType type) {
         super(type);
@@ -47,8 +47,16 @@ public class DiggerInfoAgent extends InfoAgent {
         super(type, aid);
         this.capacity = capacity;
     }
+    
+    public int getCapacity() {
+		return capacity;
+	}
 
-    /**
+	public void setCapacity(int capacity) {
+		this.capacity = capacity;
+	}
+
+	/**
      * String representation of this isntance.
      *
      * @return string representation.

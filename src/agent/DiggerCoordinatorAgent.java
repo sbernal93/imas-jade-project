@@ -2,6 +2,7 @@ package agent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import behaviour.BaseRequesterBehaviour;
 import behaviour.digger.coordinator.CreateDiggerAgentBehaviour;
@@ -16,6 +17,7 @@ import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import map.Cell;
 import onthology.GameSettings;
 import onthology.MessageContent;
 import util.Movement;
@@ -108,10 +110,26 @@ public class DiggerCoordinatorAgent extends ImasAgent{
     					
     					@Override
     					protected void handleInform(ACLMessage msg) {
-    						((DiggerCoordinatorAgent) this.getAgent()).log("Inform received from: " + msg.getSender().getName());
+    						this.getTypeAgent().log("Inform received from: " + msg.getSender().getName());
+    						try {
+    							Movement mov = (Movement) Optional.ofNullable(msg.getContentObject()).orElse(null);
+    							if(mov !=null ) {
+    								this.getTypeAgent().addMovement((Movement) msg.getContentObject());
+    							}
+							} catch (UnreadableException e) {
+								e.printStackTrace();
+							}
     					}
     		});
     	}
+    	seq.addSubBehaviour(new BaseRequesterBehaviour<DiggerCoordinatorAgent>(this, 
+    			UtilsAgents.buildMessage(this.coordinatorAgent, MessageContent.STEP_FINISHED)) {
+
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+		});
     	this.addBehaviour(seq);
     }
     
@@ -129,6 +147,42 @@ public class DiggerCoordinatorAgent extends ImasAgent{
         }
         return message;
 	}
+    
+
+	public void informApplyStep(List<Movement> list) {
+		SequentialBehaviour seq = new SequentialBehaviour();
+		//TODO: send apply step and movements to the digger agents
+		seq.addSubBehaviour(new BaseRequesterBehaviour<DiggerCoordinatorAgent>(this,
+    			UtilsAgents.buildMessage(this.coordinatorAgent, MessageContent.APPLY_STEP_FINISHED)) {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+		});
+    	
+    	this.addBehaviour(seq);
+		
+	}
+	
+	public void informNewMines(List<Cell> list) {
+		SequentialBehaviour seq = new SequentialBehaviour();
+		//TODO: contract net for mine digging
+		seq.addSubBehaviour(new BaseRequesterBehaviour<DiggerCoordinatorAgent>(this,
+    			UtilsAgents.buildMessage(this.coordinatorAgent, MessageContent.MINE_DISCOVERY)) {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+		});
+    	
+    	this.addBehaviour(seq);
+		
+	}
+
     
     /**
      * Update the game settings.
@@ -192,5 +246,7 @@ public class DiggerCoordinatorAgent extends ImasAgent{
 	public AID getCoordinatorAgent() {
 		return coordinatorAgent;
 	}
+
+
     
 }

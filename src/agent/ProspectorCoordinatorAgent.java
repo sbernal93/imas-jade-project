@@ -221,6 +221,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
     
     public void informApplyStep(List<Movement> movements){
     	SequentialBehaviour seq = new SequentialBehaviour();
+    	//prospectors always have movements, so we should respond to all
     	for (AID agent : this.prospectorAgents) {
     		Movement movement = movements.stream().filter(m -> m.getAgent().getAID().equals(agent)).findFirst().get();
     		seq.addSubBehaviour(new BaseRequesterBehaviour<ProspectorCoordinatorAgent>(this,

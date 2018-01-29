@@ -19,11 +19,13 @@ public class Movement implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	public enum MovementStatus {PROPOSAL, ACCEPTED, REJECTED};
+	public enum MovementType {NORMAL, DIGGING, DROP_OFF};
 	
 	private ImasMobileAgent agent;
 	private Cell oldCell;
 	private Cell newCell;
 	private MovementStatus status;
+	private MovementType type;
 	
 	public Movement(){
 	}
@@ -33,6 +35,16 @@ public class Movement implements Serializable{
 		this.agent = agent;
 		this.oldCell = oldCell;
 		this.newCell = newCell;
+		this.status = MovementStatus.PROPOSAL;
+		this.type = MovementType.NORMAL;
+	}
+	
+	public Movement(ImasMobileAgent agent, Cell oldCell, Cell newCell, MovementType type) {
+		super();
+		this.agent = agent;
+		this.oldCell = oldCell;
+		this.newCell = newCell;
+		this.type = type;
 		this.status = MovementStatus.PROPOSAL;
 	}
 
@@ -63,15 +75,22 @@ public class Movement implements Serializable{
 		this.status = status;
 	}
 	
+	public MovementType getType() {
+		return type;
+	}
+
+	public void setType(MovementType type) {
+		this.type = type;
+	}
+
 	public InfoAgent getInfoAgent() {
 		return new InfoAgent(this.getAgent().getType(), this.getAgent().getAID());
 	}
 
 	@Override
 	public String toString() {
-		return "Movement [agent=" + agent.getName() + ", oldCell=(" + oldCell.getRow() + ", " + oldCell.getCol()+ "),"
-				+ " newCell=(" + newCell.getRow() + ", " + newCell.getCol() + "), status=" + status
-				+ "]";
+		return "Movement [agent=" + agent + ", oldCell=" + oldCell + ", newCell=" + newCell + ", status=" + status
+				+ ", type=" + type + "]";
 	}
 	
 	

@@ -10,8 +10,10 @@ import agent.ProspectorAgent;
 import agent.ProspectorCoordinatorAgent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 import jade.proto.AchieveREResponder;
 import onthology.MessageContent;
+import util.Movement;
 
 /**.
  */
@@ -45,13 +47,27 @@ public class RequestResponseBehaviour extends AchieveREResponder {
     	DiggerAgent agent = (DiggerAgent)this.getAgent();
         ACLMessage reply = msg.createReply();
         try {
-            Object content = (Object) msg.getContent();
-            agent.log("Request received");
-            if(content.equals(MessageContent.NEW_STEP)) {
-            	agent.log("NEW_STEP request message received");
-            	reply.setPerformative(ACLMessage.AGREE);
-            	
-            }
+        	 Object content = (Object) msg.getContent();
+             agent.log("Request received");
+             boolean found = false;
+             if(content.equals(MessageContent.NEW_STEP)) {
+             	agent.log("NEW_STEP request message received");
+             	reply.setPerformative(ACLMessage.AGREE);
+             	found = true;
+             }
+             /*if(content.equals(MessageContent.APPLY_STEP)) {
+             	agent.log("APPLY_STEP request message received");
+             	reply.setPerformative(ACLMessage.AGREE);
+             	found = true;
+             }*/
+             if(!found) {
+             	Object contentObj = (Object) msg.getContentObject();
+             	if(contentObj instanceof Movement) {
+             		agent.log("APPLY_STEP request message received");
+                 	reply.setPerformative(ACLMessage.AGREE);
+                 	agent.applyNewStep((Movement) contentObj);
+             	}
+             }
         } catch (Exception e) {
             reply.setPerformative(ACLMessage.FAILURE);
             agent.errorLog(e.getMessage());
@@ -82,6 +98,20 @@ public class RequestResponseBehaviour extends AchieveREResponder {
         ACLMessage reply = msg.createReply();
         if (reply.getPerformative() != ACLMessage.FAILURE) {
 	        reply.setPerformative(ACLMessage.INFORM);
+	        if(msg.getContent().equals(MessageContent.NEW_STEP)) {
+		        try {
+					reply.setContentObject(agent.informNewStep());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+	        }
+	        /*if(msg.getContent().equals(MessageContent.APPLY_STEP)){
+	        	try {
+					reply.setContentObject((Serializable) agent.applyNewStep());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+	        }*/
 	        agent.log("INFORM message sent");
         }
         return reply;

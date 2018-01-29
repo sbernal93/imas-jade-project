@@ -96,6 +96,14 @@ public class RequestResponseBehaviour extends AchieveREResponder {
 	            	//TODO
 	            	agent.log("MINE_DISCOVERY request message received");
 	            	reply.setPerformative(ACLMessage.AGREE);
+	            	if(msg.getSender().equals(agent.getDiggerCoordinatorAgent())) {
+	            		agent.setDcInformNewMinesFinished(true);
+	            		agent.applyStepFinished();
+	            	}
+	            	if(msg.getSender().equals(agent.getProspectorCoordinatorAgent())) {
+	            		agent.setDcInformNewMinesFinished(true);
+	            		agent.applyStepFinished();
+	            	}
 	                found = true;
 	            }
 	            if(!found) {
@@ -111,8 +119,15 @@ public class RequestResponseBehaviour extends AchieveREResponder {
 	            			if(list.get(0) instanceof Cell) {
 	            				agent.log("MINE_DISCOVERY request message received");
 	        	            	reply.setPerformative(ACLMessage.AGREE);;
-	        	            	agent.log("List size is: " + list.size());
+	        	            	agent.log("new mines size is: " + list.size());
+	        	            	agent.informNewMines((List<Cell>) list);
 	            				
+	            			}
+	            		} else {
+	            			//TODO validate this, no new mines received so its finished
+	            			if(msg.getSender().equals(agent.getProspectorCoordinatorAgent())) {
+		            			agent.setDcInformNewMinesFinished(true);
+		            			agent.applyStepFinished();
 	            			}
 	            		}
 	            	}
@@ -158,7 +173,11 @@ public class RequestResponseBehaviour extends AchieveREResponder {
 	        	agent.informNewStep();
 	        }
 	        if(content.equals(MessageContent.STEP_FINISHED)) {
-	        	agent.requestStepResultFromProspectorCoordinator();
+	        	if(msg.getSender().equals(agent.getProspectorCoordinatorAgent())) {
+		        	agent.requestStepResultFromProspectorCoordinator();
+	        	} else {
+	        		agent.requestStepResultFromDiggerCoordinator();
+	        	}
 	        }
 	        if(content.equals(MessageContent.STEP_RESULT)) {
 	        	try {

@@ -2,6 +2,7 @@ package behaviour.digger.coordinator;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 
 import agent.CoordinatorAgent;
 import agent.DiggerCoordinatorAgent;
@@ -10,7 +11,9 @@ import agent.ProspectorCoordinatorAgent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREResponder;
+import map.Cell;
 import onthology.MessageContent;
+import util.Movement;
 
 /**.
  */
@@ -39,17 +42,49 @@ public class RequestResponseBehaviour extends AchieveREResponder {
      * @param msg message received.
      * @return AGREE message when all was ok, or FAILURE otherwise.
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     protected ACLMessage prepareResponse(ACLMessage msg) {
     	DiggerCoordinatorAgent agent = (DiggerCoordinatorAgent)this.getAgent();
         ACLMessage reply = msg.createReply();
         try {
             Object content = (Object) msg.getContent();
             agent.log("Request received");
-            if(content.equals(MessageContent.NEW_STEP)) {
-            	agent.log("NEW_STEP request message received");
-            	reply.setPerformative(ACLMessage.AGREE);
-            	agent.informNewStep();
+            boolean found = false;
+            if(content!=null) {
+	            if(content.equals(MessageContent.NEW_STEP)) {
+	            	agent.log("NEW_STEP request message received");
+	            	reply.setPerformative(ACLMessage.AGREE);
+	            	agent.informNewStep();
+	            	found = true;
+	            }
+	            if(content.equals(MessageContent.STEP_RESULT)) {
+	            	agent.log("STEP_RESULT request message received");
+	            	reply.setPerformative(ACLMessage.AGREE);
+	            	found = true;
+	            }
+	            if(!found) {
+	            	Object contentObj = (Object) msg.getContentObject();
+	            	if(contentObj instanceof List<?>) {
+	            		List<?> list = (List<?>) contentObj;
+	            		if(list != null && list.size()>0) {
+	            			if(list.get(0) instanceof Movement) {
+	            				agent.log("APPLY_STEP request message received");
+	        	            	reply.setPerformative(ACLMessage.AGREE);
+	        	            	agent.informApplyStep((List<Movement>) list);	
+	            			}
+	            			if(list.get(0) instanceof Cell) {
+	            				agent.log("MINE_DISCOVERY request message received");
+	        	            	reply.setPerformative(ACLMessage.AGREE);;
+	        	            	agent.log("new mines size is: " + list.size());
+	        	            	agent.informNewMines((List<Cell>) list);
+	            				
+	            			}
+	            		}
+	            	}
+	            }
+            } else {
+            	agent.log("Message with null content was from: " + msg.getSender());
             }
         } catch (Exception e) {
             reply.setPerformative(ACLMessage.FAILURE);
@@ -80,8 +115,20 @@ public class RequestResponseBehaviour extends AchieveREResponder {
     	DiggerCoordinatorAgent agent = (DiggerCoordinatorAgent) this.getAgent();
         ACLMessage reply = msg.createReply();
         if (reply.getPerformative() != ACLMessage.FAILURE) {
-	        reply.setPerformative(ACLMessage.INFORM);
-	        agent.log("INFORM message sent");
+        	if (reply.getPerformative() != ACLMessage.FAILURE) {
+            	if(msg.getContent().equals(MessageContent.STEP_RESULT)) {
+    		        reply.setPerformative(ACLMessage.INFORM);
+            		try {
+            			agent.log("Sending INFORM with: " + agent.getMovements().size());
+    					reply.setContentObject((Serializable) agent.getMovements());
+    				} catch (IOException e) {
+    					e.printStackTrace();
+    				}
+            	} else {
+    		        reply.setPerformative(ACLMessage.INFORM);
+    		        agent.log("INFORM message sent");
+            	}
+            }
         }
         return reply;
 

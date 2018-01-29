@@ -40,6 +40,7 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import map.Cell;
 import onthology.GameSettings;
 import onthology.MessageContent;
 import util.Movement;
@@ -83,6 +84,8 @@ public class CoordinatorAgent extends ImasAgent {
     private boolean dcApplyStepFinished;
     
     private boolean pcApplyStepFinished;
+    
+    private boolean dcInformNewMinesFinished;
 
     /**
      * Builds the coordinator agent.
@@ -190,7 +193,7 @@ public class CoordinatorAgent extends ImasAgent {
     public void informNewStep() {
     	this.movements = new ArrayList<>();
     	//dcInformStepFinished = false;
-    	dcInformStepFinished = true;
+    	dcInformStepFinished = false;
     	pcInformStepFinished = false;
     	//Sends messages to both coordinator agents to start a new step and waits for proposed movements,
     	//once an INFORM message is received, then gets the movements from the message content
@@ -239,9 +242,7 @@ public class CoordinatorAgent extends ImasAgent {
 					this.getTypeAgent().log("INFORM received");
 					this.getTypeAgent().addMovements((List<Movement>) msg.getContentObject());
 					this.getTypeAgent().setPcInformStepFinished(true);
-					if(this.getTypeAgent().isPcInformStepFinished() && this.getTypeAgent().isDcInformStepFinished()) {
-						this.getTypeAgent().communicateStepWithSystemAgent(MessageContent.STEP_FINISHED);
-					}
+					this.getTypeAgent().communicateStepWithSystemAgent(MessageContent.STEP_FINISHED);
 				} catch (UnreadableException e) {
 					e.printStackTrace();
 				}
@@ -252,28 +253,55 @@ public class CoordinatorAgent extends ImasAgent {
     	//message to be sent to the system agent
     }
     
-    public void communicateStepWithSystemAgent(String content) {
-    	ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-		message.clearAllReceiver();
-		message.addReceiver(getSystemAgent());
-		message.setProtocol(InteractionProtocol.FIPA_REQUEST);
-		message.setReplyByDate(new Date(System.currentTimeMillis() + 20000));
-		this.log("Request message to System agent");
-        try {
-        	message.setContent(content);
-        	this.log("Request message content:" + message.getContent());
-        	message.setContentObject((Serializable) this.getMovements());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    	this.addBehaviour(new BaseRequesterBehaviour<CoordinatorAgent>(this, message) {
+    public void requestStepResultFromDiggerCoordinator() {
+    	this.addBehaviour(new BaseRequesterBehaviour<CoordinatorAgent>(this,
+    			UtilsAgents.buildMessage(getDiggerCoordinatorAgent(), MessageContent.STEP_RESULT)) {
 
-					/**
-					 * 
-					 */
-					private static final long serialVersionUID = 1L;
-    		
-    	});
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@SuppressWarnings("unchecked")
+			@Override
+			protected void handleInform(ACLMessage msg) {
+				try {
+					this.getTypeAgent().log("INFORM received");
+					this.getTypeAgent().addMovements((List<Movement>) msg.getContentObject());
+					this.getTypeAgent().setDcInformStepFinished(true);
+					this.getTypeAgent().communicateStepWithSystemAgent(MessageContent.STEP_FINISHED);
+				} catch (UnreadableException e) {
+					e.printStackTrace();
+				}
+			}
+			
+		});
+    }
+    
+    public void communicateStepWithSystemAgent(String content) {
+    	if(this.isPcInformStepFinished() && this.isDcInformStepFinished()) {
+	    	ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+			message.clearAllReceiver();
+			message.addReceiver(getSystemAgent());
+			message.setProtocol(InteractionProtocol.FIPA_REQUEST);
+			message.setReplyByDate(new Date(System.currentTimeMillis() + 20000));
+			this.log("Request message to System agent");
+	        try {
+	        	message.setContent(content);
+	        	this.log("Request message content:" + message.getContent());
+	        	message.setContentObject((Serializable) this.getMovements());
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    	this.addBehaviour(new BaseRequesterBehaviour<CoordinatorAgent>(this, message) {
+	
+						/**
+						 * 
+						 */
+						private static final long serialVersionUID = 1L;
+	    		
+	    	});
+    	}
     }
     
     private ACLMessage buildMessageForCoordinatorsAgent(AID agent) {
@@ -293,23 +321,24 @@ public class CoordinatorAgent extends ImasAgent {
 	}
     
     public void informApplyStep(List<Movement> movements){
-    	this.dcApplyStepFinished = true;
-    	//this.dcApplyStepFinished = false;
+    	//this.dcApplyStepFinished = true;
+    	this.dcApplyStepFinished = false;
     	this.pcApplyStepFinished = false;
+    	this.dcInformNewMinesFinished = false;
     	SequentialBehaviour seq = new SequentialBehaviour();
     	//TODO:
-    	/*seq.addSubBehaviour(new BaseRequesterBehaviour<CoordinatorAgent>(this,
-    			UtilsAgents.buildMessage(this.getDiggerCoordinatorAgent(), MessageContent.APPLY_STEP)) {
+    	seq.addSubBehaviour(new BaseRequesterBehaviour<CoordinatorAgent>(this,
+    			buildMessageApplyStep(diggerCoordinatorAgent, movements)) {
 
 					private static final long serialVersionUID = 1L;
 					
 					@Override
 					protected void handleInform(ACLMessage msg) {
-							((CoordinatorAgent) this.getAgent()).log("Inform received from DiggerCoordinator for APPLY STEP");
+						this.getTypeAgent().log("Inform received from DiggerCoordinator for APPLY STEP");
 					}
-		});*/
+		});
     	seq.addSubBehaviour(new BaseRequesterBehaviour<CoordinatorAgent>(this,
-    			buildMessageApplyStepForProspectorCoordinator(prospectorCoordinatorAgent, movements)) {
+    			buildMessageApplyStep(prospectorCoordinatorAgent, movements)) {
 
 					private static final long serialVersionUID = 1L;
 					
@@ -323,13 +352,13 @@ public class CoordinatorAgent extends ImasAgent {
     	this.addBehaviour(seq);
     }
     
-    private ACLMessage buildMessageApplyStepForProspectorCoordinator(AID agent, List<Movement> movements) {
+    private ACLMessage buildMessageApplyStep(AID agent, List<Movement> movements) {
 		ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 		message.clearAllReceiver();
 		message.addReceiver(agent);
 		message.setProtocol(InteractionProtocol.FIPA_REQUEST);
 		message.setReplyByDate(new Date(System.currentTimeMillis() + 20000));
-		this.log("Request message to a ProspectorCoordinator agent");
+		this.log("Request message to " + agent.getName());
         try {
         	message.setContent(MessageContent.APPLY_STEP);
         	this.log("Request message content:" + message.getContent());
@@ -341,12 +370,43 @@ public class CoordinatorAgent extends ImasAgent {
 	}
     
     
-    public void informNewMines(){
-    	//TODO informs the digger coordinator of new mines, 
+    public void informNewMines( List<Cell> cells){
+    	this.addBehaviour(new BaseRequesterBehaviour<CoordinatorAgent>(this,
+    			buildMessageNewMineDiggerCoordinator(this.diggerCoordinatorAgent, cells)) {
+
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 1L;
+					
+					@Override
+					protected void handleInform(ACLMessage msg) {
+						this.getTypeAgent().log("Got inform from DiggerCoordinator for mine discovery");
+					}
+    		
+		});
+    	
     }
+    
+    private ACLMessage buildMessageNewMineDiggerCoordinator(AID agent, List<Cell> cells) {
+ 		ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+ 		message.clearAllReceiver();
+ 		message.addReceiver(agent);
+ 		message.setProtocol(InteractionProtocol.FIPA_REQUEST);
+ 		message.setReplyByDate(new Date(System.currentTimeMillis() + 20000));
+ 		this.log("Request message to a DiggerCoordinator agent with new mines");
+         try {
+         	message.setContent(MessageContent.MINE_DISCOVERY);
+         	this.log("Request message content:" + message.getContent());
+         	message.setContentObject((Serializable) cells);
+         } catch (Exception e) {
+             e.printStackTrace();
+         }
+         return message;
+ 	}
 
     public void applyStepFinished(){
-    	if(this.dcApplyStepFinished && this.pcApplyStepFinished) {
+    	if(this.dcApplyStepFinished && this.pcApplyStepFinished && this.dcInformNewMinesFinished) {
     		communicateStepWithSystemAgent(MessageContent.APPLY_STEP_FINISHED);
     	}
     }
@@ -447,6 +507,15 @@ public class CoordinatorAgent extends ImasAgent {
 	public void setPcApplyStepFinished(boolean pcApplyStepFinished) {
 		this.pcApplyStepFinished = pcApplyStepFinished;
 	}
+
+	public boolean isDcInformNewMinesFinished() {
+		return dcInformNewMinesFinished;
+	}
+
+	public void setDcInformNewMinesFinished(boolean dcInformNewMinesFinished) {
+		this.dcInformNewMinesFinished = dcInformNewMinesFinished;
+	}
     
+	
 }
 
