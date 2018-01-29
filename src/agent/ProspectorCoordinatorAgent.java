@@ -310,7 +310,10 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
         	message.setContent(MessageContent.MINE_DISCOVERY);
         	this.log("Request message content:" + message.getContent());
         	if(this.getNewMines() != null && this.getNewMines().size()>0) {
+        		this.log("We got new mines");
         		message.setContentObject((Serializable) this.getNewMines());
+        	} else {
+        		this.log("No new mines");
         	}
         } catch (Exception e) {
             e.printStackTrace();

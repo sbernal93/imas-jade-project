@@ -111,6 +111,7 @@ public class RequestResponseBehaviour extends AchieveREResponder {
 	            			if(list.get(0) instanceof Cell) {
 	            				agent.log("MINE_DISCOVERY request message received");
 	        	            	reply.setPerformative(ACLMessage.AGREE);;
+	        	            	agent.log("List size is: " + list.size());
 	            				
 	            			}
 	            		}

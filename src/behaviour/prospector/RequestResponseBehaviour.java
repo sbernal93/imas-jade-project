@@ -10,6 +10,7 @@ import agent.ProspectorAgent;
 import agent.ProspectorCoordinatorAgent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.lang.acl.UnreadableException;
 import jade.proto.AchieveREResponder;
 import onthology.MessageContent;
 import util.Movement;
@@ -22,6 +23,8 @@ public class RequestResponseBehaviour extends AchieveREResponder {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	private boolean isApplyStep;
 
 	/**
      * Sets up the ProspectorAgent agent and the template of messages to catch.
@@ -43,6 +46,7 @@ public class RequestResponseBehaviour extends AchieveREResponder {
      */
     @Override
     protected ACLMessage prepareResponse(ACLMessage msg) {
+    	isApplyStep = false;
     	ProspectorAgent agent = (ProspectorAgent)this.getAgent();
         ACLMessage reply = msg.createReply();
         try {
@@ -64,7 +68,7 @@ public class RequestResponseBehaviour extends AchieveREResponder {
             	if(contentObj instanceof Movement) {
             		agent.log("APPLY_STEP request message received");
                 	reply.setPerformative(ACLMessage.AGREE);
-                	reply.setContentObject((Serializable) agent.applyNewStep((Movement) contentObj));
+                	isApplyStep = true;
             	}
             }
         } catch (Exception e) {
@@ -101,6 +105,15 @@ public class RequestResponseBehaviour extends AchieveREResponder {
 		        try {
 					reply.setContentObject(agent.informNewStep());
 				} catch (IOException e) {
+					e.printStackTrace();
+				}
+	        }
+	        if(isApplyStep) {
+	        	try {
+					reply.setContentObject((Serializable) agent.applyNewStep((Movement) msg.getContentObject()));
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (UnreadableException e) {
 					e.printStackTrace();
 				}
 	        }

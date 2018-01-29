@@ -106,6 +106,7 @@ public class ProspectorAgent extends ImasMobileAgent {
 			this.getGame().getFieldCellsNextTo(this.getCell()).forEach( c -> {
 				c.detectMetal();
 				if(c.isFound()) {
+					this.log("I found a mine!!");
 					this.foundMines.add(c);
 				}
 			});
@@ -154,6 +155,9 @@ public class ProspectorAgent extends ImasMobileAgent {
 				}
 				prevLastMovement = newPlan.getMovements().get(newPlan.getMovements().size() - 1);
 				movementSteps += newPlan.getMovements().size();
+				if(movementSteps >= simSteps) {
+					break;
+				}
 			}
 		}
 		//this.getPlans().add(plan);
