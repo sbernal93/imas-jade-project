@@ -13,6 +13,7 @@ import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREResponder;
 import map.Cell;
 import onthology.MessageContent;
+import util.MetalDiscovery;
 import util.Movement;
 
 /**.
@@ -73,7 +74,7 @@ public class RequestResponseBehaviour extends AchieveREResponder {
 	        	            	reply.setPerformative(ACLMessage.AGREE);
 	        	            	agent.informApplyStep((List<Movement>) list);	
 	            			}
-	            			if(list.get(0) instanceof Cell) {
+	            			if(list.get(0) instanceof MetalDiscovery) {
 	            				agent.log("MINE_DISCOVERY request message received");
 	        	            	reply.setPerformative(ACLMessage.AGREE);;
 	        	            	agent.log("new mines size is: " + list.size());

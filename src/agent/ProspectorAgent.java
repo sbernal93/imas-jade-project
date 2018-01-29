@@ -22,6 +22,7 @@ import map.FieldCell;
 import map.PathCell;
 import onthology.GameSettings;
 import onthology.InfoAgent;
+import util.MetalDiscovery;
 import util.Movement;
 import util.Plan;
 import util.Movement.MovementStatus;
@@ -36,7 +37,7 @@ public class ProspectorAgent extends ImasMobileAgent {
      */
     private AID prospectorCoordinatorAgent;
     
-    private List<FieldCell> foundMines;
+    private List<MetalDiscovery> foundMines;
 	
     @Override
     protected void setup() {
@@ -93,7 +94,7 @@ public class ProspectorAgent extends ImasMobileAgent {
 		return this.getPlans().get(0).getMovements().get(0);
 	}
 	
-	public List<FieldCell> applyNewStep(Movement movement){
+	public List<MetalDiscovery> applyNewStep(Movement movement){
 		this.foundMines = new ArrayList<>();
 		Movement movementToMake = this.getPlans().get(0).getMovements().get(0);
 		if(movement.getStatus().equals(MovementStatus.ACCEPTED)) {
@@ -107,7 +108,9 @@ public class ProspectorAgent extends ImasMobileAgent {
 				c.detectMetal();
 				if(c.isFound()) {
 					this.log("I found a mine!!");
-					this.foundMines.add(c);
+					c.getMetal().forEach((k,v) -> {
+						this.foundMines.add(new MetalDiscovery(c, k, v));
+					});
 				}
 			});
 		} else {
@@ -180,12 +183,12 @@ public class ProspectorAgent extends ImasMobileAgent {
 	
 
 
-	public List<FieldCell> getFoundMines() {
+	public List<MetalDiscovery> getFoundMines() {
 		return foundMines;
 	}
 
 
-	public void setFoundMines(List<FieldCell> foundMines) {
+	public void setFoundMines(List<MetalDiscovery> foundMines) {
 		this.foundMines = foundMines;
 	}
 

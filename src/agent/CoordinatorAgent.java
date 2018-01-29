@@ -43,6 +43,7 @@ import jade.lang.acl.UnreadableException;
 import map.Cell;
 import onthology.GameSettings;
 import onthology.MessageContent;
+import util.MetalDiscovery;
 import util.Movement;
 
 /**
@@ -370,7 +371,7 @@ public class CoordinatorAgent extends ImasAgent {
 	}
     
     
-    public void informNewMines( List<Cell> cells){
+    public void informNewMines( List<MetalDiscovery> cells){
     	this.addBehaviour(new BaseRequesterBehaviour<CoordinatorAgent>(this,
     			buildMessageNewMineDiggerCoordinator(this.diggerCoordinatorAgent, cells)) {
 
@@ -388,7 +389,7 @@ public class CoordinatorAgent extends ImasAgent {
     	
     }
     
-    private ACLMessage buildMessageNewMineDiggerCoordinator(AID agent, List<Cell> cells) {
+    private ACLMessage buildMessageNewMineDiggerCoordinator(AID agent, List<MetalDiscovery> cells) {
  		ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
  		message.clearAllReceiver();
  		message.addReceiver(agent);

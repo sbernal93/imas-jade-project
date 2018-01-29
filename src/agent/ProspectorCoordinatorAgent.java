@@ -30,6 +30,7 @@ import map.FieldCell;
 import map.PathCell;
 import onthology.GameSettings;
 import onthology.MessageContent;
+import util.MetalDiscovery;
 import util.Movement;
 
 /**
@@ -59,9 +60,9 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 
 	private List<Movement> movements;
 	
-	private List<Cell> newMines;
+	private List<MetalDiscovery> newMines;
 	
-	private List<Cell> discoveredMines;
+	private List<MetalDiscovery> discoveredMines;
 	/**
 	 * The Agent has a list of all the prospector agents that 
 	 * are currently in the map
@@ -117,9 +118,9 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
     }
     
     private void validateDepletedMines() {
-    	for(Cell c : this.discoveredMines) {
-    		if(((FieldCell) c).isEmpty()) {
-    			this.discoveredMines.remove(c);
+    	for(MetalDiscovery m : this.discoveredMines) {
+    		if(m.getCell().isEmpty()) {
+    			this.discoveredMines.remove(m);
     		}
     	}
     }
@@ -237,7 +238,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 						protected void handleInform(ACLMessage msg) {
 							this.getTypeAgent().log("Got inform for apply step");
 							try {
-								List<Cell> newMines = (List<Cell>) Optional.ofNullable(msg.getContentObject()).orElse(null);
+								List<MetalDiscovery> newMines = (List<MetalDiscovery>) Optional.ofNullable(msg.getContentObject()).orElse(null);
 								if(newMines!=null) {
 									newMines.stream().forEach(mine -> {
 										if(this.getTypeAgent().getDiscoveredMines().stream().noneMatch(m -> m.equals(mine))) {
@@ -381,44 +382,44 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
 		this.movements.addAll(movements);
 	}
 
-	public List<Cell> getNewMines() {
+	public List<MetalDiscovery> getNewMines() {
 		return newMines;
 	}
 
-	public void setNewMines(List<Cell> newMines) {
+	public void setNewMines(List<MetalDiscovery> newMines) {
 		this.newMines = newMines;
 	}
 
-	public List<Cell> getDiscoveredMines() {
+	public List<MetalDiscovery> getDiscoveredMines() {
 		return discoveredMines;
 	}
 
-	public void setDiscoveredMines(List<Cell> discoveredMines) {
+	public void setDiscoveredMines(List<MetalDiscovery> discoveredMines) {
 		this.discoveredMines = discoveredMines;
 	}
     
-	public void addNewMines(List<Cell> mines) {
+	public void addNewMines(List<MetalDiscovery> mines) {
 		if (this.newMines == null) {
 			this.newMines = new ArrayList<>();
 		}
 		this.newMines.addAll(mines);
 	}
 	
-	public void addNewMine(Cell mine) {
+	public void addNewMine(MetalDiscovery mine) {
 		if (this.newMines == null) {
 			this.newMines = new ArrayList<>();
 		}
 		this.newMines.add(mine);
 	}
 	
-	public void addDiscoveredMines(List<Cell> mines) {
+	public void addDiscoveredMines(List<MetalDiscovery> mines) {
 		if (this.discoveredMines == null) {
 			this.discoveredMines = new ArrayList<>();
 		}
 		this.discoveredMines.addAll(mines);
 	}
 
-	public void addDiscoveredMine(Cell mine) {
+	public void addDiscoveredMine(MetalDiscovery mine) {
 		if (this.discoveredMines == null) {
 			this.discoveredMines = new ArrayList<>();
 		}

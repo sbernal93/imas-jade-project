@@ -16,6 +16,12 @@ public class MetalDiscovery implements Serializable{
 	private MetalType type;
 	private int amount;
 	
+	public MetalDiscovery(FieldCell cell, MetalType type, int amount) {
+		super();
+		this.cell = cell;
+		this.type = type;
+		this.amount = amount;
+	}
 	public FieldCell getCell() {
 		return cell;
 	}
