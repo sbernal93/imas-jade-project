@@ -88,8 +88,9 @@ public class DiggerContractNetInitiatorBehaviour extends ContractNetInitiator{
         //We sort the list, since we may have to form coalitions. The list is sorted by price outcome
         msgs.sort((m1, m2) -> {
 			try {
-				return Double.compare(((Plan)m1.getContentObject()).getPriceOutcome(),
-						((Plan)m2.getContentObject()).getPriceOutcome());
+				return Double.compare(((Plan)m2.getContentObject()).getPriceOutcome(),
+						((Plan)m1.getContentObject()).getPriceOutcome()
+						);
 			} catch (UnreadableException e1) {
 				e1.printStackTrace();
 			}

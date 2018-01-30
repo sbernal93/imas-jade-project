@@ -132,13 +132,20 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 			});
 			
 			//we look for the best manufacturing center to go based on price/distance
+
+			List<Movement> closestPath = null;
+			List<PathCell> pathCellsNextToManCenter = null ;
+			List<Movement> movementsToManCenter = null;
+			int price = 0;
+			Double calcPrice = 0.000;
+			
 			for(Cell manCenter : manufacturingCenters) {
-				List<PathCell> pathCellsNextToManCenter = this.agent.getGame().getPathCellsNextTo(manCenter);
-				List<Movement> closestPath = null;
+				pathCellsNextToManCenter = this.agent.getGame().getPathCellsNextTo(manCenter);
+				closestPath = null;
+				movementsToManCenter = new LinkedList<>();
 				//first we need the fastest way to get there
 				for(PathCell pc : pathCellsNextToManCenter) {
-					List<Movement> movementsToManCenter = new LinkedList<>();
-					if(pc.getRow() != diggingCell.getRow() && pc.getCol() != diggingCell.getCol()) {
+					if(pc.getRow() != diggingCell.getRow() || pc.getCol() != diggingCell.getCol()) {
 						movementsToManCenter = this.agent.findShortestPath(diggingCell, pc);
 					} 
 					if(closestPath == null) {
@@ -150,13 +157,13 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 					}
 				}
 				//now we look for the best price/distance
-				int price = ((ManufacturingCenterCell) manCenter).getPrice();
+				price = ((ManufacturingCenterCell) manCenter).getPrice();
 				//we add also all the moves we have to make currently, since its going to change
 				//the price/movement outcome
 			/*	this.agent.log("AllMovs: " + allMovs.size() + " movs: " +movements.size() + " closest" + closestPath.size());
 				this.agent.log("mine amount: " + mine.getAmount());
 				this.agent.log("price: " + price);*/
-				double calcPrice = UtilsAgents.calculatePrice(allMovs.size() + movements.size() + closestPath.size(), mine.getAmount(), price);
+				calcPrice = UtilsAgents.calculatePrice(allMovs.size() + movements.size() + closestPath.size(), unitsDugUp, price);
 				//this.agent.log("Calculated price outcome: " + calcPrice);
 				if( calcPrice > bestPrice) {
 					bestPrice = calcPrice;
@@ -183,12 +190,15 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 			proposal.setPerformative(ACLMessage.PROPOSE);
 			proposal.setSender(agent.getAID());
 			agent.log("Returning created proposal");
-			if(this.agent.getPlans() == null || this.agent.getPlans().isEmpty()) {
+			
+			//the plan sent doesnt need movements, could lighten the load sent
+			proposal.setContentObject(new Plan(agent, null, bestPrice));
+			/*if(this.agent.getPlans() == null || this.agent.getPlans().isEmpty()) {
 				proposal.setContentObject(planProposed);
 			} else {
 				allMovs.addAll(movements);
 				proposal.setContentObject(new Plan(this.agent, allMovs, bestPrice));
-			}
+			}*/
 			agent.log("Proposal with price: " + bestPrice);
 			return proposal;
 		} catch (UnreadableException e) {
