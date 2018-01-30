@@ -19,12 +19,19 @@ package map;
 
 import agent.AgentType;
 import gui.CellVisualizer;
+import jade.core.AID;
 import onthology.InfoAgent;
 
 /**
  * This class keeps information about a street cell in the map.
  */
 public class PathCell extends Cell {
+
+	private static final long serialVersionUID = 1L;
+
+	private boolean isDiggerWorking;
+	
+	private AID agentDigging;
 
     /**
      * Information about the agent the cell contains.
@@ -39,6 +46,7 @@ public class PathCell extends Cell {
      */
     public PathCell(int row, int col) {
         super(CellType.PATH, row, col);
+        isDiggerWorking = false;
     }
 
     @Override
@@ -54,10 +62,12 @@ public class PathCell extends Cell {
      * @return boolean
      */
     public boolean isThereADiggerAgentWorking() {
-        // TODO: update condition to fit the restriction of
-        //       allowing just a single digger working or
-        //       any amount of agents moving through.
-        return false;
+    	if(isEmpty()) {
+    		if(isDiggerWorking) {
+    			isDiggerWorking = false;
+    		}
+    	}
+        return isDiggerWorking;
     }
 
     /**
@@ -145,5 +155,31 @@ public class PathCell extends Cell {
         }
         return agents.getMapMessage();
     }
+
+	public boolean isDiggerWorking() {
+		if(isEmpty()) {
+    		if(isDiggerWorking) {
+    			isDiggerWorking = false;
+    		}
+    	}
+		return isDiggerWorking;
+	}
+
+	public void setDiggerWorking(boolean isDiggerWorking, AID agentDigging) {
+		if(isDiggerWorking) {
+			this.agentDigging = agentDigging;
+		} else {
+			this.agentDigging = null;
+		}
+		this.isDiggerWorking = isDiggerWorking;
+	}
+
+	public AID getAgentDigging() {
+		return agentDigging;
+	}
+
+	public void setAgentDigging(AID agentDigging) {
+		this.agentDigging = agentDigging;
+	}
 
 }

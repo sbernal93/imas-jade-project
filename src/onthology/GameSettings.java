@@ -369,6 +369,29 @@ public class GameSettings implements java.io.Serializable {
 		}
         return neighbors;
     }
+    
+    /**
+     * Gets all the cells next to a cell.
+     * Doesnt return diagonal cells
+     * @param cell
+     * @return
+     */
+    public List<Cell> getHorVerCellsNextTo(Cell cell) {
+    	List<Cell> neighbors = new ArrayList<>();
+    	if((cell.getRow() + 1) < map.length) {
+			neighbors.add(map[cell.getRow() + 1][cell.getCol()]);
+		}
+		if((cell.getRow() - 1) >= 0 ) {
+			neighbors.add(map[cell.getRow() - 1][cell.getCol()]);
+		}
+		if((cell.getCol() + 1) < map[0].length) {
+			neighbors.add(map[cell.getRow()][cell.getCol() + 1]);
+		}
+		if((cell.getCol() -1) >= 0 ) {
+			neighbors.add(map[cell.getRow()][cell.getCol() - 1]);
+		}
+        return neighbors;
+    }
 
     /**
      * Builds the {@link Graph} object from the map.
@@ -424,6 +447,10 @@ public class GameSettings implements java.io.Serializable {
      * @return
      */
     public boolean isValidMovement(Movement movement) {
+		PathCell cell = (PathCell) get(movement.getNewCell().getRow(), movement.getNewCell().getCol());
+		if(cell.isDiggerWorking() && !cell.getAgentDigging().equals(movement.getAgent())) {
+			return false;
+		}
     	if(movement.getType().equals(MovementType.NORMAL)) {
     		if(!(movement.getNewCell().getCellType().equals(CellType.PATH))) {
         		return false;
@@ -432,11 +459,6 @@ public class GameSettings implements java.io.Serializable {
         		return false;
         	}
     	}
-    	//TODO: validate dig and drop off
-    	//TODO
-		/*if(getDiggerAgents().stream().anyMatch(d -> d.getCell().equals(movement.getNewCell()) && d.isDigging())) {
-			return false;
-		}*/
     	return true;
     }
 

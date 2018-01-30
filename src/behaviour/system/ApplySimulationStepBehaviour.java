@@ -10,6 +10,7 @@ import com.sun.org.apache.xml.internal.security.Init;
 
 import agent.SystemAgent;
 import jade.core.behaviours.OneShotBehaviour;
+import map.PathCell;
 import onthology.InitialGameSettings;
 import util.Movement;
 import util.MovementStatus;
@@ -39,6 +40,10 @@ public class ApplySimulationStepBehaviour extends OneShotBehaviour{
 					((InitialGameSettings)this.agent.getGame()).moveAgent(m);
 				}
 				if(m.getType().equals(MovementType.DIGGING)) {
+					PathCell digCell = (PathCell) this.agent.getGame().get(m.getNewCell().getRow(), m.getNewCell().getCol());
+					if(!digCell.isDiggerWorking()) {
+						digCell.setDiggerWorking(true, m.getAgent());
+					}
 					((InitialGameSettings)this.agent.getGame()).mineDug(m);
 				}
 				if(m.getType().equals(MovementType.DROP_OFF)) {
@@ -52,8 +57,6 @@ public class ApplySimulationStepBehaviour extends OneShotBehaviour{
 				e.printStackTrace();
 			}
 		});
-		//this.agent.updateGUI();
-
 	}
 	
 	
