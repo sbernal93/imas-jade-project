@@ -17,26 +17,25 @@
  */
 package agent;
 
-import jade.core.Agent;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import jade.core.AID;
+import jade.core.Agent;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
 import jade.domain.DFService;
+import jade.domain.FIPANames.InteractionProtocol;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
-import onthology.MessageContent;
 
 /**
  * Utility class for agents.
@@ -170,6 +169,12 @@ public class UtilsAgents {
     	    return chunks;
     }
 
+	/**
+	 * Builds a message based on the input
+	 * @param agent
+	 * @param content
+	 * @return
+	 */
     public static ACLMessage buildMessage(AID agent, String content) {
 		ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 		message.clearAllReceiver();
@@ -184,11 +189,36 @@ public class UtilsAgents {
         return message;
 	}
     
+	/**
+	 * Builds a message based on the input
+	 * @param <T>
+	 * @param agent
+	 * @param content
+	 * @return
+	 */
+    public static ACLMessage buildMessageWithObj(AID agent, String content, Serializable object) {
+		ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+		message.clearAllReceiver();
+		message.addReceiver(agent);
+		message.setProtocol(InteractionProtocol.FIPA_REQUEST);
+		message.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
+        try {
+        	message.setContent(content);
+        	message.setContentObject(object);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return message;
+	}
+    
+    /**
+     * Calculates the price/movement ratio
+     * @param amountOfMovements
+     * @param amountToMine
+     * @param price
+     * @return
+     */
 	public static Double calculatePrice(int amountOfMovements, int amountToMine, int price) {
-		//double mov = amountOfMovements;
-		//double min = amountToMine;
-		//double pri = price;
-		//return (min*pri)/mov;
 		return  ((double)amountToMine * (double)price) / (double)amountOfMovements;
 	}
     

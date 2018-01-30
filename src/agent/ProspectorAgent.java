@@ -1,9 +1,6 @@
 package agent;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,13 +9,12 @@ import behaviour.prospector.RequestResponseBehaviour;
 import jade.core.AID;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
+import jade.domain.FIPANames.InteractionProtocol;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import map.Cell;
-import map.FieldCell;
 import map.PathCell;
 import onthology.GameSettings;
 import onthology.InfoAgent;
@@ -27,20 +23,42 @@ import util.Movement;
 import util.MovementStatus;
 import util.Plan;
 
+/**
+ * Prospector Agents are the agents that are going to be exploring certain 
+ * path cells. If the find themselves next to a mine that hasnt been found,
+ * it informs the ProspectorCoordinator of the metal discovery
+ *
+ */
 public class ProspectorAgent extends ImasMobileAgent {
+
+	private static final long serialVersionUID = 1L;
+    @SuppressWarnings("unused")
+	private AID prospectorCoordinatorAgent;
+    private List<MetalDiscovery> foundMines;
 
 	public ProspectorAgent() {
 		super(AgentType.PROSPECTOR);
 	}
-	  /**
-     * Prospector Coordinator agent id.
-     */
-    private AID prospectorCoordinatorAgent;
-    
-    private List<MetalDiscovery> foundMines;
 	
+	public List<MetalDiscovery> getFoundMines() {
+		return foundMines;
+	}
+
+	public void setFoundMines(List<MetalDiscovery> foundMines) {
+		this.foundMines = foundMines;
+	}
+	
+	public void setProspectorCoordinatorAgent(AID prospectorCoordinatorAgent) {
+		this.prospectorCoordinatorAgent = prospectorCoordinatorAgent;
+	}
+
+	/**
+	 * Setup for the agent when it becomes online, also setups starter behaviours to handle with
+	 * incoming messages
+	 */
     @Override
     protected void setup() {
+    	//Receives the cell he is on, the game settings and the creator as arguments
     	this.setCell((Cell) this.getArguments()[1]);
     	this.setGame((GameSettings) this.getArguments()[0]);
     	this.setProspectorCoordinatorAgent((AID) this.getArguments()[2]);
@@ -64,11 +82,6 @@ public class ProspectorAgent extends ImasMobileAgent {
             doDelete();
         }
 
-        // Searches for the ProspectorCoordinator Agent
-        //commented out, not needed coordinator agent is passed as param
-       /* ServiceDescription searchCriterion = new ServiceDescription();
-        searchCriterion.setType(AgentType.PROSPECTOR_COORDINATOR.toString());
-        this.prospectorCoordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);*/
         try {
     		//we update our cell so it has the correct AID 
 			Optional<InfoAgent> infoAgent = ((PathCell) this.getCell()).getAgents().get(AgentType.PROSPECTOR).stream().filter(a -> a.getAID() == null).findFirst();
@@ -81,6 +94,7 @@ public class ProspectorAgent extends ImasMobileAgent {
 			e.printStackTrace();
 		}
         System.out.println("Prospector agent setup finished");
+        //Setup listeners to FIPA request and contract net
         MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
         MessageTemplate cnmt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_CONTRACT_NET), MessageTemplate.MatchPerformative(ACLMessage.CFP));
         this.addBehaviour(new RequestResponseBehaviour(this, mt));
@@ -88,12 +102,21 @@ public class ProspectorAgent extends ImasMobileAgent {
     }
     
 
+    /**
+     * this method tells us that a new step has started, prospector agent should 
+	 * send based on his current plan, his next move to the Prospector Coordinator
+     * @return
+     */
 	public Movement informNewStep() {
-		//TODO: this method tells us that a new step has started, prospector agent should 
-		//send based on his current plan, his next move to the Prospector Coordinator
 		return this.getPlans().get(0).getMovements().get(0);
 	}
 	
+	/**
+	 * Applies a new step if validated, checks if there are any new mines
+	 * to be found
+	 * @param movement
+	 * @return
+	 */
 	public List<MetalDiscovery> applyNewStep(Movement movement){
 		this.foundMines = new ArrayList<>();
 		Movement movementToMake = this.getPlans().get(0).getMovements().get(0);
@@ -116,31 +139,15 @@ public class ProspectorAgent extends ImasMobileAgent {
 				}
 			});
 		} else {
-			//TODO: should do something so movement is validated
 			this.log("Movement not valid");
 		}
-		
 		return this.foundMines;
 	}
 	
-	
-	
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	public void setProspectorCoordinatorAgent(AID prospectorCoordinatorAgent) {
-		this.prospectorCoordinatorAgent = prospectorCoordinatorAgent;
-	}
-
-
 	/**
 	 * We override the method because we want the prospector agent to repeat the plan set
 	 * until the simulation ends
 	 */
-	@SuppressWarnings("unchecked")
 	public void addPlan(Plan plan, List<PathCell> pathReceived) {
 		int simSteps = this.getGame().getSimulationSteps();
 		
@@ -165,35 +172,8 @@ public class ProspectorAgent extends ImasMobileAgent {
 				}
 			}
 		}
-		//this.getPlans().add(plan);
-		
-/*		int countBacktrack = 1;
-		while(movementSteps < simSteps) {
-			//we create a copy so we dont modify the original list, we then reverse it
-			LinkedList<Movement> prevPlansMovements = (LinkedList<Movement>) this.getPlans().get(this.getPlans().size()-countBacktrack).getMovements();
-			LinkedList<Movement> copy = (LinkedList<Movement>) prevPlansMovements.clone();
-			Collections.reverse(copy);
-			this.getPlans().add(new Plan(this, copy));
-			prevPlansMovements = copy;
-			movementSteps += copy.size();
-			if(countBacktrack - this.getPlans().size() - 2 >= 0) {
-				countBacktrack = countBacktrack - 2;
-			}
-		}*/
 		this.log("Plan made");
 	}
-	
-
-
-	public List<MetalDiscovery> getFoundMines() {
-		return foundMines;
-	}
-
-
-	public void setFoundMines(List<MetalDiscovery> foundMines) {
-		this.foundMines = foundMines;
-	}
-
 
 
 }

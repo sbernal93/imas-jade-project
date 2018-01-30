@@ -4,16 +4,17 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import jade.core.AID;
 import map.Cell;
-import map.PathCell;
 import onthology.GameSettings;
-import onthology.InfoAgent;
 import util.Dijkstra;
 import util.Movement;
 import util.Plan;
 import util.Vertex;
 
+/**
+ * Base class for agents that move in the simulation
+ *
+ */
 public abstract class ImasMobileAgent extends ImasAgent{
 
 	public ImasMobileAgent(AgentType type) {
@@ -71,15 +72,16 @@ public abstract class ImasMobileAgent extends ImasAgent{
 	 * @return
 	 */
 	public List<Movement> findShortestPath(Cell destination) {
-		if(dijkstra == null) {
-			dijkstra = new Dijkstra(game.buildGraphFromMap());
-		}
-		dijkstra.execute(new Vertex("", cell));
-		List<Vertex> path = dijkstra.getPath(new Vertex("", destination));
-		
-		return dijkstra.getMovementsFromVertices(path, this);
+		return findShortestPath(cell, destination);
 	}
 	
+	/**
+	 * Finds the shortest path from a source cell to the destination cell
+	 * using {@link Dijkstra}
+	 * @param source
+	 * @param destination
+	 * @return
+	 */
 	public List<Movement> findShortestPath(Cell source, Cell destination) {
 		if(dijkstra == null) {
 			dijkstra = new Dijkstra(game.buildGraphFromMap());

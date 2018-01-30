@@ -33,12 +33,11 @@ import util.Movement;
 
 /**
  * System agent that controls the GUI and loads initial configuration settings.
- * TODO: You have to decide the onthology and protocol when interacting among
- * the Coordinator agent.
  */
 public class SystemAgent extends ImasAgent {
 
-    /**
+	private static final long serialVersionUID = 1L;
+	/**
      * GUI with the map, system agent log and statistics.
      */
     private GraphicInterface gui;

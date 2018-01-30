@@ -11,20 +11,17 @@ import behaviour.BaseRequesterBehaviour;
 import behaviour.digger.coordinator.CreateDiggerAgentBehaviour;
 import behaviour.digger.coordinator.DiggerContractNetInitiatorBehaviour;
 import behaviour.digger.coordinator.RequestResponseBehaviour;
-import behaviour.prospector.coordinator.ProspectorContractNetInitiatorBehaviour;
 import jade.core.AID;
 import jade.core.behaviours.SequentialBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
+import jade.domain.FIPANames.InteractionProtocol;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.domain.FIPANames.InteractionProtocol;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
-import map.Cell;
-import map.PathCell;
 import onthology.GameSettings;
 import onthology.MessageContent;
 import util.MetalDiscovery;
@@ -34,17 +31,14 @@ import util.Movement;
  * 
  * Digger Coordinator Agent.
  * Gets the initial Game Settings from the CoordinatorAgent, 
- * initializes the Digger Agents and sends directions to the 
- * DiggerAgents according to: New mines found or when a DiggerAgent
- * finishes digging. 
+ * initializes the Digger Agents and sets up Coalition formations 
+ * when a new mine is found
  * Updates the CoordinatorAgent with the 
  * information that each Digger did each turn
  *
  */
 public class DiggerCoordinatorAgent extends ImasAgent{
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 1L;
 	
 	private GameSettings game;
@@ -52,216 +46,17 @@ public class DiggerCoordinatorAgent extends ImasAgent{
 	private AID coordinatorAgent;
 	
 	private List<Movement> movements;
-	
-	
-	/**
-	 * The Agent has a list of all the digger agents that 
-	 * are currently in the map
-	 */
+
 	private List<AID> diggerAgents;
 
 	public DiggerCoordinatorAgent() {
 		super(AgentType.DIGGER_COORDINATOR);
 	}
 
-	   /**
-     * Agent setup method - called when it first come on-line. Configuration of
-     * language to use, ontology and initialization of behaviours.
-     */
-    @Override
-    protected void setup() {
-    	this.setGame((GameSettings) this.getArguments()[0]);
-    	this.setCoordinatorAgent((AID) this.getArguments()[1]);
-
-        /* ** Very Important Line (VIL) ***************************************/
-        this.setEnabledO2ACommunication(true, 1);
-        /* ********************************************************************/
-
-        // Register the agent to the DF
-        ServiceDescription sd1 = new ServiceDescription();
-        sd1.setType(AgentType.DIGGER_COORDINATOR.toString());
-        sd1.setName(getLocalName());
-        sd1.setOwnership(OWNER);
-        
-        DFAgentDescription dfd = new DFAgentDescription();
-        dfd.addServices(sd1);
-        dfd.setName(getAID());
-        try {
-            DFService.register(this, dfd);
-            log("Registered to the DF");
-        } catch (FIPAException e) {
-            System.err.println(getLocalName() + " registration with DF unsucceeded. Reason: " + e.getMessage());
-            doDelete();
-        }
-
-        // search CoordinatorAgent
-        //commented out, no longer needed, coordinator agent is passed as parameter
-       /* ServiceDescription searchCriterion = new ServiceDescription();
-        searchCriterion.setType(AgentType.COORDINATOR.toString());
-        this.coordinatorAgent = UtilsAgents.searchAgent(this, searchCriterion);*/
-        // searchAgent is a blocking method, so we will obtain always a correct AID
-        this.addBehaviour(new CreateDiggerAgentBehaviour(this, AgentType.DIGGER));
-        MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
-
-        this.addBehaviour(new RequestResponseBehaviour(this, mt));
-    }
-    
-    public void informNewStep() {
-    	this.movements = new ArrayList<>();
-    	SequentialBehaviour seq = new SequentialBehaviour();
-    	
-    	for (AID agent : this.diggerAgents) {
-    		seq.addSubBehaviour(new BaseRequesterBehaviour<DiggerCoordinatorAgent>(this,
-    				buildSimStepMessageForDiggerAgent(agent)) {
-
-    					private static final long serialVersionUID = 1L;
-    					
-    					@Override
-    					protected void handleInform(ACLMessage msg) {
-    						this.getTypeAgent().log("Inform received from: " + msg.getSender().getName());
-    						try {
-    							Movement mov = (Movement) Optional.ofNullable(msg.getContentObject()).orElse(null);
-    							if(mov !=null ) {
-    								this.getTypeAgent().addMovement((Movement) msg.getContentObject());
-    							}
-							} catch (UnreadableException e) {
-								e.printStackTrace();
-							}
-    					}
-    		});
-    	}
-    	seq.addSubBehaviour(new BaseRequesterBehaviour<DiggerCoordinatorAgent>(this, 
-    			UtilsAgents.buildMessage(this.coordinatorAgent, MessageContent.STEP_FINISHED)) {
-
-					/**
-					 * 
-					 */
-					private static final long serialVersionUID = 1L;
-		});
-    	this.addBehaviour(seq);
-    }
-    
-    private ACLMessage buildSimStepMessageForDiggerAgent(AID agent) {
-		ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-		message.clearAllReceiver();
-		message.addReceiver(agent);
-		message.setProtocol(InteractionProtocol.FIPA_REQUEST);
-		this.log("Request message to a Digger agent");
-        try {
-        	message.setContent(MessageContent.NEW_STEP);
-        	this.log("Request message content:" + message.getContent());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return message;
-	}
-    
-
-	public void informApplyStep(List<Movement> list) {
-		SequentialBehaviour seq = new SequentialBehaviour();
-		//TODO: send apply step and movements to the digger agents
-		for(Movement movement :  list) {
-			if(movement.getAgentType().equals(AgentType.DIGGER)) {
-				seq.addSubBehaviour(new BaseRequesterBehaviour<DiggerCoordinatorAgent>(this, 
-						buildApplyStepMessage(movement.getAgent(), movement)) {
-
-							/**
-							 * 
-							 */
-							private static final long serialVersionUID = 1L;
-							
-							@Override
-							protected void handleInform(ACLMessage msg) {
-								this.getTypeAgent().log("Inform received");
-								super.handleInform(msg);
-							}
-					
-				});
-			}
-		}
-		
-		seq.addSubBehaviour(new BaseRequesterBehaviour<DiggerCoordinatorAgent>(this,
-    			UtilsAgents.buildMessage(this.coordinatorAgent, MessageContent.APPLY_STEP_FINISHED)) {
-
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-		});
-    	
-    	this.addBehaviour(seq);
-		
-	}
-	
-	private ACLMessage buildApplyStepMessage(AID agent, Serializable movement) {
-    	ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-		message.clearAllReceiver();
-		message.addReceiver(agent);
-		message.setProtocol(InteractionProtocol.FIPA_REQUEST);
-		message.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
-		this.log("Request message to a digger agent");
-        try {
-        	message.setContent(MessageContent.APPLY_STEP);
-        	this.log("Request message content:" + message.getContent());
-        	message.setContentObject( movement);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return message;
-    }
-	
-	public void informNewMines(List<MetalDiscovery> list) {
-		SequentialBehaviour seq = new SequentialBehaviour();
-		//TODO: contract net for mine digging
-		int nResponders = this.getDiggerAgents().size();
-    	for(MetalDiscovery metal : list) {
-    		ACLMessage msg = new ACLMessage(ACLMessage.CFP);
-            msg.setLanguage(ImasAgent.LANGUAGE);
-            msg.setOntology(ImasAgent.ONTOLOGY);
-            for (AID diggerAgent : this.getDiggerAgents()) {
-                msg.addReceiver(diggerAgent);
-            }
-            msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
-            msg.setReplyByDate(new Date(System.currentTimeMillis() + 50000));
-            //Sets the first path cell of the group to be sent, the prospectors will respond with
-            //their distance to that field cell
-            try {
-				msg.setContentObject((Serializable) metal);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-            seq.addSubBehaviour(new DiggerContractNetInitiatorBehaviour(this, msg, nResponders, metal));
-    	}
-		seq.addSubBehaviour(new BaseRequesterBehaviour<DiggerCoordinatorAgent>(this,
-    			UtilsAgents.buildMessage(this.coordinatorAgent, MessageContent.MINE_DISCOVERY)) {
-
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-		});
-    	
-    	this.addBehaviour(seq);
-		
-	}
-
-    
-    /**
-     * Update the game settings.
-     *
-     * @param game current game settings.
-     */
     public void setGame(GameSettings game) {
         this.game = game;
     }
 
-    /**
-     * Gets the current game settings.
-     *
-     * @return the current game settings.
-     */
     public GameSettings getGame() {
         return this.game;
     }
@@ -311,6 +106,143 @@ public class DiggerCoordinatorAgent extends ImasAgent{
 		return coordinatorAgent;
 	}
 
+	 /**
+     * Agent setup method - called when it first come on-line. Configuration of
+     * language to use, ontology and initialization of behaviours.
+     * Setups behaviours to create digger agents and respond to FIPA Requests
+     */
+    @Override
+    protected void setup() {
+    	this.setGame((GameSettings) this.getArguments()[0]);
+    	this.setCoordinatorAgent((AID) this.getArguments()[1]);
 
+        /* ** Very Important Line (VIL) ***************************************/
+        this.setEnabledO2ACommunication(true, 1);
+        /* ********************************************************************/
+
+        // Register the agent to the DF
+        ServiceDescription sd1 = new ServiceDescription();
+        sd1.setType(AgentType.DIGGER_COORDINATOR.toString());
+        sd1.setName(getLocalName());
+        sd1.setOwnership(OWNER);
+        
+        DFAgentDescription dfd = new DFAgentDescription();
+        dfd.addServices(sd1);
+        dfd.setName(getAID());
+        try {
+            DFService.register(this, dfd);
+            log("Registered to the DF");
+        } catch (FIPAException e) {
+            System.err.println(getLocalName() + " registration with DF unsucceeded. Reason: " + e.getMessage());
+            doDelete();
+        }
+
+        this.addBehaviour(new CreateDiggerAgentBehaviour(this, AgentType.DIGGER));
+        MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchProtocol(InteractionProtocol.FIPA_REQUEST), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
+
+        this.addBehaviour(new RequestResponseBehaviour(this, mt));
+    }
     
+    /**
+     * A New step has started, so we inform all the diggers
+     */
+    public void informNewStep() {
+    	this.movements = new ArrayList<>();
+    	SequentialBehaviour seq = new SequentialBehaviour();
+    	
+    	for (AID agent : this.diggerAgents) {
+    		seq.addSubBehaviour(new BaseRequesterBehaviour<DiggerCoordinatorAgent>(this,
+    				UtilsAgents.buildMessage(agent, MessageContent.NEW_STEP)) {
+
+    					private static final long serialVersionUID = 1L;
+    					
+    					@Override
+    					protected void handleInform(ACLMessage msg) {
+    						this.getTypeAgent().log("Inform received from: " + msg.getSender().getName());
+    						try {
+    							//a digger agent may not me moving
+    							Movement mov = (Movement) Optional.ofNullable(msg.getContentObject()).orElse(null);
+    							if(mov !=null ) {
+    								this.getTypeAgent().addMovement((Movement) msg.getContentObject());
+    							}
+							} catch (UnreadableException e) {
+								e.printStackTrace();
+							}
+    					}
+    		});
+    	}
+    	//after receiving the information of the step from the diggers, we let the coordinator know
+    	seq.addSubBehaviour(new BaseRequesterBehaviour<DiggerCoordinatorAgent>(this, 
+    			UtilsAgents.buildMessage(this.coordinatorAgent, MessageContent.STEP_FINISHED)) {
+
+					private static final long serialVersionUID = 1L;
+		});
+    	this.addBehaviour(seq);
+    }
+
+    /**
+     * The step was applied, we inform the diggers that attempted a move, if any
+     * @param list
+     */
+	public void informApplyStep(List<Movement> list) {
+		SequentialBehaviour seq = new SequentialBehaviour();
+		for(Movement movement :  list) {
+			if(movement.getAgentType().equals(AgentType.DIGGER)) {
+				seq.addSubBehaviour(new BaseRequesterBehaviour<DiggerCoordinatorAgent>(this, 
+						UtilsAgents.buildMessageWithObj(movement.getAgent(),MessageContent.APPLY_STEP, movement)) {
+							private static final long serialVersionUID = 1L;
+							
+							@Override
+							protected void handleInform(ACLMessage msg) {
+								this.getTypeAgent().log("Inform received");
+								super.handleInform(msg);
+							}
+					
+				});
+			}
+		}
+		//after informing the diggers, we notify the coordinator that we are done
+		seq.addSubBehaviour(new BaseRequesterBehaviour<DiggerCoordinatorAgent>(this,
+    			UtilsAgents.buildMessage(this.coordinatorAgent, MessageContent.APPLY_STEP_FINISHED)) {
+			private static final long serialVersionUID = 1L;
+
+		});
+    	this.addBehaviour(seq);	
+	}
+
+	/**
+	 * A new mine was discovered, we setup a contract net and decide who is going to
+	 * dig it for each mine discovered this turn
+	 * @param list
+	 */
+	public void informNewMines(List<MetalDiscovery> list) {
+		SequentialBehaviour seq = new SequentialBehaviour();
+		int nResponders = this.getDiggerAgents().size();
+    	for(MetalDiscovery metal : list) {
+    		ACLMessage msg = new ACLMessage(ACLMessage.CFP);
+            msg.setLanguage(ImasAgent.LANGUAGE);
+            msg.setOntology(ImasAgent.ONTOLOGY);
+            for (AID diggerAgent : this.getDiggerAgents()) {
+                msg.addReceiver(diggerAgent);
+            }
+            msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
+            msg.setReplyByDate(new Date(System.currentTimeMillis() + 50000));
+            try {
+				msg.setContentObject((Serializable) metal);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+            seq.addSubBehaviour(new DiggerContractNetInitiatorBehaviour(this, msg, nResponders, metal));
+    	}
+    	//after setting up plans with diggers, we inform the Coordinator agent that 
+    	//we finished
+		seq.addSubBehaviour(new BaseRequesterBehaviour<DiggerCoordinatorAgent>(this,
+    			UtilsAgents.buildMessage(this.coordinatorAgent, MessageContent.MINE_DISCOVERY)) {
+			private static final long serialVersionUID = 1L;
+
+		});
+    	
+    	this.addBehaviour(seq);
+		
+	}
 }
