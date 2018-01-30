@@ -21,7 +21,7 @@ import map.ManufacturingCenterCell;
 import map.PathCell;
 import util.MetalDiscovery;
 import util.Movement;
-import util.Movement.MovementType;
+import util.MovementType;
 import util.Plan;
 
 public class DiggerContractNetResponder extends ContractNetResponder{

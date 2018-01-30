@@ -20,9 +20,6 @@ public class Movement implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public enum MovementStatus {PROPOSAL, ACCEPTED, REJECTED};
-	public enum MovementType {NORMAL, DIGGING, DROP_OFF};
-	
 	private ImasMobileAgent agent;
 	private Cell oldCell;
 	private Cell newCell;

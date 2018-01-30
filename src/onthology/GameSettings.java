@@ -29,7 +29,7 @@ import map.PathCell;
 import util.Edge;
 import util.Graph;
 import util.Movement;
-import util.Movement.MovementType;
+import util.MovementType;
 import util.Vertex;
 
 import java.nio.file.Path;

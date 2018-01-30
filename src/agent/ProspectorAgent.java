@@ -24,8 +24,8 @@ import onthology.GameSettings;
 import onthology.InfoAgent;
 import util.MetalDiscovery;
 import util.Movement;
+import util.MovementStatus;
 import util.Plan;
-import util.Movement.MovementStatus;
 
 public class ProspectorAgent extends ImasMobileAgent {
 

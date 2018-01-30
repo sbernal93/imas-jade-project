@@ -3,7 +3,7 @@ package behaviour.system;
 import agent.SystemAgent;
 import jade.core.behaviours.OneShotBehaviour;
 import util.Movement;
-import util.Movement.MovementStatus;
+import util.MovementStatus;
 
 public class ValidateSimulationStepBehaviour extends OneShotBehaviour{
 

@@ -12,8 +12,8 @@ import agent.SystemAgent;
 import jade.core.behaviours.OneShotBehaviour;
 import onthology.InitialGameSettings;
 import util.Movement;
-import util.Movement.MovementStatus;
-import util.Movement.MovementType;
+import util.MovementStatus;
+import util.MovementType;
 
 public class ApplySimulationStepBehaviour extends OneShotBehaviour{
 
