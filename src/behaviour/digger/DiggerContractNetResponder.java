@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import agent.AgentType;
 import agent.DiggerAgent;
 import agent.ProspectorAgent;
 import agent.UtilsAgents;
@@ -110,7 +111,7 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 				if(unitsDugUp>=(this.agent.getCapacity() - this.agent.getCarrying())) {
 					break;
 				}
-				movements.add(new Movement(this.agent, diggingCell, diggingCell,  MovementType.DIGGING, mine));
+				movements.add(new Movement(this.agent.getAID(), diggingCell, diggingCell,  MovementType.DIGGING, mine, AgentType.DIGGER));
 				unitsDugUp++;
 			}
 			if(unitsDugUp<mine.getAmount()) {
@@ -180,7 +181,7 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 			
 			//add all the movements to drop off metals
 			for(int i=1; i<= unitsDugUp; i++) {
-				movements.add(new Movement(this.agent, dropOffCell, dropOffCell, bestMc,  MovementType.DROP_OFF));
+				movements.add(new Movement(this.agent.getAID(), dropOffCell, dropOffCell, bestMc,  MovementType.DROP_OFF, AgentType.DIGGER));
 			}
 			
 			//we propose the plan with the movements to the mine and the MC, and the amount earned

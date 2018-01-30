@@ -376,7 +376,7 @@ public class InitialGameSettings extends GameSettings {
         PathCell oldCell = (PathCell) get(movement.getOldCell().getRow(), movement.getOldCell().getCol());
         newCell.addAgent(agent);
         oldCell.removeAgent(agent);
-        movement.getAgent().setCell(newCell);
+       // movement.getAgent().setCell(newCell);
         //addAgentToList(movement.getAgent().getType(), newCell);
         if(!agentList.get(agent.getType()).contains(newCell)) {
             this.agentList.get(agent.getType()).add(newCell);

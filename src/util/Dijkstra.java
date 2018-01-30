@@ -146,9 +146,9 @@ public class Dijkstra implements Serializable{
     		Movement movement = null;
     		if(!firstIt) {
     			if(prevMovement == null) {
-        			movement = new Movement(agent, agent.getCell(), vertex.getCell());
+        			movement = new Movement(agent.getType(), agent.getAID(), agent.getCell(), vertex.getCell());
         		} else {
-        			movement = new Movement(agent, prevMovement.getNewCell(), vertex.getCell());
+        			movement = new Movement(agent.getType(), agent.getAID(), prevMovement.getNewCell(), vertex.getCell());
         		}
         		movements.add(movement);
         		prevMovement = movement;
@@ -186,9 +186,9 @@ public class Dijkstra implements Serializable{
     		Movement movement = null;
     		if(!firstIt) {
     			if(prevMovement == null) {
-        			movement = new Movement(agent, source, vertex.getCell());
+        			movement = new Movement(agent.getType(), agent.getAID(), source, vertex.getCell());
         		} else {
-        			movement = new Movement(agent, prevMovement.getNewCell(), vertex.getCell());
+        			movement = new Movement(agent.getType(), agent.getAID(), prevMovement.getNewCell(), vertex.getCell());
         		}
         		movements.add(movement);
         		prevMovement = movement;

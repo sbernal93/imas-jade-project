@@ -302,7 +302,7 @@ public class GameSettings implements java.io.Serializable {
         PathCell oldCell = (PathCell) movement.getOldCell();
         newCell.addAgent(agent);
         oldCell.removeAgent(agent);
-        movement.getAgent().setCell(newCell);
+       // movement.getAgent().setCell(newCell);
         if(!agentList.get(agent.getType()).contains(newCell)) {
             this.agentList.get(agent.getType()).add(newCell);
             this.agentList.get(agent.getType()).remove(oldCell);

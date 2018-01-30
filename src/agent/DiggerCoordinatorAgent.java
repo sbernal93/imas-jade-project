@@ -161,9 +161,9 @@ public class DiggerCoordinatorAgent extends ImasAgent{
 		SequentialBehaviour seq = new SequentialBehaviour();
 		//TODO: send apply step and movements to the digger agents
 		for(Movement movement :  list) {
-			if(movement.getAgent() instanceof DiggerAgent) {
+			if(movement.getAgentType().equals(AgentType.DIGGER)) {
 				seq.addSubBehaviour(new BaseRequesterBehaviour<DiggerCoordinatorAgent>(this, 
-						buildApplyStepMessage(movement.getAgent().getAID(), movement)) {
+						buildApplyStepMessage(movement.getAgent(), movement)) {
 
 							/**
 							 * 

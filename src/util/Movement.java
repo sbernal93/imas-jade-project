@@ -2,11 +2,10 @@ package util;
 
 import java.io.Serializable;
 
-import agent.ImasMobileAgent;
+import agent.AgentType;
+import jade.core.AID;
 import map.Cell;
-import map.FieldCell;
 import onthology.InfoAgent;
-import onthology.MetalType;
 
 /**
  * Class for handling the movement of agents
@@ -20,7 +19,8 @@ public class Movement implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private ImasMobileAgent agent;
+	private AgentType agentType;
+	private AID agent;
 	private Cell oldCell;
 	private Cell newCell;
 	private MovementStatus status;
@@ -31,51 +31,55 @@ public class Movement implements Serializable{
 	public Movement(){
 	}
 	
-	public Movement(ImasMobileAgent agent, Cell oldCell, Cell newCell) {
+	public Movement(AgentType atype, AID agent, Cell oldCell, Cell newCell) {
 		super();
 		this.agent = agent;
 		this.oldCell = oldCell;
 		this.newCell = newCell;
+		this.agentType = atype;
 		this.status = MovementStatus.PROPOSAL;
 		this.type = MovementType.NORMAL;
 	}
 	
-	public Movement(ImasMobileAgent agent, Cell oldCell, Cell newCell, MovementType type) {
+	public Movement(AID agent, Cell oldCell, Cell newCell, MovementType type, AgentType atype) {
 		super();
 		this.agent = agent;
 		this.oldCell = oldCell;
 		this.newCell = newCell;
 		this.type = type;
+		this.agentType = atype;
 		this.status = MovementStatus.PROPOSAL;
 	}
 
 	
 	
-	public Movement(ImasMobileAgent agent, Cell oldCell, Cell newCell, MovementType type,
-			MetalDiscovery metal) {
+	public Movement(AID agent, Cell oldCell, Cell newCell, MovementType type,
+			MetalDiscovery metal, AgentType atype) {
 		super();
 		this.agent = agent;
 		this.oldCell = oldCell;
 		this.newCell = newCell;
 		this.status = MovementStatus.PROPOSAL;
 		this.type = type;
+		this.agentType = atype;
 		this.metal= metal;
 	}
 	
-	public Movement(ImasMobileAgent agent, Cell oldCell, Cell newCell, Cell mcCell, MovementType type) {
+	public Movement(AID agent, Cell oldCell, Cell newCell, Cell mcCell, MovementType type, AgentType atype) {
 		super();
 		this.agent = agent;
 		this.oldCell = oldCell;
 		this.newCell = newCell;
 		this.status = MovementStatus.PROPOSAL;
 		this.type = type;
+		this.agentType = atype;
 		this.mcCell = mcCell;
 	}
 
-	public ImasMobileAgent getAgent() {
+	public AID getAgent() {
 		return agent;
 	}
-	public void setAgent(ImasMobileAgent agent) {
+	public void setAgent(AID agent) {
 		this.agent = agent;
 	}
 	public Cell getOldCell() {
@@ -108,7 +112,7 @@ public class Movement implements Serializable{
 	}
 
 	public InfoAgent getInfoAgent() {
-		return new InfoAgent(this.getAgent().getType(), this.getAgent().getAID());
+		return new InfoAgent(agentType, this.getAgent());
 	}
 
 	@Override
@@ -132,6 +136,14 @@ public class Movement implements Serializable{
 
 	public void setMetal(MetalDiscovery metal) {
 		this.metal = metal;
+	}
+
+	public AgentType getAgentType() {
+		return agentType;
+	}
+
+	public void setAgentType(AgentType agentType) {
+		this.agentType = agentType;
 	}
 	
 	
