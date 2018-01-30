@@ -115,7 +115,7 @@ public class RequestResponseBehaviour extends AchieveREResponder {
 	            			if(list.get(0) instanceof Movement) {
 	            				agent.log("APPLY_STEP request message received");
 	        	            	reply.setPerformative(ACLMessage.AGREE);
-	        	            	agent.informApplyStep((List<Movement>) list);	
+	        	            	agent.informApplyStep( msg.getContentObject());	
 	            			}
 	            			if(list.get(0) instanceof MetalDiscovery) {
 	            				agent.log("MINE_DISCOVERY request message received");

@@ -194,7 +194,7 @@ public class DiggerCoordinatorAgent extends ImasAgent{
 		
 	}
 	
-	private ACLMessage buildApplyStepMessage(AID agent, Movement movement) {
+	private ACLMessage buildApplyStepMessage(AID agent, Serializable movement) {
     	ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 		message.clearAllReceiver();
 		message.addReceiver(agent);
@@ -204,7 +204,7 @@ public class DiggerCoordinatorAgent extends ImasAgent{
         try {
         	message.setContent(MessageContent.APPLY_STEP);
         	this.log("Request message content:" + message.getContent());
-        	message.setContentObject((Serializable) movement);
+        	message.setContentObject( movement);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -223,7 +223,7 @@ public class DiggerCoordinatorAgent extends ImasAgent{
                 msg.addReceiver(diggerAgent);
             }
             msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
-            msg.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
+            msg.setReplyByDate(new Date(System.currentTimeMillis() + 50000));
             //Sets the first path cell of the group to be sent, the prospectors will respond with
             //their distance to that field cell
             try {

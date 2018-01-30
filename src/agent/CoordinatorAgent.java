@@ -321,7 +321,7 @@ public class CoordinatorAgent extends ImasAgent {
         return message;
 	}
     
-    public void informApplyStep(List<Movement> movements){
+    public void informApplyStep(Serializable movements){
     	//this.dcApplyStepFinished = true;
     	this.dcApplyStepFinished = false;
     	this.pcApplyStepFinished = false;
@@ -353,7 +353,7 @@ public class CoordinatorAgent extends ImasAgent {
     	this.addBehaviour(seq);
     }
     
-    private ACLMessage buildMessageApplyStep(AID agent, List<Movement> movements) {
+    private ACLMessage buildMessageApplyStep(AID agent, Serializable movements) {
 		ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 		message.clearAllReceiver();
 		message.addReceiver(agent);
@@ -363,7 +363,7 @@ public class CoordinatorAgent extends ImasAgent {
         try {
         	message.setContent(MessageContent.APPLY_STEP);
         	this.log("Request message content:" + message.getContent());
-        	message.setContentObject((Serializable) movements);
+        	message.setContentObject( movements);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -123,10 +123,12 @@ public class DiggerAgent extends ImasMobileAgent{
 				isDigging = false;
 				isDroppingMetalOff = false;
 				this.setCell(movementToMake.getNewCell());
+				log("Moving around");
 			}
 			if(movementToMake.getType().equals(MovementType.DIGGING)) {
 				//TODO: substract from mine? or should system agent do that?
 				//yes! exactly, system agent does that!
+				log("Diggin the night away, my capacity is: " + capacity + " and Im carrying: " + carrying);
 				isDigging = true;
 				carrying++;
 				if(carrying>=capacity) {
@@ -135,6 +137,7 @@ public class DiggerAgent extends ImasMobileAgent{
 			}
 			if(movementToMake.getType().equals(MovementType.DROP_OFF)) {
 				//TODO: substract amount of metal being carried
+				log("Dropping off a huge load: " + carrying);
 				isDroppingMetalOff = true;
 				carrying --;
 				if(carrying <= 0) {

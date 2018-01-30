@@ -1,6 +1,7 @@
 package agent;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import jade.core.AID;
@@ -85,6 +86,10 @@ public abstract class ImasMobileAgent extends ImasAgent{
 		}
 		dijkstra.execute(new Vertex("", source));
 		List<Vertex> path = dijkstra.getPath(new Vertex("", destination));
+		
+		if(path == null) {
+			return new LinkedList<>();
+		}
 		
 		return dijkstra.getMovementsFromVertices(path, this, source);
 	}

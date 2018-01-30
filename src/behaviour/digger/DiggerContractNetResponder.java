@@ -78,8 +78,18 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 			//carrying anything after the plan is finished
 			
 			//finds closest path cell
+			//if he has a plan already set, the plan should be made starting from
+			//the last cell in that plan
+			Cell currentCell = null;
+			if(this.agent.getPlans() != null && this.agent.getPlans().size()>0) {
+				Plan lastPlan =  this.agent.getPlans().get(this.agent.getPlans().size() - 1);
+				currentCell = lastPlan.getMovements().get(lastPlan.getMovements().size() - 1).getNewCell();
+			} else {
+				currentCell = this.agent.getCell();
+			}
+			//finds the closest path cell to the mine
 			for(PathCell pc : pathCells) {
-				List<Movement> pcMovements = this.agent.findShortestPath(pc);
+				List<Movement> pcMovements = this.agent.findShortestPath(currentCell, pc);
 				if(movements == null) {
 					movements = pcMovements;
 				} else {
@@ -89,13 +99,18 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 				}
 			}
 			//now that movement to the mine is made, we need to add movements for digging the metal
-			Cell lastCell = movements.get(movements.size() - 1).getNewCell();
+			Cell diggingCell = null;
+			if(movements.size()>0) {
+				diggingCell = movements.get(movements.size() - 1).getNewCell();
+			} else {
+				diggingCell = currentCell;
+			}
 			int unitsDugUp = 0;
 			for(int i=1; i<= mine.getAmount(); i++) {
-				if(unitsDugUp>=(this.agent.getCapacity() + this.agent.getCarrying())) {
+				if(unitsDugUp>=(this.agent.getCapacity() - this.agent.getCarrying())) {
 					break;
 				}
-				movements.add(new Movement(this.agent, lastCell, lastCell,  MovementType.DIGGING, mine));
+				movements.add(new Movement(this.agent, diggingCell, diggingCell,  MovementType.DIGGING, mine));
 				unitsDugUp++;
 			}
 			if(unitsDugUp<mine.getAmount()) {
@@ -104,11 +119,11 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 				//maybe skip going to MC? but then what price should we bid
 			} 
 			//the digger dug up all he could, now to go to the nearest manufacturing center
-			//TODO: consider best manufacturing center based on price/movement
+			//consider best manufacturing center based on price/movement
 			List<Cell> manufacturingCenters = this.agent.getGame().getManufacturingCenters(mine.getType());
 			
 			List<Movement> movementsToManufacturingCenter = new ArrayList<>();
-			double bestPrice = Double.MAX_VALUE;
+			double bestPrice = 0.0;
 			Cell bestMc = null;
 			
 			List<Movement> allMovs = new LinkedList<>();
@@ -122,7 +137,10 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 				List<Movement> closestPath = null;
 				//first we need the fastest way to get there
 				for(PathCell pc : pathCellsNextToManCenter) {
-					List<Movement> movementsToManCenter = this.agent.findShortestPath(pc);
+					List<Movement> movementsToManCenter = new LinkedList<>();
+					if(pc.getRow() != diggingCell.getRow() && pc.getCol() != diggingCell.getCol()) {
+						movementsToManCenter = this.agent.findShortestPath(diggingCell, pc);
+					} 
 					if(closestPath == null) {
 						closestPath = movementsToManCenter;
 					} else {
@@ -135,8 +153,12 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 				int price = ((ManufacturingCenterCell) manCenter).getPrice();
 				//we add also all the moves we have to make currently, since its going to change
 				//the price/movement outcome
+			/*	this.agent.log("AllMovs: " + allMovs.size() + " movs: " +movements.size() + " closest" + closestPath.size());
+				this.agent.log("mine amount: " + mine.getAmount());
+				this.agent.log("price: " + price);*/
 				double calcPrice = UtilsAgents.calculatePrice(allMovs.size() + movements.size() + closestPath.size(), mine.getAmount(), price);
-				if( calcPrice < bestPrice) {
+				//this.agent.log("Calculated price outcome: " + calcPrice);
+				if( calcPrice > bestPrice) {
 					bestPrice = calcPrice;
 					movementsToManufacturingCenter = closestPath;
 					bestMc = manCenter;
@@ -144,10 +166,14 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 				
 			}
 			movements.addAll(movementsToManufacturingCenter);
+			Cell dropOffCell = diggingCell;
+			if(movementsToManufacturingCenter.size() > 0) {
+				dropOffCell =  movementsToManufacturingCenter.get(movementsToManufacturingCenter.size() - 1).getNewCell();
+			}
 			
 			//add all the movements to drop off metals
 			for(int i=1; i<= unitsDugUp; i++) {
-				movements.add(new Movement(this.agent, lastCell, lastCell, bestMc,  MovementType.DROP_OFF));
+				movements.add(new Movement(this.agent, dropOffCell, dropOffCell, bestMc,  MovementType.DROP_OFF));
 			}
 			
 			//we propose the plan with the movements to the mine and the MC, and the amount earned
@@ -163,6 +189,7 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 				allMovs.addAll(movements);
 				proposal.setContentObject(new Plan(this.agent, allMovs, bestPrice));
 			}
+			agent.log("Proposal with price: " + bestPrice);
 			return proposal;
 		} catch (UnreadableException e) {
 			e.printStackTrace();
