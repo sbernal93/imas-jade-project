@@ -127,7 +127,7 @@ public class ProspectorAgent extends ImasMobileAgent {
 				this.getPlans().get(0).getMovements().remove(0);
 			}
 			this.setCell(movementToMake.getNewCell());
-			this.getGame().getFieldCellsNextTo(this.getCell()).forEach( c -> {
+			this.getGame().getFieldCellsNextTo(this.getCell(), true).forEach( c -> {
 				if(!c.isFound()) {
 					c.detectMetal();
 					if(c.isFound()) {

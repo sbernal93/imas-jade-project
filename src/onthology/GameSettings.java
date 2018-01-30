@@ -323,8 +323,12 @@ public class GameSettings implements java.io.Serializable {
      * @param cell
      * @return
      */
-    public List<PathCell> getPathCellsNextTo(Cell cell) {
-    	return getCellsNextTo(cell).stream().filter(c -> c.getCellType().equals(CellType.PATH)).map(c -> (PathCell) c).collect(Collectors.toList());
+    public List<PathCell> getPathCellsNextTo(Cell cell, boolean diagonal) {
+    	if(diagonal) {
+    		return getCellsNextTo(cell).stream().filter(c -> c.getCellType().equals(CellType.PATH)).map(c -> (PathCell) c).collect(Collectors.toList());
+    	} else {
+    		return getHorVerCellsNextTo(cell).stream().filter(c -> c.getCellType().equals(CellType.PATH)).map(c -> (PathCell) c).collect(Collectors.toList());
+    	}
     }
     
     /**
@@ -332,8 +336,12 @@ public class GameSettings implements java.io.Serializable {
      * @param cell
      * @return
      */
-    public List<FieldCell> getFieldCellsNextTo(Cell cell) {
-    	return getCellsNextTo(cell).stream().filter(c -> c.getCellType().equals(CellType.FIELD)).map(c -> (FieldCell) c).collect(Collectors.toList());
+    public List<FieldCell> getFieldCellsNextTo(Cell cell, boolean diagonal) {
+    	if(diagonal) {
+    		return getCellsNextTo(cell).stream().filter(c -> c.getCellType().equals(CellType.FIELD)).map(c -> (FieldCell) c).collect(Collectors.toList());
+    	} else {
+    		return getHorVerCellsNextTo(cell).stream().filter(c -> c.getCellType().equals(CellType.FIELD)).map(c -> (FieldCell) c).collect(Collectors.toList());
+    	}
     }
     
     /**
@@ -411,7 +419,7 @@ public class GameSettings implements java.io.Serializable {
          //to create the edge
          for(Vertex vertex : vertices) {
              Cell cell = vertex.getCell();
-             for(PathCell pc : getPathCellsNextTo(cell)) {
+             for(PathCell pc : getPathCellsNextTo(cell, false)) {
                 edgy.add(new Edge("", vertex, vertices.stream().filter(v -> v.getCell().equals(pc)).findFirst().get(), 1));
              }
          }
@@ -424,12 +432,12 @@ public class GameSettings implements java.io.Serializable {
      * path cell once to the list. 
      * @return
      */
-    public List<PathCell> getPathCellsNextToFieldCells(){
+    public List<PathCell> getPathCellsNextToFieldCells(boolean diagonal){
     	List<Cell> fieldCells = this.getCellsOfType().get(CellType.FIELD);
     	List<PathCell> pathCells = new ArrayList<>();
     	
     	for(Cell cell : fieldCells) {
-    		List<PathCell> neighbours = getPathCellsNextTo(cell);
+    		List<PathCell> neighbours = getPathCellsNextTo(cell, true);
     		for(PathCell pc : neighbours) {
     			if(!pathCells.stream().anyMatch(p -> p.equals(pc))) {
     				pathCells.add(pc);
@@ -455,7 +463,7 @@ public class GameSettings implements java.io.Serializable {
     		if(!(movement.getNewCell().getCellType().equals(CellType.PATH))) {
         		return false;
         	}
-        	if(!getPathCellsNextTo(movement.getOldCell()).stream().anyMatch(c -> c.equals(movement.getNewCell()))) {
+        	if(!getPathCellsNextTo(movement.getOldCell(), false).stream().anyMatch(c -> c.equals(movement.getNewCell()))) {
         		return false;
         	}
     	}

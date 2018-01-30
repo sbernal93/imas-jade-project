@@ -273,7 +273,7 @@ public class ProspectorCoordinatorAgent extends ImasAgent{
     public SequentialBehaviour performContractNet() throws IOException{
     	SequentialBehaviour seq = new SequentialBehaviour();
         int nResponders = this.getProspectorAgents().size();
-    	List<PathCell> pathCellsToExplore = game.getPathCellsNextToFieldCells();
+    	List<PathCell> pathCellsToExplore = game.getPathCellsNextToFieldCells(true);
     	double size = Math.ceil(pathCellsToExplore.size() / Double.valueOf(nResponders));
     	List<List<PathCell>> splitted = UtilsAgents.splitList(pathCellsToExplore, (int) size);
     	for(List<PathCell> group : splitted) {

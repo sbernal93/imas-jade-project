@@ -70,7 +70,7 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 		try {
 			
 			MetalDiscovery mine = (MetalDiscovery) cfp.getContentObject();
-			List<PathCell> pathCells = this.agent.getGame().getPathCellsNextTo(mine.getCell());
+			List<PathCell> pathCells = this.agent.getGame().getPathCellsNextTo(mine.getCell(), true);
 			
 			List<Movement> movements = null;
 			//TODO: validate metal type. Although the way we are doing this is that 
@@ -141,7 +141,7 @@ public class DiggerContractNetResponder extends ContractNetResponder{
 			Double calcPrice = 0.000;
 			
 			for(Cell manCenter : manufacturingCenters) {
-				pathCellsNextToManCenter = this.agent.getGame().getPathCellsNextTo(manCenter);
+				pathCellsNextToManCenter = this.agent.getGame().getPathCellsNextTo(manCenter, true);
 				closestPath = null;
 				movementsToManCenter = new LinkedList<>();
 				//first we need the fastest way to get there
