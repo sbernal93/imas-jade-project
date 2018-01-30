@@ -2,6 +2,7 @@ package behaviour.system;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 import agent.CoordinatorAgent;
 import agent.SystemAgent;
@@ -76,6 +77,16 @@ public class WaitApplyStepEndBehaviour extends SimpleBehaviour{
 		
 		if(this.agent.getGame().getSimulationSteps() <= this.agent.getCurrentStep()) {
 			this.agent.log("Simulation finished");
+			StringJoiner statistics = new StringJoiner("\n");
+			statistics.add("Benefits: " + this.agent.getPriceObtained());
+			statistics.add("Manufactured Metal: " + this.agent.getAmountOfMineTurnedIn());
+			statistics.add("Average benefit for unit of metal: "
+			+  (double)this.agent.getPriceObtained()/(double)this.agent.getAmountOfMineTurnedIn());
+			statistics.add("Average time for discovering metal: ");
+			statistics.add("Average time for digging metal: ");
+			statistics.add("Ratio of discovered metal: ");
+			statistics.add("Ratio of collected metal: ");
+			this.agent.getGui().showStatistics(statistics.toString());
 			return FINISHED_SIMULATION;
 		}
 		this.agent.log("Simulation continues");

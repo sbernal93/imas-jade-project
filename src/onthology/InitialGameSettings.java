@@ -255,7 +255,8 @@ public class InitialGameSettings extends GameSettings {
             throw new Error(getClass().getCanonicalName() + " : Not allowed negative number of elements.");
         }
         if (maxElements > freeCells) {
-            throw new Error(getClass().getCanonicalName() + " : Not allowed add more elements than empty cells.");
+            //throw new Error(getClass().getCanonicalName() + " : Not allowed add more elements than empty cells.");
+        	return;
         }
         if (maxVisible < 0) {
             throw new Error(getClass().getCanonicalName() + " : Not allowed negative number of visible elements.");
