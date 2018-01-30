@@ -54,7 +54,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "GameSettings")
 public class GameSettings implements java.io.Serializable {
 
-    /* Default values set to all attributes, just in case. */
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	/* Default values set to all attributes, just in case. */
     /**
      * Seed for random numbers.
      */
@@ -221,6 +225,13 @@ public class GameSettings implements java.io.Serializable {
         this.diggersCapacity = diggersCapacity;
     }
 
+    public Graph getMapGraph(){
+    	if(this.graph == null) {
+    		this.graph = buildGraphFromMap();
+    	}
+    	return this.graph;
+    }
+    
     /**
      * Gets the full current city map.
      * @return the current city map.
@@ -257,12 +268,10 @@ public class GameSettings implements java.io.Serializable {
     }
 
     public String toString() {
-        //TODO: show a human readable summary of the game settings.
         return "Game settings";
     }
 
     public String getShortString() {
-        //TODO: list of agents
         return "Game settings: agent related string";
     }
 
@@ -318,46 +327,49 @@ public class GameSettings implements java.io.Serializable {
     	return getCellsNextTo(cell).stream().filter(c -> c.getCellType().equals(CellType.PATH)).map(c -> (PathCell) c).collect(Collectors.toList());
     }
     
+    /**
+     * Gets all the Field cells next to a Cell
+     * @param cell
+     * @return
+     */
     public List<FieldCell> getFieldCellsNextTo(Cell cell) {
     	return getCellsNextTo(cell).stream().filter(c -> c.getCellType().equals(CellType.FIELD)).map(c -> (FieldCell) c).collect(Collectors.toList());
     }
     
     /**
      * Gets all the cells next to a cell.
-     * Does not return diagonal cells
      * @param cell
      * @return
      */
     public List<Cell> getCellsNextTo(Cell cell) {
     	List<Cell> neighbors = new ArrayList<>();
-    	int [] positions = {0,1};
-    	for(int posX : positions) {
-    		if(posX == 0) {
-    			if((cell.getRow() + 1) < map.length) {
-        			neighbors.add(map[cell.getRow() + 1][cell.getCol()]);
-    			}
-    			if((cell.getRow() - 1) >= 0 ) {
-        			neighbors.add(map[cell.getRow() - 1][cell.getCol()]);
-    			}
-    		} else {
-    			if((cell.getCol() + 1) < map[0].length) {
-    				neighbors.add(map[cell.getRow()][cell.getCol() + 1]);
-    			}
-    			if((cell.getCol() -1) >= 0 ) {
-    				neighbors.add(map[cell.getRow()][cell.getCol() - 1]);
-    			}
-    		}
-    	}
+    	if((cell.getRow() + 1) < map.length) {
+			neighbors.add(map[cell.getRow() + 1][cell.getCol()]);
+			if((cell.getCol() + 1) < map[0].length) {
+				neighbors.add(map[cell.getRow() + 1][cell.getCol() + 1]);
+			}
+			if((cell.getCol() -1) >= 0 ) {
+				neighbors.add(map[cell.getRow() + 1][cell.getCol() - 1]);
+			}
+		}
+		if((cell.getRow() - 1) >= 0 ) {
+			neighbors.add(map[cell.getRow() - 1][cell.getCol()]);
+			if((cell.getCol() + 1) < map[0].length) {
+				neighbors.add(map[cell.getRow() - 1][cell.getCol() + 1]);
+			}
+			if((cell.getCol() -1) >= 0 ) {
+				neighbors.add(map[cell.getRow() - 1][cell.getCol() - 1]);
+			}
+		}
+		if((cell.getCol() + 1) < map[0].length) {
+			neighbors.add(map[cell.getRow()][cell.getCol() + 1]);
+		}
+		if((cell.getCol() -1) >= 0 ) {
+			neighbors.add(map[cell.getRow()][cell.getCol() - 1]);
+		}
         return neighbors;
     }
-    
-    public Graph getMapGraph(){
-    	if(this.graph == null) {
-    		this.graph = buildGraphFromMap();
-    	}
-    	return this.graph;
-    }
-    
+
     /**
      * Builds the {@link Graph} object from the map.
      * Path cells should be the only ones with edges calculated
