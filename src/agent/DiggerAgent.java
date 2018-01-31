@@ -1,6 +1,7 @@
 package agent;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Optional;
 
 import behaviour.digger.DiggerContractNetResponder;
@@ -14,6 +15,7 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import map.Cell;
+import map.FieldCell;
 import map.PathCell;
 import onthology.DiggerInfoAgent;
 import onthology.GameSettings;
@@ -194,8 +196,16 @@ public class DiggerAgent extends ImasMobileAgent{
 				this.setCell(movementToMake.getNewCell());
 			}
 			if(movementToMake.getType().equals(MovementType.DIGGING)) {
+				if(!isDigging) {
+					((FieldCell) this.getGame().get(movementToMake.getMetal().getCell().getRow(), movementToMake.getMetal().getCell().getCol())).addMetalTimeStartedDigging(Calendar.getInstance().getTimeInMillis());
+				}
 				isDigging = true;
 				carrying++;
+				/*if(carrying>=capacity || !this.getPlans().get(1).getMovements().get(0).getType().equals(MovementType.DIGGING)) {
+					PathCell digCell = (PathCell) this.getGame().get(movementToMake.getNewCell().getRow(), movementToMake.getNewCell().getCol());
+					digCell.setDiggerWorking(false, this.getAID());
+					isDigging = false;
+				}*/
 				if(carrying>=capacity) {
 					isDigging = false;
 				}

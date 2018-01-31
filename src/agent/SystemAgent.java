@@ -58,6 +58,8 @@ public class SystemAgent extends ImasAgent {
     
     private int amountOfMineTurnedIn;
     
+    private int amountOfMineDugUp;
+    
     /**
      * Current amount of steps in the game
      */
@@ -233,6 +235,14 @@ public class SystemAgent extends ImasAgent {
 
 	public void setAmountOfMineTurnedIn(int amountOfMineTurnedIn) {
 		this.amountOfMineTurnedIn = amountOfMineTurnedIn;
+	}
+
+	public int getAmountOfMineDugUp() {
+		return amountOfMineDugUp;
+	}
+
+	public void setAmountOfMineDugUp(int amountOfMineDugUp) {
+		this.amountOfMineDugUp = amountOfMineDugUp;
 	}
 	
     

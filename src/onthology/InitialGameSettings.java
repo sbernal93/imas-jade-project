@@ -23,6 +23,7 @@ import util.Movement;
 
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -320,6 +321,7 @@ public class InitialGameSettings extends GameSettings {
     private void setElements(MetalType type, int amount, boolean visible, int ncell) {
         SettableFieldCell cell = (SettableFieldCell)cellsOfType.get(CellType.FIELD).get(ncell);
         cell.setElements(type, amount);
+        cell.addMetalTimeSet(Calendar.getInstance().getTimeInMillis());
         if (visible) {
             cell.detectMetal();
         }

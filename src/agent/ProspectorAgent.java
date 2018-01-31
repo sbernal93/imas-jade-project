@@ -1,6 +1,7 @@
 package agent;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -132,6 +133,7 @@ public class ProspectorAgent extends ImasMobileAgent {
 					c.detectMetal();
 					if(c.isFound()) {
 						this.log("I found a mine!!");
+						c.addMetalTimeDiscovery(Calendar.getInstance().getTimeInMillis());
 						c.getMetal().forEach((k,v) -> {
 							this.foundMines.add(new MetalDiscovery(c, k, v));
 						});

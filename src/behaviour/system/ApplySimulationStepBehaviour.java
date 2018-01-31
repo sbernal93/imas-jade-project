@@ -44,6 +44,7 @@ public class ApplySimulationStepBehaviour extends OneShotBehaviour{
 					if(!digCell.isDiggerWorking()) {
 						digCell.setDiggerWorking(true, m.getAgent());
 					}
+					this.agent.setAmountOfMineDugUp(this.agent.getAmountOfMineDugUp() + 1);
 					((InitialGameSettings)this.agent.getGame()).mineDug(m);
 				}
 				if(m.getType().equals(MovementType.DROP_OFF)) {

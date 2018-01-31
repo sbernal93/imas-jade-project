@@ -19,7 +19,10 @@ package map;
 
 import gui.CellVisualizer;
 import onthology.MetalType;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,6 +45,12 @@ public class FieldCell extends Cell {
      * to find it yet.
      */
     protected boolean found = false;
+    
+    private List<Long> metalTimeSet;
+    
+    private List<Long> metalTimeDiscovery;
+    
+    private List<Long> metalTimeStartedDiggin;
 
     /**
      * Builds a cell corresponding to a field.
@@ -149,6 +158,48 @@ public class FieldCell extends Cell {
 	public boolean isFound() {
 		return found;
 	}
+
+	public List<Long> getMetalTimeSet() {
+		return metalTimeSet;
+	}
+
+	public void setMetalTimeSet(List<Long> metalTimeSet) {
+		this.metalTimeSet = metalTimeSet;
+	}
+
+	public List<Long> getMetalTimeDiscovery() {
+		return metalTimeDiscovery;
+	}
+
+	public void setMetalTimeDiscovery(List<Long> metalTimeDiscovery) {
+		this.metalTimeDiscovery = metalTimeDiscovery;
+	}
+
+	public List<Long> getMetalTimeStartedDiggin() {
+		return metalTimeStartedDiggin;
+	}
+
+	public void setMetalTimeStartedDiggin(List<Long> metalTimeStartedDiggin) {
+		this.metalTimeStartedDiggin = metalTimeStartedDiggin;
+	}
     
+	public void addMetalTimeSet(long time) {
+		if(this.metalTimeSet == null) {
+			this.metalTimeSet = new ArrayList<Long>();
+		}
+		this.metalTimeSet.add(time);
+	}
+	public void addMetalTimeDiscovery(long time) {
+		if(this.metalTimeDiscovery == null) {
+			this.metalTimeDiscovery = new ArrayList<Long>();
+		}
+		this.metalTimeDiscovery.add(time);
+	}
+	public void addMetalTimeStartedDigging(long time) {
+		if(this.metalTimeStartedDiggin == null) {
+			this.metalTimeStartedDiggin = new ArrayList<Long>();
+		}
+		this.metalTimeStartedDiggin.add(time);
+	}
     
 }
